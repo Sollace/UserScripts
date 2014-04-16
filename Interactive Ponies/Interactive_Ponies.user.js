@@ -6,7 +6,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.1.3
+// @version     1.2
 // @grant       none
 // ==/UserScript==
 
@@ -61,7 +61,6 @@ function setDocCookie(name, val) {
 
 if (window.top != window) {
     var embeds = document.getElementsByTagName('EMBED');
-    //alert(embeds.length);
     if (embeds.length > 0) {
         document.body.innerHTML = replaceAll('<embed ', '<embed wmode="opaque" menu="false" ', document.body.innerHTML);
     }
@@ -110,7 +109,12 @@ var Ponies = [
     new Pony('Spitfire', 'wbsf',
              "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals"),
     placeHolder(), //Soarin
-    placeHolder() //Thunderlane
+    placeHolder(), //Thunderlane
+    placeHolder(), //Fleetfoot
+    new Pony('Farm Pony Rarity', 'fpr',
+             "I love mud!!!;I luv bein' covered in mud!!!!! \n*splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*"),
+    placeHolder('Sea Breeze', 'sb',
+        '.. ...;.. .. .. ..;.... .. .;.... . .... . ... .. .;.')
 ];
 
 var GlobalPonyType = getPonyType();
@@ -324,9 +328,11 @@ function setupMorePonies() {
         });
     }
     
-    InteractivePony.prototype.ponyType = GlobalPonyType;
+    InteractivePony.prototype.ponyType = function () {
+        return GlobalPonyType;
+    }
     InteractivePony.prototype.Say = function (a) {
-        this.text = (this.forceSleep != true && this.state != 'sleeping') ? Ponies[this.ponyType % Ponies.length].getSay(a) : 'zzz...';
+        this.text = (this.forceSleep != true && this.state != 'sleeping') ? Ponies[this.ponyType() % Ponies.length].getSay(a) : 'zzz...';
         this.next_text_timer = this.text_counter = 0;
         this.dom_element.find('div.speech').fadeIn();
     };
@@ -336,7 +342,7 @@ function setupMorePonies() {
         this.SetSprite('cloud_sleep_right.gif');
     };
     InteractivePony.prototype.SetSprite = function (a) {
-        var pone = Ponies[this.ponyType % Ponies.length];
+        var pone = Ponies[this.ponyType() % Ponies.length];
         pone.cssImages(this.dom_element, this.facing);
         var access = pone.getAccess(this.dom_element, this.facing, this.base_url, a);
         
@@ -368,7 +374,10 @@ function setupMorePonies() {
         $(window).bind('konami', function() {
             var a = new InteractivePony();
             a.dom_element.find('div.speech').fadeOut();
-            a.ponyType = Math.floor(Math.random() * Ponies.length);
+            var type = Math.floor(Math.random() * Ponies.length);
+            a.ponyType = function () {
+                return type;
+            };
             a.Say(dash_sayings[Math.floor(Math.random() * dash_sayings.length)]);
             setInterval(function () {
                 window_focused && (a.Update(0.016), a.Render())
@@ -483,6 +492,16 @@ function gPGif(pon, img) {
         case 'drstand8': return 'data:image/gif;base64,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';
         case 'drdash8':
         case 'drtrot8': return 'http://fc00.deviantart.net/fs70/f/2014/058/5/4/dr_hooves__fez_walk_by_comeha-d786hmv.gif';
+        
+        case 'fprstand': return 'http://fc04.deviantart.net/fs71/f/2014/100/3/3/farmpony_rarity_idle_by_botchan_mlp-d7dx8mn.gif';
+        case 'fprsleep': return 'http://fc01.deviantart.net/fs71/f/2014/106/5/7/farmpony_rarity_scratching_her_head_by_botchan_mlp-d7ep6yl.gif';
+        case 'fprtrot':
+        case 'fprdash': return 'http://fc06.deviantart.net/fs71/f/2014/099/5/8/farmpony_rarity_trotting_by_botchan_mlp-d7dskt9.gif';
+
+        case 'sbstand':
+        case 'sbtrot':
+        case 'sbdash': return 'http://fc07.deviantart.net/fs70/f/2014/064/3/7/seabreeze_floating_by_botchan_mlp-d7939jq.gif';
+        case 'sbsleep': return 'http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif';
     }
     return null;
 }
