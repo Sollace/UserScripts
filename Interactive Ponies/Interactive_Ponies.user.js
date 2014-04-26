@@ -113,7 +113,7 @@ var Ponies = [
     placeHolder(), //Fleetfoot
     new Pony('Farm Pony Rarity', 'fpr',
              "I love mud!!!;I luv bein' covered in mud!!!!! \n*splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*"),
-    placeHolder('Sea Breeze', 'sb',
+    new Pony('Sea Breeze', 'sb',
         '.. ...;.. .. .. ..;.... .. .;.... . .... . ... .. .;.')
 ];
 
