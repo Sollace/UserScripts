@@ -127,14 +127,19 @@ var Ponies = [
     isOnDay(1, 4) ?
     new Pony('Scootaloo', 'chicken',
               "I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Bukka bukka;Bukka bukka;Bukka bukka;Bukka bukka, scoot- SCOOTALOO!!!;Bukka...")
-    : new Pony('Scootaloo', 'cmc3',
-              "I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh.;Bukka bukka;That is not how you call a chicken.;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks.;I'm liking this idea.;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!"),
+    : attachEvents(new Pony('Scootaloo', 'cmc3',
+              "I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh.;Bukka bukka;That is not how you call a chicken.;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks.;I'm liking this idea.;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!"), {
+                  'mouseenter': function () {
+                      if (Math.random() * 20 <= 5) {
+                          this.Speak("What?;Watch it! That thing's sharp!;Ow!;Quit it!;BAD TOUCH! BAD TOUCH!");
+                      }
+                  }
+              }),
     placeHolder() //Babs Seed
 ];
 
 var GlobalPonyType = getPonyType();
 setupMorePonies();
-
 
 //--------------------------------------------------------------------------------------------------
 //----------------------------------------FUNCTIONS-------------------------------------------------
@@ -162,6 +167,16 @@ function placeHolder() {
 
 function sleepless(pony) {
     pony.Sleepless = true;
+    return pony;
+}
+
+function attachEvents(pony, eventObject) {
+    eventObject.Trigger = function (ev, interactivePony, e) {
+        if (this[ev] != null) {
+            this[ev].apply(interactivePony, e);
+        }
+    }
+    pony.Events = eventObject;
     return pony;
 }
 
@@ -356,10 +371,21 @@ function setupMorePonies() {
     
     InteractivePony.prototype.ponyType = function () {
         return GlobalPonyType;
-    }
+    };
+    InteractivePony.prototype.Trigger = function (ev, e) {
+        var pone = Ponies[this.ponyType() % Ponies.length];
+        if (pone.Events != null) {
+            pone.Events.Trigger(ev, this, e);
+        }
+    };
     InteractivePony.prototype.Say = function (a) {
-        var p = Ponies[this.ponyType() % Ponies.length];
-        this.text = (p.Sleepless == true || this.forceSleep != true && this.state != 'sleeping') ? p.getSay(a) : 'zzz...';
+        var pone = Ponies[this.ponyType() % Ponies.length];
+        this.text = (pone.Sleepless == true || this.forceSleep != true && this.state != 'sleeping') ? pone.getSay(a) : 'zzz...';
+        this.next_text_timer = this.text_counter = 0;
+        this.dom_element.find('div.speech').fadeIn();
+    };
+    InteractivePony.prototype.Speak = function (a) {
+        this.text = pickOne(a.split(';'));
         this.next_text_timer = this.text_counter = 0;
         this.dom_element.find('div.speech').fadeIn();
     };
@@ -367,6 +393,7 @@ function setupMorePonies() {
         this.state = this.state == 'sleeping' ? 'default' : 'sleeping';
         this.forceSleep = this.state == 'sleeping';
         this.SetSprite('cloud_sleep_right.gif');
+        this.Trigger('click');
     };
     InteractivePony.prototype.SetSprite = function (a) {
         var pone = Ponies[this.ponyType() % Ponies.length];
@@ -383,6 +410,11 @@ function setupMorePonies() {
             this.dom_element.find('img.interactive_pony').after('<img class="interactive_pony_accessory" style="position:absolute;bottom:0px;" />');
             this.dom_element.find('img.interactive_pony').add('img.interactive_pony_accessory').css('user-select', 'none');
             this.dom_element.find('img.interactive_pony').add('img.interactive_pony_accessory').css('pointer-events', 'none');
+            
+            var me = this;
+            $(this.dom_element).on('mousedown mouseenter mouseleave mousemove mouseover mouseout mouseup dblclick hover keydown keypress keyup', function (e) {
+                me.Trigger(e.type, e);
+            });
         }
         if (this.forceSleep != true) {
             this._Render();
