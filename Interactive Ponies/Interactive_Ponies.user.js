@@ -84,7 +84,7 @@ var Ponies = [
              "*cries*;....;I'd like to be a tree;I am so frustrated;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*"),
     isOnDay(31, 10) ?
     attachEvents(sleepless(new SpecialPony('Pinkamena', 'pm', 1,
-             "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Halloween.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!")), {
+             "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!")), {
                  'mouseenter': function () {
                      if (Math.random() * 40 <= 5) {
                          this.Speak("You're my besst friend;Hehehe;Hehehe slicey slicey;Pinkie Pie doesn't live here any more. He. He. He.");
