@@ -2,7 +2,7 @@
 // @name        FimFiction Sommenter
 // @namespace   sollace
 // @include     http://www.fimfiction.net*
-// @include     https://www.fimfition.net*
+// @include     https://www.fimfiction.net*
 // @version     1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
