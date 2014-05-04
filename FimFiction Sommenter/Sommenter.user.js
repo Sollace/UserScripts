@@ -61,32 +61,35 @@ body.pin_comment #add_comment_box {\
     z-index: 99999;}\
 body.pin_comment #add_comment_form {\
         height: 90px;}\
-body.pin_comment #add_comment_form:hover {\
+body.pin_comment #add_comment_form:hover,\
+body.pin_comment.hold_comment #add_comment_form {\
         transition: height 0.45s ease !important;\
         height: 350px;}\
-body.pin_comment #add_comment_box:hover .dark_toolbar {\
+body.pin_comment #add_comment_box:hover .dark_toolbar,\
+body.pin_comment.hold_comment #add_comment_box .dark_toolbar {\
         transition: bottom 0.45s ease;}\
 body.pin_comment #add_comment_form .dark_toolbar {\
         position: absolute;\
         bottom: 70px;\
         background: none;\
         border: none;}\
-body.pin_comment #add_comment_form:hover .dark_toolbar {\
+body.pin_comment #add_comment_form:hover .dark_toolbar,\
+body.pin_comment.hold_comment #add_comment_form .dark_toolbar {\
         bottom: 330px;}\
 body.pin_comment #add_comment_form textarea {\
         resize: none;}\
-body.pin_comment #add_comment_form:hover textarea {\
-        resize: none;\
-    margin-top: 5px;\
+body.pin_comment #add_comment_form:hover textarea,\
+body.pin_comment.hold_comment #add_comment_form textarea {\
+        margin-top: 5px;\
         height: 285px !important;}\
-body.pin_comment #add_comment_form:not(:hover) textarea {\
+body.pin_comment:not(.hold_comment) #add_comment_form:not(:hover) textarea {\
         position: absolute;\
         bottom: 0px;\
     min-height: 85px !important;\
         height: 85px !important;}\
 body.pin_comment #add_comment_box .emoticons_panel {\
         transition: width 1s ease, opacity 2s ease 0.5s;}\
-body.pin_comment #add_comment_form:not(:hover) .emoticons_panel {\
+body.pin_comment:not(.hold_comment) #add_comment_form:not(:hover) .emoticons_panel {\
         width: 0px;\
         opacity: 0;\
         transition: none;}\
@@ -96,12 +99,12 @@ body.pin_comment #add_comment_box #comment_preview {\
         width: 100%;\
         padding: 0px;\
         background: white;\
-    max-height: 500px;\
-    min-height: 200px;\
-    overflow-y: auto;\
+        max-height: 500px;\
+        min-height: 200px;\
+        overflow-y: auto;\
         transition: opacity 0.5s ease;\
-    pointer-events: none;}\
-body.pin_comment #add_comment_box:not(:hover) #comment_preview {\
+        pointer-events: none;}\
+body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) #comment_preview {\
         opacity: 0.3;}");
 
 //--------------------------------------------------------------------------------------------------
