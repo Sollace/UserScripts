@@ -7,6 +7,7 @@
 // @include     https://www.fimfiction.net*
 // @version     1.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
+// @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // ==/UserScript==

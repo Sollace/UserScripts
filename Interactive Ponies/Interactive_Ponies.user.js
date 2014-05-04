@@ -8,6 +8,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
 // @version     1.4
 // @grant       none
 // ==/UserScript==
