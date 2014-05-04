@@ -13,12 +13,12 @@ var SpecialTitles = {
         "FimFiction Modder": [138711, 10539, 27165],
         "Emote Contributor": [129122]
     },
-    setUpSpecialTitles: function() {
-        for (var i in registeredTitles) {
-            setSpecialTitle(registeredTitles[i], i);
+    setUpSpecialTitles: function () {
+        for (var i in this.registeredTitles) {
+            this.setSpecialTitle(this.registeredTitles[i], i);
         }
     },
-    setSpecialTitle: function(userIds, title) {
+    setSpecialTitle: function (userIds, title) {
         for (var i = 0; i < userIds.length; i++) {
             $(".author > .avatar > img[src^='//www.fimfiction-static.net/images/avatars/" + userIds[i] + "']").each(function (item) {
                 var prev = this.parentNode.previousSibling;
@@ -30,13 +30,13 @@ var SpecialTitles = {
     },
     registerUserTitle: function (user, title) {
         if (typeof user != 'Number') return;
-        if (registeredTitles[title] == null) {
-            registeredTitles[title] = [];
+        if (this.registeredTitles[title] == null) {
+            this.registeredTitles[title] = [];
         }
-        for (var i = 0; i < registeredTitles[title].length; i++) {
-            if (registeredTitles[title][i] == user) return;
+        for (var i = 0; i < this.registeredTitles[title].length; i++) {
+            if (this.registeredTitles[title][i] == user) return;
         }
-        registeredTitles[title].push(user);
+        this.registeredTitles[title].push(user);
     }
 };
 if (!$('body').attr('title_looper_started')) {
