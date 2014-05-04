@@ -3,6 +3,7 @@
 // @description Adds more Interactive Ponies to FimFiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
+// @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
 // @include     https://www.youtube*
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
