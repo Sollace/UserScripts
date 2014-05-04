@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        Interactive Ponies
 // @description Adds more Interactive Ponies to FimFiction.net
-// @namespace   sollace
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @include     https://www.youtube*
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*

@@ -1,9 +1,11 @@
 ﻿// ==UserScript==
 // @name        FimFiction Sommenter
-// @namespace   sollace
+// @description Adds an option to pin the comment box to the bottom of the window.
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1
+// @version     1.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -33,6 +35,17 @@ if (interactiveP.length > 0) {
 var commentBox = $("#add_comment_box a[title='Text Color']");
 if (commentBox.length > 0) {
     setupTogglePin(commentBox.parent()[0]);
+
+    $(document).ready(function () {
+        $('#add_comment_box .form_submitter').on('click', function () {
+            $('body.pin_comment #comment_preview').css('opacity', 0);
+            setTimeout(function () {
+                $('body.pin_comment #comment_preview').html('');
+                $('body.pin_comment #comment_preview').css('display', '');
+                $('body.pin_comment #comment_preview').css('opacity', '');
+            }, 500);
+        });
+    });
 }
 
 makeStyle(".comments_pinner:before {\

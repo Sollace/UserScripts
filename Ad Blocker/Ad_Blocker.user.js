@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        FimFic Ad Blocker
-// @namespace   sollace
 // @description Hides the ads on FimFiction
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     1

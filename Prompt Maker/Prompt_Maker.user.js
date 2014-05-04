@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        Prompt Maker
-// @namespace   fimfiction
 // @description Adds a button to FimFiction to generate random prompts
+// @author      Sollace
+// @namespace   fimfiction-sollace
 // @version     1.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
