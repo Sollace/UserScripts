@@ -2,16 +2,20 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     0.0
+// @version     1.0
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
-(function () {
+(function (win) {
+    var ver = 1.0;
+    var startup =
+        (typeof (SpecialTitles) === 'undefined') && (typeof (win.SpecialTitles) === 'undefined') &&
+        (win == window || (typeof (window.SpecialTitles) === 'undefined'));
     function STs(load) {
-        var _version = version;
-        var _registeredTitles = load.registeredTitles();
+        var _version = ver;
+        var _registeredTitles = load != null ? load.registeredTitles() : {};
         
         loadIn({
             "FimFiction Modder": [138711, 10539, 27165],
@@ -47,12 +51,9 @@
             return _registeredTitles;
         }
     }
-    STs.prototype.version = function () {
-        return 0.0;
-    };
     STs.prototype.setUpSpecialTitles = function () {
         for (var i in this.registeredTitles()) {
-            this.setSpecialTitle(this.registeredTitles[i], i);
+            this.setSpecialTitle(this.registeredTitles()[i], i);
         }
     };
     STs.prototype.setSpecialTitle = function (userIds, title) {
@@ -76,31 +77,41 @@
         this.registeredTitles()[title].push(user);
     };
 
-    if (typeof (unsafeWindow) !== 'undefined') {
-        if (typeof (unsafeWindow.SpecialTitles) !== 'undefined') {
-            if (unsafeWindow.SpecialTitles.version() < version) {
-                unsafeWindow.SpecialTitles = new STs(unsafeWindow.SpecialTitles);
-            } else {
-                unsafeWindow.SpecialTitles = new STs();
-            }
-
-            SpecialTitles = {
-                setSpecialTitle: function (userIds, title) {
-                    unsafeWindow.SpecialTitles.setSpecialTitle(userIds, title);
-                },
-                setUpSpecialTitles: function () {
-                    unsafeWindow.SpecialTitles.setUpSpecialTitles();
-                },
-                registerUserTitle: function (user, title) {
-                    unsafeWindow.SpecialTitles.registerUserTitle(user, title);
-                }
-            };
+    if (typeof (win.SpecialTitles) !== 'undefined') {
+        if (win.SpecialTitles.version() < ver) {
+            win.SpecialTitles = new STs(win.SpecialTitles);
         }
     } else {
-        if (typeof (SpecialTitles) !== 'undefined' || SpecialTitles.version() < version) {
-            SpecialTitles = new STs(SpecialTitles);
-        } else {
-            SpecialTitles = new STs();
-        }
+        win.SpecialTitles = new STs();
     }
-})();
+
+    if (win != window) {
+        window.SpecialTitles = {
+            version: function () {
+                return win.SpecialTitles.version();
+            },
+            registeredTitles: function (v) {
+                return win.SpecialTitles.registeredTitles(v);
+            },
+            setSpecialTitle: function (userIds, title) {
+                win.SpecialTitles.setSpecialTitle(userIds, title);
+            },
+            setUpSpecialTitles: function () {
+                win.SpecialTitles.setUpSpecialTitles();
+            },
+            registerUserTitle: function (user, title) {
+                win.SpecialTitles.registerUserTitle(user, title);
+            }
+        };
+    }
+
+    if (startup) {
+        win.SpecialTitles.setUpSpecialTitles();
+        setTimeout(function () {
+            try {win.SpecialTitles.setUpSpecialTitles();
+            } catch (e) {
+                alert('Error in ticking win.SpecialTitles.setUpSpecialTitles()\n' + e);
+            }
+        }, 500);
+    }
+})(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
