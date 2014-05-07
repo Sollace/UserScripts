@@ -9,7 +9,9 @@
 // @grant       GM_setValue
 // ==/UserScript==
 
-makeStyle('\
+if (getIsLoggedIn()) {
+
+    makeStyle('\
 body.editing .user_toolbar > .inner:not(.editor),\
 body:not(.editing) .user_toolbar .editor {\
     display: none;}\
@@ -37,64 +39,65 @@ display: inline-block;\
     position: absolute !important;}');
 
 
-var buttonRegistry = [];
-var usedButtons = [];
+    var buttonRegistry = [];
+    var usedButtons = [];
 
-var toolbar = $($('.user_toolbar > .inner')[0]);
+    var toolbar = $($('.user_toolbar > .inner')[0]);
 
-var held = null;
+    var held = null;
 
-var def = new ToolBar(toolbar.children());
+    var def = new ToolBar(toolbar.children());
 
-var norm = def.getConfig();
-var conf = getConfig();
+    var norm = def.getConfig();
+    var conf = getConfig();
 
-if (conf != norm) {
-    def.fromConfig(conf);
-    def.gen(toolbar);
-}
-
-var editPane = $('<div class="inner editor" />');
-toolbar.after(editPane);
-
-def.getEdit(editPane);
-
-$(document).mousemove(function (e) {
-    if ($('#button_moving').length > 0) {
-        $('#button_moving').css('top', (e.pageY + 5) + 'px');
-        $('#button_moving').css('left', (e.pageX + 5) + 'px');
-    }
-});
-
-var control = $('<a href="javascript:void();" >Edit Toolbar</a>');
-control.click(function () {
-    if ($('body').hasClass('editing')) {
-        $('body').removeClass('editing')
-    } else {
-        $('body').addClass('editing')
-    }
-});
-$('.banner-buttons').append(control);
-control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
-control.click(function () {
     if (conf != norm) {
-        setConfig(norm);
-        def.fromConfig(norm);
+        def.fromConfig(conf);
         def.gen(toolbar);
-        def.getEdit(editPane);
     }
-});
-$('.banner-buttons').append(control);
 
-$("#view_mature_topbar").off();
-$("#view_mature_topbar").change(function (e) {
-    if ($(this).attr('checked')) {
-        if (!confirm('Please confirm that you are of legal age to read sexual or other adult content in your country by clicking OK. Click Cancel if this is not true.')) {
-            $(this).attr('checked', false);
+    var editPane = $('<div class="inner editor" />');
+    toolbar.after(editPane);
+
+    def.getEdit(editPane);
+
+    $(document).mousemove(function (e) {
+        if ($('#button_moving').length > 0) {
+            $('#button_moving').css('top', (e.pageY + 5) + 'px');
+            $('#button_moving').css('left', (e.pageX + 5) + 'px');
         }
-    }
-    unsafeWindow.setCookie('view_mature', $(this).is(':checked'), 10000);
-});
+    });
+
+    var control = $('<a href="javascript:void();" >Edit Toolbar</a>');
+    control.click(function () {
+        if ($('body').hasClass('editing')) {
+            $('body').removeClass('editing')
+        } else {
+            $('body').addClass('editing')
+        }
+    });
+    $('.banner-buttons').append(control);
+    control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
+    control.click(function () {
+        if (conf != norm) {
+            setConfig(norm);
+            def.fromConfig(norm);
+            def.gen(toolbar);
+            def.getEdit(editPane);
+        }
+    });
+    $('.banner-buttons').append(control);
+
+    $("#view_mature_topbar").off();
+    $("#view_mature_topbar").change(function (e) {
+        if ($(this).attr('checked')) {
+            if (!confirm('Please confirm that you are of legal age to read sexual or other adult content in your country by clicking OK. Click Cancel if this is not true.')) {
+                $(this).attr('checked', false);
+            }
+        }
+        unsafeWindow.setCookie('view_mature', $(this).is(':checked'), 10000);
+    });
+}
 
 function getConfig() {
     return GM_getValue('config', norm);
@@ -360,6 +363,15 @@ function Baggage(el) {
 function replaceAll(find, replace, me) {
     var escapeRegExp = function (str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
     return me.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+//==API FUNCTION==//
+function getIsLoggedIn() {
+    try {
+        return unsafeWindow.logged_in_user != null;
+    } catch (e) {
+    }
+    return false;
 }
 
 //==API FUNCTION==//
