@@ -9,6 +9,89 @@
 // @grant       GM_setValue
 // ==/UserScript==
 
+function ToolBar(buttons) {
+    this.children = [];
+
+    for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i].tagName == 'DIV' || buttons[i].tagName == 'A' || buttons[i].tagName == 'LABEL') {
+            this.children.push(new Button(this, i, buttons[i], true));
+        } else {
+            this.children.push(new Baggage(buttons[i]));
+        }
+    }
+
+    this.gen = function (bar) {
+        $(bar).children().each(function () {
+            $(this).detach();
+        });
+        for (var i = 0; i < this.children.length; i++) {
+            var nod = this.children[i].genNode();
+            if (i == 0) {
+                $(nod).addClass('button-first');
+                $(nod).css('border-left', '1px solid rgba(0, 0, 0, 0.2)');
+            } else {
+                $(nod).css('border-left', '');
+            }
+            $(bar).append(nod);
+        }
+    }
+}
+ToolBar.prototype.getEdit = function (bar) {
+    $(bar).empty();
+    for (var i = 0; i < this.children.length; i++) {
+        $(bar).append(this.children[i].getEditNode());
+    }
+}
+ToolBar.prototype.getConfig = function () {
+    var result = [];
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].type != 'hidden') {
+            result.push(this.children[i].getconfigEntry());
+        }
+    }
+    return JSON.stringify(result);
+}
+ToolBar.prototype.fromConfig = function (config) {
+    config = JSON.parse(config);
+    var childs = [];
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].type == 'hidden') {
+            childs.push(this.children[i]);
+        }
+    }
+
+    for (var i = 0; i < config.length; i++) {
+        var b = getButton(config[i]);
+        if (b != null) {
+            b._parent = this;
+            childs.push(b);
+        }
+    }
+    this.children = childs;
+
+    for (var i = 0; i < buttonRegistry.poslength() ; i++) {
+        if (!usedButtons.get(i) && !unusedButtons.get(i)) {
+            searchButton(this, norm);
+        }
+    }
+}
+
+function Deck(buttons) {
+    this.children = [];
+
+    for (var i = 0; i < buttons.length; i++) {
+        this.children.push(Pin(this, i, buttons[i]));
+    }
+
+    this.getDeck = function (bar) {
+        $(bar).empty();
+        for (var i = 0; i < this.children.length; i++) {
+            $(bar).append(this.children[i].getPinNode());
+        }
+    }
+}
+Deck.prototype = ToolBar.prototype;
+
 if (getIsLoggedIn()) {
 
     makeStyle('\
@@ -22,10 +105,17 @@ if (getIsLoggedIn()) {
     display: block;\
     visibility: visible;\
     opacity: 1;}\
+body.editing .nav_bar,\
+body.editing .editor {\
+    height: auto !important;}\
 body.editing .user_toolbar > .inner:not(.editor),\
+body.editing .nav_bar > .light:not(.editor),\
 body:not(.editing) .user_toolbar .editor,\
+body:not(.editing) .nav_bar .editor,\
 .user_toolbar .bin .items {\
     display: none;}\
+.user_toolbar > .inner > .button > i {\
+        float: none !important;}\
 .inner.label {\
     position: absolute;\
     background-color: inherit;\
@@ -75,23 +165,33 @@ body:not(.editing) .user_toolbar .editor,\
     var customButtonData = [];
 
     var toolbar = $($('.user_toolbar > .inner')[0]);
+    var navbar = $('.nav_bar > .light');
 
     var held = null;
 
+    var nav = new Deck(navbar.find('.button').toArray());
     var def = new ToolBar(toolbar.children());
     var disabled = new ToolBar([]);
 
     makeCustomButtons(3);
 
-    var norm = def.getConfig();
+    var norm = [
+        nav.getConfig(),
+        def.getConfig()
+    ];
     var conf = getConfig();
 
     if (conf != norm) {
-        def.fromConfig(conf);
+        nav.fromConfig(conf[0]);
+        def.fromConfig(conf[1]);
         def.gen(toolbar);
     }
 
     loadUnusedButtons(disabled);
+
+    var navPane = $('<div class="light editor" />');
+    navbar.after(navPane);
+    nav.getDeck(navPane);
 
     var editPane = $('<div class="inner editor" />');
     toolbar.after(editPane);
@@ -141,10 +241,12 @@ body:not(.editing) .user_toolbar .editor,\
     control.click(function () {
         setConfig(norm);
         clearUnusedButtons();
-        def.fromConfig(norm);
+        nav.fromConfig(norm[0]);
+        def.fromConfig(norm[1]);
         loadUnusedButtons(disabled);
         def.gen(toolbar);
         def.getEdit(editPane);
+        nav.getDeck(navPane);
         disabled.getEdit(unusedBin);
     });
 }
@@ -216,75 +318,6 @@ function clearUnusedButtons() {
     GM_setValue('unused', defaultUnused());
 }
 
-function ToolBar(buttons) {
-    this.children = [];
-
-    for (var i = 0; i < buttons.length; i++) {
-        if (buttons[i].tagName == 'DIV' || buttons[i].tagName == 'A' || buttons[i].tagName == 'LABEL') {
-            this.children.push(new Button(this, i, buttons[i], true));
-        } else {
-            this.children.push(new Baggage(buttons[i]));
-        }
-    }
-
-    this.gen = function (bar) {
-        $(bar).children().each(function () {
-            $(this).detach();
-        });
-        for (var i = 0; i < this.children.length; i++) {
-            var nod = this.children[i].genNode();
-            if (i == 0) {
-                $(nod).addClass('button-first');
-                $(nod).css('border-left', '1px solid rgba(0, 0, 0, 0.2)');
-            } else {
-                $(nod).css('border-left', '');
-            }
-            $(bar).append(nod);
-        }
-    }
-    this.getEdit = function (bar) {
-        $(bar).children().each(function () {
-            $(this).detach();
-        });
-        for (var i = 0; i < this.children.length; i++) {
-            $(bar).append(this.children[i].getEditNode());
-        }
-    }
-    this.getConfig = function () {
-        var result = [];
-        for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].type == 'button') {
-                result.push(this.children[i].getconfigEntry());
-            }
-        }
-        return JSON.stringify(result);
-    }
-    this.fromConfig = function (config) {
-        config = JSON.parse(config);
-        var childs = [];
-        for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].type != 'button') {
-                childs.push(this.children[i]);
-            }
-        }
-
-        for (var i = 0; i < config.length; i++) {
-            var b = getButton(config[i]);
-            if (b != null) {
-                b._parent = this;
-                childs.push(b);
-            }
-        }
-        this.children = childs;
-
-        for (var i = 0; i < buttonRegistry.poslength() ; i++) {
-            if (!usedButtons.get(i) && !unusedButtons.get(i)) {
-                searchButton(this, norm);
-            }
-        }
-    }
-}
-
 function searchButton(holder, i, buttons) {
     for (var j = 0; j < norm.length; j++) {
         if (norm[j]['i'] == i) {
@@ -306,7 +339,7 @@ function getButton(entry) {
         unusedButtons.set(i, false);
         var childs = [];
         for (var i = 0; i < button.children.length; i++) {
-            if (button.children[i].type != 'button') {
+            if (button.children[i].type == 'hidden') {
                 childs.push(button.children[i]);
             }
         }
@@ -324,6 +357,12 @@ function getButton(entry) {
         return button;
     }
     return null;
+}
+
+function Pin(p, index, el) {
+    var result = new Button(p, index, el, false);
+    result.type = 'pin';
+    return result;
 }
 
 //function Button(custom, el, handleChilds) {
@@ -346,6 +385,7 @@ function Button(p, index, el, handleChilds) {
         unusedButtons.push(false);
     }
 
+    this.type = 'button';
     this.originalElement = $(el);
     this._parent = p;
     this._index = index;
@@ -353,6 +393,9 @@ function Button(p, index, el, handleChilds) {
     this.timeout = 0;
     this.listNode = null;
     this.children = [];
+
+    this.originalParent = $($(el).parent());
+    this.originalIndex = this.originalElement.index();
 
     if (handleChilds && el.tagName == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
         this.listNode = $(this.originalElement.find('.menu_list')[0]);
@@ -373,7 +416,7 @@ function Button(p, index, el, handleChilds) {
         if (this.listNode != null) {
             result['c'] = [];
             for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i].type == 'button') {
+                if (this.children[i].type != 'hidden') {
                     result['c'].push(this.children[i].getconfigEntry());
                 }
             }
@@ -393,6 +436,29 @@ function Button(p, index, el, handleChilds) {
             }
             this._parent.children = newchilds;
             _removed = true;
+        }
+    }
+    this.gohome = function () {
+        unusedButtons.set(this.id, false);
+        usedButtons.set(this.id, true);
+
+        var added = false;
+        var nesiblings = [];
+        var siblings = this.originalParent.children().toArray();
+        for (var i = 0; i < siblings.length; i++) {
+            if (i == this.originalIndex) {
+                nesiblings.push(this.originalElement);
+                added = true;
+            }
+            nesiblings.push(siblings[i]);
+            $(siblings[i]).detach();
+        }
+        if (!added) {
+            nesiblings.push(this.originalElement);
+        }
+
+        for (var i = 0; i < nesiblings.length; i++) {
+            this.originalParent.append(nesiblings[i]);
         }
     }
     this.add = function () {
@@ -429,6 +495,43 @@ function Button(p, index, el, handleChilds) {
             }
         }
         return this.originalElement;
+    }
+    this.getPinNode = function () {
+        var result = $('<div class="button editing_button" />');
+        var copy = this.originalElement.clone();
+        var me = this;
+
+        copy.find('.menu_list').remove();
+        copy.find('input').remove();
+        if (this.listNode == null) {
+            result.append(copy.html());
+        } else {
+            copy.find('.menu_list').remove();
+            result.html($(copy.find('.button')[0]).html());
+        }
+
+        $(result).click(function (e) {
+            e.stopPropagation();
+            if (held == null) {
+                me.pickup(this, e);
+            } else if (held.timeout <= 0) {
+                if (held.type == 'pin') {
+                    held._index = me._index;
+                    held._parent = me._parent;
+                    if (me._parent == nav) {
+                        held.return();
+                    } else {
+                        held.drop();
+                    }
+                } else if (me._parent != nav) {
+                    held._index = me._index;
+                    held._parent = me._parent;
+                    held.drop();
+                }
+            }
+        });
+
+        return result;
     }
     this.getEditNode = function () {
         var result = $('<div class="button editing_button" />');
@@ -470,7 +573,7 @@ function Button(p, index, el, handleChilds) {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
-                } else if (held.listNode == null || held.children.length == 0) {
+                } else if (held.type != 'pin' && (held.listNode == null || held.children.length == 0)) {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
@@ -511,13 +614,26 @@ function Button(p, index, el, handleChilds) {
 
         def.gen(toolbar);
         def.getEdit(editPane);
+        nav.getDeck(navPane);
         disabled.getEdit(unusedBin);
 
-        setConfig(def.getConfig());
+        setConfig([nav.getConfig(), def.getConfig()]);
         saveUnusedButtons();
     }
+    this.return = function () {
+        held = null;
 
-    this.type = 'button';
+        this.add();
+        this.gohome();
+
+        def.gen(toolbar);
+        def.getEdit(editPane);
+        nav.getDeck(navPane);
+        disabled.getEdit(unusedBin);
+
+        setConfig([nav.getConfig(), def.getConfig()]);
+        saveUnusedButtons();
+    }
 }
 
 function makeCustomButtons(total) {
