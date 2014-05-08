@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        LoosfulTools
+// @name        LoosefulTools
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
@@ -13,40 +13,63 @@ if (getIsLoggedIn()) {
 
     makeStyle('\
 body.editing .user_toolbar > .inner:not(.editor),\
-body:not(.editing) .user_toolbar .editor {\
+body:not(.editing) .user_toolbar .editor,\
+.user_toolbar .bin .items {\
     display: none;}\
+.inner.label {\
+    position: absolute;\
+    background-color: inherit;\
+    transition: background-color 0.5s ease 0s;\
+    border-radius: 0 4px 20px 0;\
+    border: 1px solid rgba(0, 0, 0, 0.2);\
+    border-top: none;\
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
+    left: 0px;\
+    padding: 6px;\
+    padding-right: 20px;\
+    bottom: -30px;}\
+.user_toolbar .bin {\
+    border-top: 1px solid rgba(0, 0, 0, 0.5);\
+    margin-top: 5px;\
+    min-height: 40px;\
+    background-color: rgba(250, 240, 230, 0.6);}\
 .user_toolbar .editor a {\
     pointer-events: none;}\
-display: inline-block;\
-.editing_button .items {\
-    min-height: 50px;\
-    min-width: 200px;\
-    background: rgba(255,255,255,0.6);}\
-.user_toolbar .editor a {\
-    pointer-events: none;}\
-.editing_button .items {\
-    cursor: default;}\
 .editing_button {\
     cursor: move;}\
 .editing_button .items {\
+    cursor: default;\
     min-height: 50px;\
     min-width: 200px;\
     background: rgba(255,255,255,0.3);\
     padding: 5px;}\
 #button_moving {\
-    position: absolute !important;}\
-#button_moving {\
-    position: absolute !important;}');
+    pointer-events: none;\
+    z-index: 100000;\
+    position: fixed !important;}\
+#button_moving:after {\
+    content: "Click to place, ESC to cancel";\
+    display: block;\
+    position: absolute;\
+    white-space: nowrap;\
+    top: -20px;\
+    background: rgba(255,255,255,0.4);\
+    border-radius: 5px;\
+    padding: 0 5px 0 5px;\
+    line-height: 20px;}');
 
 
     var buttonRegistry = [];
     var usedButtons = [];
+    var unusedButtons = [];
 
     var toolbar = $($('.user_toolbar > .inner')[0]);
 
     var held = null;
 
     var def = new ToolBar(toolbar.children());
+
+    var disabled = loadUnusedButtons(new ToolBar([]));
 
     var norm = def.getConfig();
     var conf = getConfig();
@@ -58,13 +81,36 @@ display: inline-block;\
 
     var editPane = $('<div class="inner editor" />');
     toolbar.after(editPane);
-
     def.getEdit(editPane);
+
+    var unusedBin = $('<div class="inner editor bin" />');
+    $(unusedBin).click(function () {
+        if ($(this).children().length == 0) {
+            if (held != null) {
+                if (held.children.length == 0) {
+                    held._index = 0;
+                    held._parent = disabled;
+                    held.drop();
+                }
+            }
+        }
+    });
+    $(editPane).after(unusedBin);
+    disabled.getEdit(unusedBin);
+
+    $(unusedBin).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
 
     $(document).mousemove(function (e) {
         if ($('#button_moving').length > 0) {
-            $('#button_moving').css('top', (e.pageY + 5) + 'px');
-            $('#button_moving').css('left', (e.pageX + 5) + 'px');
+            $('#button_moving').css('top', (e.clientY - $('#button_moving').attr('data_offset_Y')) + 'px');
+            $('#button_moving').css('left', (e.clientX - $('#button_moving').attr('data_offset_X')) + 'px');
+        }
+    });
+    $(document).keypress(function (e) {
+        if (e.keyCode == 27) {
+            if (held != null && $('#button_moving').length != 0) {
+                held.drop();
+            }
         }
     });
 
@@ -79,11 +125,13 @@ display: inline-block;\
     $('.banner-buttons').append(control);
     control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
     control.click(function () {
-        if (conf != norm) {
+        if (conf != norm || disabled.children.length != 0) {
             setConfig(norm);
+            clearUnusedButtons();
             def.fromConfig(norm);
             def.gen(toolbar);
             def.getEdit(editPane);
+            disabled.getEdit(unusedBin);
         }
     });
     $('.banner-buttons').append(control);
@@ -103,9 +151,41 @@ function getConfig() {
     return GM_getValue('config', norm);
 }
 
-function setConfig(v) {
-    conf = v;
-    GM_setValue('config', v);
+function setConfig(used) {
+    conf = used;
+    GM_setValue('config', used);
+}
+
+function loadUnusedButtons(p) {
+    var result = [];
+    var ids = GM_getValue('unused', '').split(';');
+    for (var i = 0; i < ids.length; i++) {
+        var index = parseInt(ids[i]);
+        if (index > -1 && index < buttonRegistry.length) {
+            result.push(buttonRegistry[index]);
+            buttonRegistry[index]._parent = p;
+            unusedButtons[index] = true;
+
+        }
+    }
+    p.children = result;
+    return p;
+}
+
+function saveUnusedButtons() {
+    var value = [];
+    for (var i = 0; i < unusedButtons.length; i++) {
+        if (unusedButtons[i]) value.push(i);
+    }
+    GM_setValue('unused', value.join(';'));
+}
+
+function clearUnusedButtons() {
+    for (var i = 0; i < unusedButtons.length; i++) {
+        unusedButtons[i] = false;
+    }
+    disabled.children = [];
+    GM_setValue('unused', '');
 }
 
 function ToolBar(buttons) {
@@ -155,17 +235,18 @@ function ToolBar(buttons) {
                 childs.push(this.children[i]);
             }
         }
-        
+
         for (var i = 0; i < config.length; i++) {
             var b = getButton(config[i]);
             if (b != null) {
+                b._parent = this;
                 childs.push(b);
             }
         }
         this.children = childs;
 
         for (var i = 0; i < buttonRegistry.length; i++) {
-            if (!usedButtons[i]) {
+            if (!usedButtons[i] && !unusedButtons[i]) {
                 searchButton(this, norm);
             }
         }
@@ -199,6 +280,7 @@ function getButton(entry) {
             for (var i = 0; i < entry['c'].length; i++) {
                 var b = getButton(entry['c'][i]);
                 if (b != null) {
+                    b._parent = button;
                     childs.push(b);
                 }
             }
@@ -215,12 +297,14 @@ function Button(p, index, el, handleChilds) {
     this._parent = p;
     this._index = index;
     var _removed = false;
+    this.timeout = 0;
     this.listNode = null;
     this.children = [];
 
     this.id = buttonRegistry.length;
     buttonRegistry.push(this);
     usedButtons.push(false);
+    unusedButtons.push(false);
 
     if (handleChilds && el.tagName == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
         this.listNode = $(this.originalElement.find('.menu_list')[0]);
@@ -256,23 +340,33 @@ function Button(p, index, el, handleChilds) {
                     newchilds.push(this._parent.children[i]);
                 }
             }
+            for (var i = 0; i < newchilds.length; i++) {
+                newchilds[i]._index = i;
+            }
             this._parent.children = newchilds;
             _removed = true;
         }
     }
     this.add = function () {
         if (_removed) {
+            unusedButtons[this.id] = this._parent == disabled;
+
             var newchilds = [];
-            for (var i = 0; i <= this._parent.children.length; i++) {
-                if (i == this._index) {
+            for (var i = 0; i < this._parent.children.length; i++) {
+                if (this._parent.children[i]._index == this._index) {
                     newchilds.push(this);
+                    _removed = false;
                 }
-                if (i < this._parent.children.length) {
-                    newchilds.push(this._parent.children[i]);
-                }
+                newchilds.push(this._parent.children[i]);
+            }
+            if (_removed) {
+                newchilds.push(this);
+                _removed = false;
+            }
+            for (var i = 0; i < newchilds.length; i++) {
+                newchilds[i]._index = i;
             }
             this._parent.children = newchilds;
-            _removed = false;
         }
     }
     this.genNode = function () {
@@ -289,6 +383,8 @@ function Button(p, index, el, handleChilds) {
     this.getEditNode = function () {
         var result = $('<div class="button editing_button" />');
         var copy = this.originalElement.clone();
+        var me = this;
+
         copy.find('.menu_list').remove();
         copy.find('input').remove();
         if (this.listNode == null) {
@@ -297,30 +393,30 @@ function Button(p, index, el, handleChilds) {
             copy.find('.menu_list').remove();
             result.html($(copy.find('.button')[0]).html());
         }
+
+        var subs = $('<div class="items" />');
         if (this.listNode != null) {
-            var subs = $('<div class="items" />');
             for (var i = 0; i < this.children.length; i++) {
                 subs.append(this.children[i].getEditNode());
             }
             $(result).append(subs);
-            $(subs).mousedown(function (e) {
-                if ($('#button_moving').length != 0 && $(this).children().length == 0) {
-                    held._index = 0;
-                    held._parent = me;
-                    held.drop($('#button_moving'), e);
-                    e.preventDefault();
-                }
-            });
         }
 
-        var me = this;
-        $(result).mousedown(function (e) {
+        $(result).click(function (e) {
             if ($('#button_moving').length == 0) {
                 me.pickup(this, e);
-            } else {
-                held._index = me._index;
-                held._parent = me._parent;
-                held.drop(this, e);
+            } else if (held != null && held.timeout <= 0) {
+                if (held.listNode == null || me._parent != disabled || held.children.length == 0) {
+                    if (me.listNode != null && $(subs).children().length == 0) {
+                        held._index = 0;
+                        held._parent = me;
+                        held.drop();
+                    } else {
+                        held._index = me._index;
+                        held._parent = me._parent;
+                        held.drop();
+                    }
+                }
             }
             e.preventDefault();
         });
@@ -330,21 +426,36 @@ function Button(p, index, el, handleChilds) {
 
     this.pickup = function (node, e) {
         held = this;
-        this.remove();
+
+        held.remove();
+        held.timeout = 50;
+        var interval = setInterval(function () {
+            if (--held.timeout == 0) {
+                clearInterval(interval);
+            }
+        }, 10);
+
+        var offX = e.clientX - ($(node).offset().left - $(window).scrollLeft());
+        var offY = e.clientY - ($(node).offset().top - $(window).scrollTop());
+
+        $(node).attr('data_offset_X', offX);
+        $(node).attr('data_offset_Y', offY);
+        $(node).css('left', (e.clientX) - offX + 'px');
+        $(node).css('top', (e.clientY) - offY + 'px');
+
         $(node).attr('id', 'button_moving');
-        $(node).css('position', 'absolute');
-        $(node).css('top', (e.pageY + 5) + 'px');
-        $(node).css('left', (e.pageX + 5) + 'px');
+        $(node).css('position', 'fixed');
         def.gen(toolbar);
-        setConfig(def.getConfig());
     }
-    this.drop = function (node, e) {
+    this.drop = function () {
         held = null;
         this.add();
-        $(node).css('position', '');
         def.gen(toolbar);
         def.getEdit(editPane);
+        disabled.getEdit(unusedBin);
+
         setConfig(def.getConfig());
+        saveUnusedButtons();
     }
 
     this.type = 'button';
