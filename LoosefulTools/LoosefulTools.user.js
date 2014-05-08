@@ -18,6 +18,10 @@ if (getIsLoggedIn()) {
     -moz-user-select: none;}\
 .user_toolbar .button:not(.editing) .editBox {\
     display: none;}\
+.button.editing + div.menu_list {\
+    display: block;\
+    visibility: visible;\
+    opacity: 1;}\
 body.editing .user_toolbar > .inner:not(.editor),\
 body:not(.editing) .user_toolbar .editor,\
 .user_toolbar .bin .items {\
@@ -204,6 +208,10 @@ function defaultUnused() {
 function clearUnusedButtons() {
     for (var i = unusedButtons.neglength() ; i < unusedButtons.poslength() ; i++) {
         unusedButtons.set(i, i < 0);
+        if (i < 0) {
+            buttonRegistry.get(i)._parent = disabled;
+            buttonRegistry.get(i).children = [];
+        }
     }
     GM_setValue('unused', defaultUnused());
 }
