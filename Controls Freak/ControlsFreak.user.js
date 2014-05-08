@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        LoosefulTools
+// @name        Controls Freak
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
@@ -63,6 +63,7 @@ ToolBar.prototype.fromConfig = function (config) {
     for (var i = 0; i < config.length; i++) {
         var b = getButton(config[i]);
         if (b != null) {
+            b._index = childs.length;
             b._parent = this;
             childs.push(b);
         }
@@ -190,6 +191,15 @@ body:not(.editing) .nav_bar .editor,\
     loadUnusedButtons(disabled);
 
     var navPane = $('<div class="light editor" />');
+    $(navPane).click(function () {
+        if (held != null) {
+            if (held.type == 'pin' && held.children.length == 0) {
+                held._index = nav.children.length;
+                held._parent = nav;
+                held.drop();
+            }
+        }
+    });
     navbar.after(navPane);
     nav.getDeck(navPane);
 
@@ -201,7 +211,7 @@ body:not(.editing) .nav_bar .editor,\
     $(unusedBin).click(function () {
         if (held != null) {
             if (held.children.length == 0) {
-                held._index = 0;
+                held._index = nav.children.length;
                 held._parent = disabled;
                 held.drop();
             }
@@ -347,6 +357,7 @@ function getButton(entry) {
             for (var i = 0; i < entry['c'].length; i++) {
                 var b = getButton(entry['c'][i]);
                 if (b != null) {
+                    b._index = childs.length;
                     b._parent = button;
                     childs.push(b);
                 }
@@ -573,7 +584,7 @@ function Button(p, index, el, handleChilds) {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
-                } else if (held.type != 'pin' && (held.listNode == null || held.children.length == 0)) {
+                } else if (held.listNode == null || held.children.length == 0) {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
