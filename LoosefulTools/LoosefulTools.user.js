@@ -12,6 +12,12 @@
 if (getIsLoggedIn()) {
 
     makeStyle('\
+.custom_button {\
+    cursor: pointer;\
+    -webkit-user-select: none;\
+    -moz-user-select: none;}\
+.user_toolbar .button:not(.editing) .editBox {\
+    display: none;}\
 body.editing .user_toolbar > .inner:not(.editor),\
 body:not(.editing) .user_toolbar .editor,\
 .user_toolbar .bin .items {\
@@ -58,18 +64,20 @@ body:not(.editing) .user_toolbar .editor,\
     padding: 0 5px 0 5px;\
     line-height: 20px;}');
 
+    var buttonRegistry = new register();
+    var usedButtons = new register();
+    var unusedButtons = new register();
 
-    var buttonRegistry = [];
-    var usedButtons = [];
-    var unusedButtons = [];
+    var customButtonData = [];
 
     var toolbar = $($('.user_toolbar > .inner')[0]);
 
     var held = null;
 
     var def = new ToolBar(toolbar.children());
+    var disabled = new ToolBar([]);
 
-    var disabled = loadUnusedButtons(new ToolBar([]));
+    makeCustomButtons(3);
 
     var norm = def.getConfig();
     var conf = getConfig();
@@ -79,19 +87,19 @@ body:not(.editing) .user_toolbar .editor,\
         def.gen(toolbar);
     }
 
+    loadUnusedButtons(disabled);
+
     var editPane = $('<div class="inner editor" />');
     toolbar.after(editPane);
     def.getEdit(editPane);
 
     var unusedBin = $('<div class="inner editor bin" />');
     $(unusedBin).click(function () {
-        if ($(this).children().length == 0) {
-            if (held != null) {
-                if (held.children.length == 0) {
-                    held._index = 0;
-                    held._parent = disabled;
-                    held.drop();
-                }
+        if (held != null) {
+            if (held.children.length == 0) {
+                held._index = 0;
+                held._parent = disabled;
+                held.drop();
             }
         }
     });
@@ -108,13 +116,14 @@ body:not(.editing) .user_toolbar .editor,\
     });
     $(document).keypress(function (e) {
         if (e.keyCode == 27) {
-            if (held != null && $('#button_moving').length != 0) {
+            if (held != null) {
                 held.drop();
             }
         }
     });
 
-    var control = $('<a href="javascript:void();" >Edit Toolbar</a>');
+    var control = $('<a href="javascript:void();" >Arrange Buttons</a>');
+    $('.banner-buttons').append(control);
     control.click(function () {
         if ($('body').hasClass('editing')) {
             $('body').removeClass('editing')
@@ -122,31 +131,19 @@ body:not(.editing) .user_toolbar .editor,\
             $('body').addClass('editing')
         }
     });
-    $('.banner-buttons').append(control);
-    control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
-    control.click(function () {
-        if (conf != norm || disabled.children.length != 0) {
-            setConfig(norm);
-            clearUnusedButtons();
-            def.fromConfig(norm);
-            def.gen(toolbar);
-            def.getEdit(editPane);
-            disabled.getEdit(unusedBin);
-        }
-    });
-    $('.banner-buttons').append(control);
 
-    $("#view_mature_topbar").off();
-    $("#view_mature_topbar").change(function (e) {
-        if ($(this).attr('checked')) {
-            if (!confirm('Please confirm that you are of legal age to read sexual or other adult content in your country by clicking OK. Click Cancel if this is not true.')) {
-                $(this).attr('checked', false);
-            }
-        }
-        unsafeWindow.setCookie('view_mature', $(this).is(':checked'), 10000);
+    control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
+    $('.banner-buttons').append(control);
+    control.click(function () {
+        setConfig(norm);
+        clearUnusedButtons();
+        def.fromConfig(norm);
+        loadUnusedButtons(disabled);
+        def.gen(toolbar);
+        def.getEdit(editPane);
+        disabled.getEdit(unusedBin);
     });
 }
-
 function getConfig() {
     return GM_getValue('config', norm);
 }
@@ -158,34 +155,57 @@ function setConfig(used) {
 
 function loadUnusedButtons(p) {
     var result = [];
-    var ids = GM_getValue('unused', '').split(';');
+    var ids = GM_getValue('unused', defaultUnused()).split(';');
     for (var i = 0; i < ids.length; i++) {
         var index = parseInt(ids[i]);
-        if (index > -1 && index < buttonRegistry.length) {
-            result.push(buttonRegistry[index]);
-            buttonRegistry[index]._parent = p;
-            unusedButtons[index] = true;
-
+        if (index >= buttonRegistry.neglength() && index < buttonRegistry.poslength()) {
+            result.push(buttonRegistry.get(index));
+            buttonRegistry.get(index)._parent = p;
+            unusedButtons.set(index, true);
+        }
+    }
+    for (var i = unusedButtons.neglength() ; i < 0; i++) {
+        var b = buttonRegistry.get(i);
+        if (unusedButtons.get(i) && !usedButtons.get(i) && !arrContains(result, b)) {
+            result.push(b);
+            b._parent = p;
+            usedButtons.set(i, false);
         }
     }
     p.children = result;
     return p;
 }
 
+function arrContains(arr, item) {
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == item) return true;
+    }
+    return false;
+}
+
 function saveUnusedButtons() {
     var value = [];
-    for (var i = 0; i < unusedButtons.length; i++) {
-        if (unusedButtons[i]) value.push(i);
+    for (var i = buttonRegistry.neglength() ; i < 0; i++) {
+        if (unusedButtons.get(i)) {
+            value.push(i);
+        }
     }
     GM_setValue('unused', value.join(';'));
 }
 
-function clearUnusedButtons() {
-    for (var i = 0; i < unusedButtons.length; i++) {
-        unusedButtons[i] = false;
+function defaultUnused() {
+    var value = [];
+    for (var i = buttonRegistry.neglength() ; i < 0; i++) {
+        value.push(i);
     }
-    disabled.children = [];
-    GM_setValue('unused', '');
+    return value.join(';');
+}
+
+function clearUnusedButtons() {
+    for (var i = unusedButtons.neglength() ; i < unusedButtons.poslength() ; i++) {
+        unusedButtons.set(i, i < 0);
+    }
+    GM_setValue('unused', defaultUnused());
 }
 
 function ToolBar(buttons) {
@@ -200,7 +220,9 @@ function ToolBar(buttons) {
     }
 
     this.gen = function (bar) {
-        $(bar).empty();
+        $(bar).children().each(function () {
+            $(this).detach();
+        });
         for (var i = 0; i < this.children.length; i++) {
             var nod = this.children[i].genNode();
             if (i == 0) {
@@ -213,7 +235,9 @@ function ToolBar(buttons) {
         }
     }
     this.getEdit = function (bar) {
-        $(bar).empty();
+        $(bar).children().each(function () {
+            $(this).detach();
+        });
         for (var i = 0; i < this.children.length; i++) {
             $(bar).append(this.children[i].getEditNode());
         }
@@ -245,8 +269,8 @@ function ToolBar(buttons) {
         }
         this.children = childs;
 
-        for (var i = 0; i < buttonRegistry.length; i++) {
-            if (!usedButtons[i] && !unusedButtons[i]) {
+        for (var i = 0; i < buttonRegistry.poslength() ; i++) {
+            if (!usedButtons.get(i) && !unusedButtons.get(i)) {
                 searchButton(this, norm);
             }
         }
@@ -256,20 +280,22 @@ function ToolBar(buttons) {
 function searchButton(holder, i, buttons) {
     for (var j = 0; j < norm.length; j++) {
         if (norm[j]['i'] == i) {
-            holder.children.push(buttonRegistry[i]);
-            usedButtons[i] = true;
+            holder.children.push(buttonRegistry.get(i));
+            usedButtons.set(i, true);
+            unusedButtons.set(i, false);
             break;
         } else if (norm[j]['c'] != null) {
-            searchButton(buttonRegistry[i], norm[j]['c']);
+            searchButton(buttonRegistry.get(i), norm[j]['c']);
         }
     }
 }
 
 function getButton(entry) {
     var index = parseInt(entry['i']);
-    if (index < buttonRegistry.length) {
-        var button = buttonRegistry[index];
-        usedButtons[index] = true;
+    if (index >= buttonRegistry.neglength() && index < buttonRegistry.poslength()) {
+        var button = buttonRegistry.get(index);
+        usedButtons.set(index, true);
+        unusedButtons.set(i, false);
         var childs = [];
         for (var i = 0; i < button.children.length; i++) {
             if (button.children[i].type != 'button') {
@@ -292,7 +318,26 @@ function getButton(entry) {
     return null;
 }
 
+//function Button(custom, el, handleChilds) {
 function Button(p, index, el, handleChilds) {
+    if (p == true) {
+        buttonRegistry.cust(this);
+        usedButtons.cust(false);
+        unusedButtons.cust(true);
+        this.id = buttonRegistry.neglength();
+
+        p = disabled;
+        handleChilds = el;
+        el = index;
+        index = disabled.children.length;
+        disabled.children.push(this);
+    } else {
+        this.id = buttonRegistry.poslength();
+        buttonRegistry.push(this);
+        usedButtons.push(false);
+        unusedButtons.push(false);
+    }
+
     this.originalElement = $(el);
     this._parent = p;
     this._index = index;
@@ -300,11 +345,6 @@ function Button(p, index, el, handleChilds) {
     this.timeout = 0;
     this.listNode = null;
     this.children = [];
-
-    this.id = buttonRegistry.length;
-    buttonRegistry.push(this);
-    usedButtons.push(false);
-    unusedButtons.push(false);
 
     if (handleChilds && el.tagName == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
         this.listNode = $(this.originalElement.find('.menu_list')[0]);
@@ -349,7 +389,7 @@ function Button(p, index, el, handleChilds) {
     }
     this.add = function () {
         if (_removed) {
-            unusedButtons[this.id] = this._parent == disabled;
+            unusedButtons.set(this.id, this._parent == disabled);
 
             var newchilds = [];
             for (var i = 0; i < this._parent.children.length; i++) {
@@ -373,7 +413,9 @@ function Button(p, index, el, handleChilds) {
         $(this.originalElement).removeClass('button-first');
 
         if (this.children.length > 0 && this.listNode != null) {
-            $(this.listNode).empty();
+            $(this.listNode).children().each(function () {
+                $(this).detach();
+            });
             for (var i = 0; i < this.children.length; i++) {
                 $(this.listNode).append(this.children[i].genNode());
             }
@@ -402,23 +444,30 @@ function Button(p, index, el, handleChilds) {
             $(result).append(subs);
         }
 
+        $(subs).click(function (e) {
+            e.stopPropagation();
+            if (me._parent != disabled && me.listNode != null && me.children.length == 0) {
+                held._index = 0;
+                held._parent = me;
+                held.drop();
+            }
+        });
+
         $(result).click(function (e) {
-            if ($('#button_moving').length == 0) {
+            e.stopPropagation();
+            if (held == null) {
                 me.pickup(this, e);
-            } else if (held != null && held.timeout <= 0) {
-                if (held.listNode == null || me._parent != disabled || held.children.length == 0) {
-                    if (me.listNode != null && $(subs).children().length == 0) {
-                        held._index = 0;
-                        held._parent = me;
-                        held.drop();
-                    } else {
-                        held._index = me._index;
-                        held._parent = me._parent;
-                        held.drop();
-                    }
+            } else if (held.timeout <= 0) {
+                if (me._parent != disabled) {
+                    held._index = me._index;
+                    held._parent = me._parent;
+                    held.drop();
+                } else if (held.listNode == null || held.children.length == 0) {
+                    held._index = me._index;
+                    held._parent = me._parent;
+                    held.drop();
                 }
             }
-            e.preventDefault();
         });
 
         return result;
@@ -449,7 +498,9 @@ function Button(p, index, el, handleChilds) {
     }
     this.drop = function () {
         held = null;
+
         this.add();
+
         def.gen(toolbar);
         def.getEdit(editPane);
         disabled.getEdit(unusedBin);
@@ -459,6 +510,86 @@ function Button(p, index, el, handleChilds) {
     }
 
     this.type = 'button';
+}
+
+function makeCustomButtons(total) {
+    loadCustomButtons();
+    for (var i = 0; i < total; i++) {
+        if (i > customButtonData.length) {
+            customButtonData.push({
+                'icon': 'user',
+                'name': 'Custom'
+            });
+        }
+        customButton(i);
+    }
+    saveCustomButtons();
+}
+
+function resetCustomButtons() {
+    for (var i = 0; i < customButtonData.length; i++) {
+        customButtonData[i] = {
+            'icon': 'user',
+            'name': 'Custom'
+        };
+    }
+    saveCustomButtons();
+}
+
+function loadCustomButtons() {
+    var data = GM_getValue('custom_d', null);
+
+    if (data != null) {
+        data = JSON.parse(data);
+        for (var i = 0; i < data.length; i++) {
+            customButtonData[i] = data[i];
+        }
+    }
+}
+
+function saveCustomButtons() {
+    GM_setValue('custom_d', JSON.stringify(customButtonData));
+}
+
+function customButton(index) {
+    var node = $('<div class="user_drop_down_menu"><div class="menu_list" /></div>');
+    var a = $('<div class="button custom_button" href="javascript:void();"><i class="bind_icon fa fa-' + customButtonData[index].icon + '" /><span class="bind_name">' + customButtonData[index].name + '</span></div>');
+    node.prepend(a);
+
+    var editBox = $('<div class="editBox" />');
+    a.append(editBox);
+
+    var editName = $('<input type="text" />');
+    editBox.append(editName);
+    editName.val(customButtonData[index].name);
+    editName.change(function () {
+        var v = $(this).val();
+        customButtonData[index].name = v == '' ? 'Custom' : v;
+        a.find('.bind_name').html(customButtonData[index].name);
+        saveCustomButtons();
+    });
+    var editIcon = $('<select />');
+    editBox.append(editIcon);
+    var icons = ["ambulance", "anchor", "android", "apple", "archive", "asterisk", "ban", "bar-chart-o", "beer", "bell", "bell-o", "bolt", "book", "bookmark", "briefcase", "bug", "building-o", "bullhorn", "calendar", "camera", "certificate", "chain", "chain-broken", "check", "clipboard", "clock-o", "cloud", "cloud-download", "cloud-upload", "coffee", "comment", "comments", "compass", "credit-card", "cutlery", "dashboard", "desktop", "dollar", "download", "eject", "envelope", "envelope-o", "eraser", "euro", "exclamation", "eye", "facebook", "female", "fighter-jet", "file", "file-o", "file-text", "file-text-o", "film", "fire", "fire-extinguisher", "flag", "flag-checkered", "flag-o", "flask", "flickr", "folder", "folder-open", "frown-o", "gamepad", "gbp", "gear", "gears", "gift", "glass", "globe", "google-plus", "hdd-o", "headphones", "heart", "heart-o", "home", "hospital-o", "inbox", "info", "key", "keyboard-o", "laptop", "leaf", "legal", "lemon-o", "lightbulb-o", "linux", "list-ol", "list-ul", "lock", "magic", "magnet", "male", "medkit", "meh-o", "microphone", "minus-circle", "mobile", "money", "moon-o", "music", "pagelines", "paperclip", "pencil", "phone", "picture-o", "plane", "play-circle", "plus-circle", "power-off", "print", "puzzle-piece", "question", "quote-left", "quote-right", "refresh", "repeat", "road", "rocket", "rss", "save", "scissors", "search", "shield", "shopping-cart", "smile-o", "stack-exchange", "star", "star-half", "star-half-empty", "star-o", "stethoscope", "suitcase", "sun-o", "tablet", "tag", "tags", "thumb-tack", "thumbs-down", "thumbs-o-down", "thumbs-o-up", "thumbs-up", "ticket", "times-circle", "tint", "trash-o", "trophy", "truck", "tumblr", "twitter", "umbrella", "unlock", "upload", "user", "users", "video-camera", "warning", "wheelchair", "windows", "wrench", "youtube"];
+    for (var i = 0; i < icons.length; i++) {
+        editIcon.append('<option>' + icons[i] + '</option>');
+    }
+    editIcon.val(customButtonData[index].icon);
+    editIcon.change(function () {
+        var val = $(this).find('option:selected').text();
+        customButtonData[index].icon = val;
+        a.find('.bind_icon').attr('class', 'bind_icon fa fa-' + val);
+        saveCustomButtons();
+    });
+
+    a.dblclick(function (e) {
+        if ($(this).hasClass('editing')) {
+            $(this).removeClass('editing');
+        } else {
+            $(this).addClass('editing');
+        }
+    });
+    new Button(true, node[0], true);
 }
 
 function Baggage(el) {
@@ -474,6 +605,39 @@ function Baggage(el) {
 function replaceAll(find, replace, me) {
     var escapeRegExp = function (str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
     return me.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+function register() {
+    this.standard = [];
+    this.custom = [];
+
+    this.get = function (i) {
+        if (i >= 0) {
+            return this.standard[i];
+        }
+        return this.custom[-(i + 1)];
+    }
+    this.set = function (i, v) {
+        if (i >= 0) {
+            this.standard[i] = v;
+        } else {
+            this.custom[-(i + 1)] = v;
+        }
+    }
+    this.push = function (v) {
+        this.standard.push(v);
+    }
+    this.cust = function (v) {
+        this.custom.push(v);
+    }
+
+    this.poslength = function () {
+        return this.standard.length;
+    }
+
+    this.neglength = function () {
+        return -(this.custom.length);
+    }
 }
 
 //==API FUNCTION==//
