@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.0
+// @version     1.0.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -46,12 +46,13 @@ function ToolBar(buttons) {
 ToolBar.prototype.getContainer = function (holder, classes, allow) {
     if (this.container == null) {
         this.container = $('<div class="editor" />');
+        var me = this;
         $(holder).after(this.container);
         $(this.container).click(function () {
             if (held != null) {
                 if (allow.apply(held)) {
-                    held._index = nav.children.length;
-                    held._parent = disabled;
+                    held._index = me.children.length;
+                    held._parent = me;
                     held.drop();
                 }
             }
@@ -232,7 +233,7 @@ body:not(.editing) .nav_bar .editor,\
 
     $(toolbar).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
     disabled.getContainer(toolbar, ['inner', 'bin'], function () {
-        return this.children.length == 0;
+        return this.type != 'pin' && this.children.length == 0;
     });
 
     def.getContainer(toolbar, ['inner'], function () {
