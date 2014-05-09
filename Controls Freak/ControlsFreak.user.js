@@ -35,12 +35,30 @@ function ToolBar(buttons) {
             $(bar).append(nod);
         }
     }
-}
-ToolBar.prototype.getEdit = function (bar) {
-    $(bar).empty();
-    for (var i = 0; i < this.children.length; i++) {
-        $(bar).append(this.children[i].getEditNode());
+    this.getEdit = function (bar) {
+        $(bar).empty();
+        for (var i = 0; i < this.children.length; i++) {
+            $(bar).append(this.children[i].getEditNode());
+        }
     }
+}
+ToolBar.prototype.getContainer = function (holder, classes, allow) {
+    var result = $('<div class="editor" />');
+    $(holder).after(result);
+    $(result).click(function () {
+        if (held != null) {
+            if (allow.apply(held)) {
+                held._index = nav.children.length;
+                held._parent = disabled;
+                held.drop();
+            }
+        }
+    });
+    for (var i = 0; i < classes.length; i++) {
+        $(result).addClass(classes[i]);
+    }
+    this.getEdit(result);
+    return result;
 }
 ToolBar.prototype.getConfig = function () {
     var result = [];
@@ -53,6 +71,7 @@ ToolBar.prototype.getConfig = function () {
 }
 ToolBar.prototype.fromConfig = function (config) {
     config = JSON.parse(config);
+
     var childs = [];
     for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].type == 'hidden') {
@@ -65,6 +84,8 @@ ToolBar.prototype.fromConfig = function (config) {
         if (b != null) {
             b._index = childs.length;
             b._parent = this;
+            usedButtons.set(config[i], true);
+            unusedButtons.set(config[i], false);
             childs.push(b);
         }
     }
@@ -84,7 +105,7 @@ function Deck(buttons) {
         this.children.push(Pin(this, i, buttons[i]));
     }
 
-    this.getDeck = function (bar) {
+    this.getEdit = function (bar) {
         $(bar).empty();
         for (var i = 0; i < this.children.length; i++) {
             $(bar).append(this.children[i].getPinNode());
@@ -183,6 +204,8 @@ body:not(.editing) .nav_bar .editor,\
     var conf = getConfig();
 
     if (conf != norm) {
+        usedButtons.flush(false);
+        unusedButtons.flush(false);
         nav.fromConfig(conf[0]);
         def.fromConfig(conf[1]);
         def.gen(toolbar);
@@ -190,36 +213,17 @@ body:not(.editing) .nav_bar .editor,\
 
     loadUnusedButtons(disabled);
 
-    var navPane = $('<div class="light editor" />');
-    $(navPane).click(function () {
-        if (held != null) {
-            if (held.type == 'pin' && held.children.length == 0) {
-                held._index = nav.children.length;
-                held._parent = nav;
-                held.drop();
-            }
-        }
+    var navPane = nav.getContainer(navbar, ['light'], function () {
+        return this.type == 'pin' && this.children.length == 0;
     });
-    navbar.after(navPane);
-    nav.getDeck(navPane);
 
-    var editPane = $('<div class="inner editor" />');
-    toolbar.after(editPane);
-    def.getEdit(editPane);
-
-    var unusedBin = $('<div class="inner editor bin" />');
-    $(unusedBin).click(function () {
-        if (held != null) {
-            if (held.children.length == 0) {
-                held._index = nav.children.length;
-                held._parent = disabled;
-                held.drop();
-            }
-        }
+    var editPane = def.getContainer(toolbar, ['inner'], function () {
+        return true;
     });
-    $(editPane).after(unusedBin);
-    disabled.getEdit(unusedBin);
 
+    var unusedBin = disabled.getContainer(editPane, ['inner', 'bin'], function () {
+        return this.children.length == 0;
+    });
     $(unusedBin).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
 
     $(document).mousemove(function (e) {
@@ -251,12 +255,14 @@ body:not(.editing) .nav_bar .editor,\
     control.click(function () {
         setConfig(norm);
         clearUnusedButtons();
+        usedButtons.flush(false);
+        unusedButtons.flush(false, true);
         nav.fromConfig(norm[0]);
         def.fromConfig(norm[1]);
         loadUnusedButtons(disabled);
         def.gen(toolbar);
         def.getEdit(editPane);
-        nav.getDeck(navPane);
+        nav.getEdit(navPane);
         disabled.getEdit(unusedBin);
     });
 }
@@ -271,20 +277,28 @@ function setConfig(used) {
 
 function loadUnusedButtons(p) {
     var result = [];
-    var ids = GM_getValue('unused', defaultUnused()).split(';');
+    var ids = GM_getValue('unused', null);
+    if (ids == null) {
+        ids = defaultUnused();
+    } else {
+        ids = JSON.parse(ids);
+    }
     for (var i = 0; i < ids.length; i++) {
         var index = parseInt(ids[i]);
         if (index >= buttonRegistry.neglength() && index < buttonRegistry.poslength()) {
-            result.push(buttonRegistry.get(index));
-            buttonRegistry.get(index)._parent = p;
+            var b = buttonRegistry.get(index);
+            b._parent = p;
+            b._index = result.length;
+            result.push(b);
             unusedButtons.set(index, true);
         }
     }
     for (var i = unusedButtons.neglength() ; i < 0; i++) {
         var b = buttonRegistry.get(i);
         if (unusedButtons.get(i) && !usedButtons.get(i) && !arrContains(result, b)) {
-            result.push(b);
             b._parent = p;
+            b._index = result.length;
+            result.push(b);
             usedButtons.set(i, false);
         }
     }
@@ -301,12 +315,12 @@ function arrContains(arr, item) {
 
 function saveUnusedButtons() {
     var value = [];
-    for (var i = buttonRegistry.neglength() ; i < 0; i++) {
+    for (var i = buttonRegistry.neglength() ; i < buttonRegistry.poslength() ; i++) {
         if (unusedButtons.get(i)) {
             value.push(i);
         }
     }
-    GM_setValue('unused', value.join(';'));
+    GM_setValue('unused', JSON.stringify(value));
 }
 
 function defaultUnused() {
@@ -314,24 +328,31 @@ function defaultUnused() {
     for (var i = buttonRegistry.neglength() ; i < 0; i++) {
         value.push(i);
     }
-    return value.join(';');
+    return value;
 }
 
 function clearUnusedButtons() {
     for (var i = unusedButtons.neglength() ; i < unusedButtons.poslength() ; i++) {
         unusedButtons.set(i, i < 0);
         if (i < 0) {
-            buttonRegistry.get(i)._parent = disabled;
-            buttonRegistry.get(i).children = [];
+            var b = buttonRegistry.get(i);
+            b._parent = disabled;
+            b.children = [];
         }
     }
-    GM_setValue('unused', defaultUnused());
+    for (var i = 0; i < disabled.children.length; i++) {
+        disabled.children[i]._index = i;
+    }
+    GM_setValue('unused', JSON.stringify(defaultUnused()));
 }
 
 function searchButton(holder, i, buttons) {
     for (var j = 0; j < norm.length; j++) {
         if (norm[j]['i'] == i) {
-            holder.children.push(buttonRegistry.get(i));
+            var b = buttonRegistry.get(i);
+            b._index = holder.children.length;
+            b._parent = button;
+            holder.children.push();
             usedButtons.set(i, true);
             unusedButtons.set(i, false);
             break;
@@ -625,7 +646,7 @@ function Button(p, index, el, handleChilds) {
 
         def.gen(toolbar);
         def.getEdit(editPane);
-        nav.getDeck(navPane);
+        nav.getEdit(navPane);
         disabled.getEdit(unusedBin);
 
         setConfig([nav.getConfig(), def.getConfig()]);
@@ -639,7 +660,7 @@ function Button(p, index, el, handleChilds) {
 
         def.gen(toolbar);
         def.getEdit(editPane);
-        nav.getDeck(navPane);
+        nav.getEdit(navPane);
         disabled.getEdit(unusedBin);
 
         setConfig([nav.getConfig(), def.getConfig()]);
@@ -764,6 +785,17 @@ function register() {
     }
     this.cust = function (v) {
         this.custom.push(v);
+    }
+    this.flush = function (p, n) {
+        if (typeof (n) == 'undefined') {
+            n = p;
+        }
+        for (var i = 0; i < this.standard.length; i++) {
+            this.standard[i] = p;
+        }
+        for (var i = 0; i < this.custom.length; i++) {
+            this.custom[i] = n;
+        }
     }
 
     this.poslength = function () {
