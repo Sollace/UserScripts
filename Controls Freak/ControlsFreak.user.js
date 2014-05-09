@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.0.1
+// @version     1.0.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -684,14 +684,14 @@ function Button(p, index, el, handleChilds) {
 }
 
 function makeCustomButtons(total) {
-    loadCustomButtons();
     for (var i = 0; i < total; i++) {
-        if (i > customButtonData.length) {
-            customButtonData.push({
-                'icon': 'user',
-                'name': 'Custom'
-            });
-        }
+        customButtonData.push({
+            'icon': 'user',
+            'name': 'Custom'
+        });
+    }
+    loadCustomButtons();
+    for (var i = 0; i < customButtonData.length; i++) {
         customButton(i);
     }
     saveCustomButtons();
@@ -708,11 +708,9 @@ function resetCustomButtons() {
 }
 
 function loadCustomButtons() {
-    var data = GM_getValue('custom_d', null);
-
-    if (data != null) {
-        data = JSON.parse(data);
-        for (var i = 0; i < data.length; i++) {
+    var data = JSON.parse(GM_getValue('custom_d', '[]'));
+    for (var i = 0; i < data.length; i++) {
+        if (i < customButtonData.length) {
             customButtonData[i] = data[i];
         }
     }
