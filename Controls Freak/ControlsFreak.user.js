@@ -10,6 +10,7 @@
 // ==/UserScript==
 
 function ToolBar(buttons) {
+    this.container = null;
     this.children = [];
 
     for (var i = 0; i < buttons.length; i++) {
@@ -35,30 +36,32 @@ function ToolBar(buttons) {
             $(bar).append(nod);
         }
     }
-    this.getEdit = function (bar) {
-        $(bar).empty();
+    this.getEdit = function () {
+        this.container.empty();
         for (var i = 0; i < this.children.length; i++) {
-            $(bar).append(this.children[i].getEditNode());
+            this.container.append(this.children[i].getEditNode());
         }
     }
 }
 ToolBar.prototype.getContainer = function (holder, classes, allow) {
-    var result = $('<div class="editor" />');
-    $(holder).after(result);
-    $(result).click(function () {
-        if (held != null) {
-            if (allow.apply(held)) {
-                held._index = nav.children.length;
-                held._parent = disabled;
-                held.drop();
+    if (this.container == null) {
+        this.container = $('<div class="editor" />');
+        $(holder).after(this.container);
+        $(this.container).click(function () {
+            if (held != null) {
+                if (allow.apply(held)) {
+                    held._index = nav.children.length;
+                    held._parent = disabled;
+                    held.drop();
+                }
             }
+        });
+        for (var i = 0; i < classes.length; i++) {
+            this.container.addClass(classes[i]);
         }
-    });
-    for (var i = 0; i < classes.length; i++) {
-        $(result).addClass(classes[i]);
+        this.getEdit();
     }
-    this.getEdit(result);
-    return result;
+    return this.container;
 }
 ToolBar.prototype.getConfig = function () {
     var result = [];
@@ -99,16 +102,24 @@ ToolBar.prototype.fromConfig = function (config) {
 }
 
 function Deck(buttons) {
+    this.container = null;
     this.children = [];
 
     for (var i = 0; i < buttons.length; i++) {
         this.children.push(Pin(this, i, buttons[i]));
     }
 
-    this.getEdit = function (bar) {
-        $(bar).empty();
+    this.getEdit = function () {
+        this.container.empty();
         for (var i = 0; i < this.children.length; i++) {
-            $(bar).append(this.children[i].getPinNode());
+            this.container.append(this.children[i].getPinNode());
+        }
+    }
+    this.home = function () {
+        for (var i = 0; i < this.children.length; i++) {
+            if (this.children[i].type = 'pin') {
+                this.children[i].gohome();
+            }
         }
     }
 }
@@ -215,18 +226,18 @@ body:not(.editing) .nav_bar .editor,\
 
     loadUnusedButtons(disabled);
 
-    var navPane = nav.getContainer(navbar, ['light'], function () {
+    nav.getContainer(navbar, ['light'], function () {
         return this.type == 'pin' && this.children.length == 0;
     });
 
-    var editPane = def.getContainer(toolbar, ['inner'], function () {
-        return true;
-    });
-
-    var unusedBin = disabled.getContainer(editPane, ['inner', 'bin'], function () {
+    $(toolbar).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
+    disabled.getContainer(toolbar, ['inner', 'bin'], function () {
         return this.children.length == 0;
     });
-    $(unusedBin).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
+
+    def.getContainer(toolbar, ['inner'], function () {
+        return true;
+    });
 
     $(document).mousemove(function (e) {
         if ($('#button_moving').length > 0) {
@@ -263,9 +274,10 @@ body:not(.editing) .nav_bar .editor,\
         def.fromConfig(norm[1]);
         loadUnusedButtons(disabled);
         def.gen(toolbar);
-        def.getEdit(editPane);
-        nav.getEdit(navPane);
-        disabled.getEdit(unusedBin);
+        nav.home();
+        def.getEdit();
+        nav.getEdit();
+        disabled.getEdit();
     });
 }
 function getConfig() {
@@ -647,9 +659,9 @@ function Button(p, index, el, handleChilds) {
         this.add();
 
         def.gen(toolbar);
-        def.getEdit(editPane);
-        nav.getEdit(navPane);
-        disabled.getEdit(unusedBin);
+        def.getEdit();
+        nav.getEdit();
+        disabled.getEdit();
 
         setConfig([nav.getConfig(), def.getConfig()]);
         saveUnusedButtons();
@@ -661,9 +673,9 @@ function Button(p, index, el, handleChilds) {
         this.gohome();
 
         def.gen(toolbar);
-        def.getEdit(editPane);
-        nav.getEdit(navPane);
-        disabled.getEdit(unusedBin);
+        def.getEdit();
+        nav.getEdit();
+        disabled.getEdit();
 
         setConfig([nav.getConfig(), def.getConfig()]);
         saveUnusedButtons();
