@@ -159,6 +159,8 @@ body:not(.editing) .nav_bar .editor,\
     pointer-events: none;}\
 .editing_button {\
     cursor: move;}\
+.editing_button i {\
+    float: none !important;}\
 .editing_button .items {\
     cursor: default;\
     min-height: 50px;\
