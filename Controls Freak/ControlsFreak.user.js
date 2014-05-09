@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.0.2
+// @version     1.0.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -25,12 +25,13 @@ function ToolBar(buttons) {
         $(bar).children().each(function () {
             $(this).detach();
         });
+        var addedClass = false;
         for (var i = 0; i < this.children.length; i++) {
             var nod = this.children[i].genNode();
-            if (i == 0) {
+            if (!addedClass && ($(nod).prop('tagName') == 'DIV' || $(nod).prop('tagName') == 'A')) {
                 $(nod).addClass('button-first');
-                $(nod).css('border-left', '1px solid rgba(0, 0, 0, 0.2)');
-            } else {
+                addedClass = true;
+            } else if (i > 0) {
                 $(nod).css('border-left', '');
             }
             $(bar).append(nod);
@@ -102,10 +103,13 @@ ToolBar.prototype.fromConfig = function (config) {
     }
 }
 
-function Deck(buttons) {
+function Deck() {
     this.container = null;
     this.children = [];
 
+    var buttons = $('.nav_bar .light .notifications_link ~ .container .button').toArray();
+    /*buttons.unshift($('.nav_bar .light .mail_link').parent());
+    buttons.unshift($('.nav_bar .light .feed_link').parent());*/
     for (var i = 0; i < buttons.length; i++) {
         this.children.push(Pin(this, i, buttons[i]));
     }
@@ -205,7 +209,7 @@ body:not(.editing) .nav_bar .editor,\
 
     var held = null;
 
-    var nav = new Deck(navbar.find('.button').toArray());
+    var nav = new Deck();
     var def = new ToolBar(toolbar.children());
     var disabled = new ToolBar([]);
 
