@@ -1,9 +1,9 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        Controls Freak
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.0.4
+// @version     1.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -37,14 +37,14 @@ function ToolBar(buttons) {
             $(bar).append(nod);
         }
     }
-    this.getEdit = function () {
-        this.container.empty();
-        for (var i = 0; i < this.children.length; i++) {
-            this.container.append(this.children[i].getEditNode());
-        }
-    }
     this.accept = function (node) {
         node.drop();
+    }
+}
+ToolBar.prototype.getEdit = function () {
+    this.container.empty();
+    for (var i = 0; i < this.children.length; i++) {
+        this.container.append(this.children[i].getEditNode());
     }
 }
 ToolBar.prototype.getContainer = function (holder, classes, allow) {
@@ -110,20 +110,10 @@ function Deck() {
     this.container = null;
     this.children = [];
 
-    var buttons = $('.nav_bar .light .notifications_link ~ .container .button').toArray();
-    //var buttons = [ $('.nav_bar .light .notifications_link ~ .container').parent() ];
-    /*buttons.unshift($('.nav_bar .light .mail_link').parent());
-    buttons.unshift($('.nav_bar .light .feed_link').parent());*/
-    for (var i = 0; i < buttons.length; i++) {
-        this.children.push(Pin(this, i, buttons[i], false));
-    }
+    this.children.push(new Button(this, 0, $('.nav_bar .light .mail_link').parent(), false, 'pin'));
+    this.children.push(new Button(this, 1, $('.nav_bar .light .feed_link').parent(), false, 'pin'));
+    this.children.push(new Button(this, 2, $('.nav_bar .light .notifications_link').parent(), true, 'pin'));
 
-    this.getEdit = function () {
-        this.container.empty();
-        for (var i = 0; i < this.children.length; i++) {
-            this.container.append(this.children[i].getPinNode());
-        }
-    }
     this.home = function () {
         for (var i = 0; i < this.children.length; i++) {
             if (this.children[i].type = 'pin') {
@@ -140,6 +130,64 @@ Deck.prototype = ToolBar.prototype;
 if (getIsLoggedIn()) {
 
     makeStyle('\
+.user_toolbar .notifications_link:before {\
+    content: "";}\
+.user_toolbar .mail_link:before {\
+    content: "";}\
+.user_toolbar .feed_link:before {\
+    content: "";}\
+.user_toolbar div[class*="_link"]:before {\
+    font-family: "FontAwesome";}\
+.user_toolbar div[class*="_link"] div {\
+    padding: 4px;\
+    line-height: 1em;\
+    display: none;}\
+.user_toolbar div[class*="_link"] div:before {\
+    content: "(";}\
+.user_toolbar div[class*="_link"] div:after {\
+    content: ")";}\
+.user_toolbar .link_container .link {\
+    position: absolute;\
+    left: 0px;\
+    right: 0px;\
+    top: 0px;\
+    bottom: 0px;\
+    display: block;\
+    z-index: 2;}\
+.user_toolbar div[class*="_link"] {\
+    min-width: 24px;\
+    display: inline-block;\
+    vertical-align: middle;\
+    background-color: rgba(255, 255, 255, 0.1);\
+    background-position: right top;\
+    text-decoration: none;\
+    font-family: Arial;\
+    font-size: 13px;\
+    font-weight: bold;\
+    color: rgba(0, 0, 0, 0.85);\
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
+    padding-left: 12px;\
+    padding-right: 12px;\
+    line-height: 38px;\
+    transition-property: background-color, box-shadow;\
+    transition-duration: 0.1s;\
+    border-right: 1px solid rgba(0, 0, 0, 0.2);\
+    margin: -1px 0px 0px;\
+    box-shadow: 0px 0px 8px transparent inset;\
+    border-top: 1px solid rgba(0, 0, 0, 0.2);}\
+.user_toolbar .link_container:hover {\
+    background-color: rgba(0, 0, 0, 0.2);}\
+div.user_toolbar div.inner > div[class*="_link"]:hover, div.user_toolbar div.inner > div.user_drop_down_menu:hover > div[class*="_link"] {\
+    border-left: 1px solid rgba(0, 0, 0, 0.2);\
+    margin-left: -1px;}\
+div.user_toolbar .drop_down_container.hover > .container > div.menu_list {\
+    display: block;\
+    visibility: visible;\
+    opacity: 1;\
+    transition-delay: 0s;}\
+.drop_down_container.hover div.container {\
+    display: block !important;}\
+\
 .custom_button {\
     cursor: pointer;\
     -webkit-user-select: none;\
@@ -239,7 +287,7 @@ body:not(.editing) .nav_bar .editor,\
     loadUnusedButtons(disabled);
 
     nav.getContainer(navbar, ['light'], function () {
-        return this.type == 'pin' && this.children.length == 0;
+        return this.isPinnable();
     });
 
     $(toolbar).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
@@ -419,14 +467,8 @@ function getButton(entry) {
     return null;
 }
 
-function Pin(p, index, el, handleChilds) {
-    var result = new Button(p, index, el, handleChilds);
-    result.type = 'pin';
-    return result;
-}
-
 //function Button(custom, el, handleChilds) {
-function Button(p, index, el, handleChilds) {
+function Button(p, index, el, handleChilds, typ) {
     if (p == true) {
         buttonRegistry.cust(this);
         usedButtons.cust(false);
@@ -445,7 +487,7 @@ function Button(p, index, el, handleChilds) {
         unusedButtons.push(false);
     }
 
-    this.type = 'button';
+    this.type = typ == null ? 'button' : typ;
     this.originalElement = $(el);
     this._parent = p;
     this._index = index;
@@ -457,12 +499,15 @@ function Button(p, index, el, handleChilds) {
     this.originalParent = $($(el).parent());
     this.originalIndex = this.originalElement.index();
 
-    if (handleChilds && el.tagName == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
+    if (handleChilds && $(el).prop('tagName') == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
         this.listNode = $(this.originalElement.find('.menu_list')[0]);
+        if (this.listNode.length == 0) {
+            this.listNode = $(this.originalElement.find('.container > .menu_list')[0]);
+        }
         var childs = this.listNode.children();
         for (var i = 0; i < childs.length; i++) {
             if (childs[i].tagName == 'A' || childs[i].tagName == 'DIV' || childs[i].tagName == 'LABEL') {
-                this.children.push(new Button(this, i, childs[i], false));
+                this.children.push(new Button(this, i, childs[i], false, this.type));
             } else {
                 this.children.push(new Baggage(childs[i]));
             }
@@ -520,6 +565,14 @@ function Button(p, index, el, handleChilds) {
         for (var i = 0; i < nesiblings.length; i++) {
             this.originalParent.append(nesiblings[i]);
         }
+
+        if (this.listNode != null) {
+            for (var i = 0; i < this.children.length; i++) {
+                if (this.children[i].type == 'pin') {
+                    this.children[i].gohome();
+                }
+            }
+        }
     }
     this.add = function () {
         if (_removed) {
@@ -556,55 +609,22 @@ function Button(p, index, el, handleChilds) {
         }
         return this.originalElement;
     }
-    this.getPinNode = function () {
-        var result = $('<div class="button editing_button" />');
-        var copy = this.originalElement.clone();
-        var me = this;
-
-        copy.find('.menu_list').remove();
-        copy.find('input').remove();
-        if (this.listNode == null) {
-            result.append(copy.html());
-        } else {
-            copy.find('.menu_list').remove();
-            result.html($(copy.find('.button')[0]).html());
-        }
-
-        $(result).click(function (e) {
-            e.stopPropagation();
-            if (held == null) {
-                me.pickup(this, e);
-            } else if (held.timeout <= 0) {
-                if (held.type == 'pin') {
-                    held._index = me._index;
-                    held._parent = me._parent;
-                    if (me._parent == nav) {
-                        held.return();
-                    } else {
-                        held.drop();
-                    }
-                } else if (me._parent != nav) {
-                    held._index = me._index;
-                    held._parent = me._parent;
-                    held.drop();
-                }
-            }
-        });
-
-        return result;
-    }
     this.getEditNode = function () {
         var result = $('<div class="button editing_button" />');
         var copy = this.originalElement.clone();
         var me = this;
 
-        copy.find('.menu_list').remove();
+        copy.find('.menu_list').add(copy.find('.container')).remove();
         copy.find('input').remove();
         if (this.listNode == null) {
             result.append(copy.html());
         } else {
-            copy.find('.menu_list').remove();
-            result.html($(copy.find('.button')[0]).html());
+            var bs = $(copy.find('.button'));
+            if (bs.length == 1) {
+                result.html(bs[0]).html();
+            } else {
+                result.append(copy.html());
+            }
         }
 
         var subs = $('<div class="items" />');
@@ -624,22 +644,45 @@ function Button(p, index, el, handleChilds) {
             }
         });
 
-        $(result).click(function (e) {
-            e.stopPropagation();
-            if (held == null) {
-                me.pickup(this, e);
-            } else if (held.timeout <= 0) {
-                if (me._parent != disabled) {
-                    held._index = me._index;
-                    held._parent = me._parent;
-                    held.drop();
-                } else if ((held.listNode == null || held.children.length == 0) && held.type != 'pin') {
-                    held._index = me._index;
-                    held._parent = me._parent;
-                    held.drop();
+        if (this.type == 'pin') {
+            $(result).click(function (e) {
+                e.stopPropagation();
+                if (held == null) {
+                    me.pickup(this, e);
+                } else if (held.timeout <= 0) {
+                    if (held.type == 'pin') {
+                        held._index = me._index;
+                        held._parent = me._parent;
+                        if (me._parent == nav) {
+                            held.return();
+                        } else {
+                            held.drop();
+                        }
+                    } else if (me._parent != nav) {
+                        held._index = me._index;
+                        held._parent = me._parent;
+                        held.drop();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            $(result).click(function (e) {
+                e.stopPropagation();
+                if (held == null) {
+                    me.pickup(this, e);
+                } else if (held.timeout <= 0) {
+                    if (me._parent != disabled) {
+                        held._index = me._index;
+                        held._parent = me._parent;
+                        held.drop();
+                    } else if ((held.listNode == null || held.children.length == 0) && held.type != 'pin') {
+                        held._index = me._index;
+                        held._parent = me._parent;
+                        held.drop();
+                    }
+                }
+            });
+        }
 
         return result;
     }
@@ -674,6 +717,7 @@ function Button(p, index, el, handleChilds) {
 
         def.gen(toolbar);
         def.getEdit();
+        nav.home();
         nav.getEdit();
         disabled.getEdit();
 
@@ -688,11 +732,21 @@ function Button(p, index, el, handleChilds) {
 
         def.gen(toolbar);
         def.getEdit();
+        nav.home();
         nav.getEdit();
         disabled.getEdit();
 
         setConfig([nav.getConfig(), def.getConfig()]);
         saveUnusedButtons();
+    }
+    this.isPinnable = function () {
+        if (this.type == 'pin') {
+            for (var i = 0; i < this.children.length; i++) {
+                if (!this.children[i].isPinnable()) return false;
+            }
+            return true;
+        }
+        return false;
     }
 }
 
