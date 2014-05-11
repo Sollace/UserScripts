@@ -37,9 +37,6 @@ function ToolBar(buttons) {
             $(bar).append(nod);
         }
     }
-    this.accept = function (node) {
-        node.drop();
-    }
 }
 ToolBar.prototype.getEdit = function () {
     this.container.empty();
@@ -57,7 +54,7 @@ ToolBar.prototype.getContainer = function (holder, classes, allow) {
                 if (allow.apply(held)) {
                     held._index = me.children.length;
                     held._parent = me;
-                    me.accept(held);
+                    held.drop();
                 }
             }
         });
@@ -110,19 +107,18 @@ function Deck() {
     this.container = null;
     this.children = [];
 
+    this.deckStart = $('#home_link + .link_container');
+
     this.children.push(new Button(this, 0, $('.nav_bar .light .mail_link').parent(), false, 'pin'));
     this.children.push(new Button(this, 1, $('.nav_bar .light .feed_link').parent(), false, 'pin'));
     this.children.push(new Button(this, 2, $('.nav_bar .light .notifications_link').parent(), true, 'pin'));
 
-    this.home = function () {
-        for (var i = 0; i < this.children.length; i++) {
+    this.gen = function () {
+        for (var i = this.children.length - 1; i >= 0; i--) {
             if (this.children[i].type = 'pin') {
-                this.children[i].gohome();
+                this.deckStart.after(this.children[i].genNode(i));
             }
         }
-    }
-    this.accept = function (node) {
-        node.return();
     }
 }
 Deck.prototype = ToolBar.prototype;
@@ -138,6 +134,8 @@ if (getIsLoggedIn()) {
     content: "";}\
 .user_toolbar div[class*="_link"]:before {\
     font-family: "FontAwesome";}\
+.user_toolbar div[class*="_link"].new div {\
+    display: inline-block;}\
 .user_toolbar div[class*="_link"] div {\
     padding: 4px;\
     line-height: 1em;\
@@ -154,17 +152,26 @@ if (getIsLoggedIn()) {
     bottom: 0px;\
     display: block;\
     z-index: 2;}\
+.user_toolbar div[class*="_link"].new {\
+    margin: -2px 0px -1px;}\
+.user_toolbar div[class*="_link"]:not(.new) {\
+    color: rgba(0, 0, 0, 0.85);\
+    background-color: rgba(255, 255, 255, 0.1);}\
+.user_toolbar .user_drop_down_menu:hover > div[class*="_link"].new, .user_toolbar div[class*="_link"].new:hover {\
+    background-color: #A0472E;\
+    color: #FFF;\
+    text-shadow: -1px -1px #803824;\
+    border-bottom: 1px solid #703120;\
+    border-left: 1px solid #803824;}\
 .user_toolbar div[class*="_link"] {\
     min-width: 24px;\
     display: inline-block;\
     vertical-align: middle;\
-    background-color: rgba(255, 255, 255, 0.1);\
     background-position: right top;\
     text-decoration: none;\
     font-family: Arial;\
     font-size: 13px;\
     font-weight: bold;\
-    color: rgba(0, 0, 0, 0.85);\
     text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
     padding-left: 12px;\
     padding-right: 12px;\
@@ -177,7 +184,7 @@ if (getIsLoggedIn()) {
     border-top: 1px solid rgba(0, 0, 0, 0.2);}\
 .user_toolbar .link_container:hover {\
     background-color: rgba(0, 0, 0, 0.2);}\
-div.user_toolbar div.inner > div[class*="_link"]:hover, div.user_toolbar div.inner > div.user_drop_down_menu:hover > div[class*="_link"] {\
+div.user_toolbar div.inner > div[class*="_link"]:not(.new):hover, div.user_toolbar div.inner > div.user_drop_down_menu:hover > div[class*="_link"]:not(.new) {\
     border-left: 1px solid rgba(0, 0, 0, 0.2);\
     margin-left: -1px;}\
 div.user_toolbar .drop_down_container.hover > .container > div.menu_list {\
@@ -281,6 +288,7 @@ body:not(.editing) .nav_bar .editor,\
         unusedButtons.flush(false);
         nav.fromConfig(conf[0]);
         def.fromConfig(conf[1]);
+        nav.gen();
         def.gen(toolbar);
     }
 
@@ -334,7 +342,7 @@ body:not(.editing) .nav_bar .editor,\
         def.fromConfig(norm[1]);
         loadUnusedButtons(disabled);
         def.gen(toolbar);
-        nav.home();
+        nav.gen();
         def.getEdit();
         nav.getEdit();
         disabled.getEdit();
@@ -552,26 +560,18 @@ function Button(p, index, el, handleChilds, typ) {
         var siblings = this.originalParent.children().toArray();
         for (var i = 0; i < siblings.length; i++) {
             if (i == this.originalIndex) {
-                nesiblings.push(this.originalElement);
+                nesiblings.push(this.genNode());
                 added = true;
             }
             nesiblings.push(siblings[i]);
             $(siblings[i]).detach();
         }
         if (!added) {
-            nesiblings.push(this.originalElement);
+            nesiblings.push(this.genNode());
         }
 
         for (var i = 0; i < nesiblings.length; i++) {
             this.originalParent.append(nesiblings[i]);
-        }
-
-        if (this.listNode != null) {
-            for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i].type == 'pin') {
-                    this.children[i].gohome();
-                }
-            }
         }
     }
     this.add = function () {
@@ -600,9 +600,7 @@ function Button(p, index, el, handleChilds, typ) {
         $(this.originalElement).removeClass('button-first');
 
         if (this.children.length > 0 && this.listNode != null) {
-            $(this.listNode).children().each(function () {
-                $(this).detach();
-            });
+            $(this.listNode).children().detach();
             for (var i = 0; i < this.children.length; i++) {
                 $(this.listNode).append(this.children[i].genNode());
             }
@@ -653,11 +651,7 @@ function Button(p, index, el, handleChilds, typ) {
                     if (held.type == 'pin') {
                         held._index = me._index;
                         held._parent = me._parent;
-                        if (me._parent == nav) {
-                            held.return();
-                        } else {
-                            held.drop();
-                        }
+                        held.drop();
                     } else if (me._parent != nav) {
                         held._index = me._index;
                         held._parent = me._parent;
@@ -717,22 +711,7 @@ function Button(p, index, el, handleChilds, typ) {
 
         def.gen(toolbar);
         def.getEdit();
-        nav.home();
-        nav.getEdit();
-        disabled.getEdit();
-
-        setConfig([nav.getConfig(), def.getConfig()]);
-        saveUnusedButtons();
-    }
-    this.return = function () {
-        held = null;
-
-        this.add();
-        this.gohome();
-
-        def.gen(toolbar);
-        def.getEdit();
-        nav.home();
+        nav.gen();
         nav.getEdit();
         disabled.getEdit();
 
