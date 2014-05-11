@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.0.3
+// @version     1.0.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -43,6 +43,9 @@ function ToolBar(buttons) {
             this.container.append(this.children[i].getEditNode());
         }
     }
+    this.accept = function (node) {
+        node.drop();
+    }
 }
 ToolBar.prototype.getContainer = function (holder, classes, allow) {
     if (this.container == null) {
@@ -54,7 +57,7 @@ ToolBar.prototype.getContainer = function (holder, classes, allow) {
                 if (allow.apply(held)) {
                     held._index = me.children.length;
                     held._parent = me;
-                    held.drop();
+                    me.accept(held);
                 }
             }
         });
@@ -108,10 +111,11 @@ function Deck() {
     this.children = [];
 
     var buttons = $('.nav_bar .light .notifications_link ~ .container .button').toArray();
+    //var buttons = [ $('.nav_bar .light .notifications_link ~ .container').parent() ];
     /*buttons.unshift($('.nav_bar .light .mail_link').parent());
     buttons.unshift($('.nav_bar .light .feed_link').parent());*/
     for (var i = 0; i < buttons.length; i++) {
-        this.children.push(Pin(this, i, buttons[i]));
+        this.children.push(Pin(this, i, buttons[i], false));
     }
 
     this.getEdit = function () {
@@ -126,6 +130,9 @@ function Deck() {
                 this.children[i].gohome();
             }
         }
+    }
+    this.accept = function (node) {
+        node.return();
     }
 }
 Deck.prototype = ToolBar.prototype;
@@ -144,7 +151,8 @@ if (getIsLoggedIn()) {
     visibility: visible;\
     opacity: 1;}\
 body.editing .nav_bar,\
-body.editing .editor {\
+body.editing .editor:not(.label) {\
+    min-height: 40px;\
     height: auto !important;}\
 body.editing .user_toolbar > .inner:not(.editor),\
 body.editing .nav_bar > .light:not(.editor),\
@@ -169,7 +177,6 @@ body:not(.editing) .nav_bar .editor,\
 .user_toolbar .bin {\
     border-top: 1px solid rgba(0, 0, 0, 0.5);\
     margin-top: 5px;\
-    min-height: 40px;\
     background-color: rgba(250, 240, 230, 0.6);}\
 .user_toolbar .editor a {\
     pointer-events: none;}\
@@ -306,6 +313,7 @@ function loadUnusedButtons(p) {
         var index = parseInt(ids[i]);
         if (index >= buttonRegistry.neglength() && index < buttonRegistry.poslength()) {
             var b = buttonRegistry.get(index);
+            b.children = [];
             b._parent = p;
             b._index = result.length;
             result.push(b);
@@ -315,6 +323,7 @@ function loadUnusedButtons(p) {
     for (var i = unusedButtons.neglength() ; i < 0; i++) {
         var b = buttonRegistry.get(i);
         if (unusedButtons.get(i) && !usedButtons.get(i) && !arrContains(result, b)) {
+            b.children = [];
             b._parent = p;
             b._index = result.length;
             result.push(b);
@@ -410,8 +419,8 @@ function getButton(entry) {
     return null;
 }
 
-function Pin(p, index, el) {
-    var result = new Button(p, index, el, false);
+function Pin(p, index, el, handleChilds) {
+    var result = new Button(p, index, el, handleChilds);
     result.type = 'pin';
     return result;
 }
@@ -624,7 +633,7 @@ function Button(p, index, el, handleChilds) {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
-                } else if (held.listNode == null || held.children.length == 0) {
+                } else if ((held.listNode == null || held.children.length == 0) && held.type != 'pin') {
                     held._index = me._index;
                     held._parent = me._parent;
                     held.drop();
