@@ -126,6 +126,14 @@ Deck.prototype = ToolBar.prototype;
 if (getIsLoggedIn()) {
 
     makeStyle('\
+.nav_bar .menu_list .user_drop_down_menu {\
+    display: block !important;}\
+.nav_bar .menu_list i {\
+    float: left !important;\
+    width: 23px;}\
+.user_toolbar .menu_list i {\
+    float: right !important;\
+    width: initial !important;}\
 .nav_bar .container .link_container {\
     background-color: rgba(255, 255, 255, 0.1);\
     padding-left: 6px;\
@@ -222,7 +230,8 @@ div.nav_bar .light div.drop_down_container.user_drop_down_menu .menu_list {\
     background-color: #DB6209;\
     color: #FFF;\
     text-shadow: -1px -1px #803824;\
-    margin-bottom: 0px;}\
+    border-bottom: 1px #FFF !important;\
+    margin-bottom: 1px !important;}\
 .user_toolbar .menu_list .user_drop_down_menu:hover > .new:before,\
 .user_toolbar .menu_list .new:before {\
     color: #AAA;}\
@@ -284,7 +293,7 @@ div.user_toolbar .drop_down_container.hover > .container > div.menu_list,\
     cursor: pointer;\
     -webkit-user-select: none;\
     -moz-user-select: none;}\
-.user_toolbar .button:not(.editing) .editBox {\
+.button:not(.editing) .editBox {\
     display: none;}\
 .button.editing + div.menu_list {\
     display: block;\
