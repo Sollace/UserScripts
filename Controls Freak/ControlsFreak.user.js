@@ -126,12 +126,73 @@ Deck.prototype = ToolBar.prototype;
 if (getIsLoggedIn()) {
 
     makeStyle('\
+.nav_bar .container .link_container {\
+    background-color: rgba(255, 255, 255, 0.1);\
+    padding-left: 6px;\
+    padding-right: 12px;\
+    transition-property: none;\
+    transition-duration: 0s;\
+    text-shadow: 1px 1px rgba(255, 255, 255, 0.4);\
+    box-shadow: none;\
+    border: none;\
+    border-bottom: solid 1px #DDD;}\
+.nav_bar .container .link_container:hover {\
+    background-color: #FFF;\
+    margin-left: 0px;}\
+.nav_bar .container .link_container div[class*="_link"] {\
+    text-shadow: inherit !important;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu div[class*="_link"]:not(.new):before,\
+.nav_bar .container .link_container div[class*="_link"]:before {\
+    color: #AAA;\
+    text-shadow: inherit !important;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu:hover div[class*="_link"]:not(.new):before,\
+.nav_bar .container .link_container:hover div[class*="_link"]:before {\
+    color: #2773E6 !important;}\
+.user_toolbar .user_drop_down_menu .menu_list div[class*="_link"] div,\
+.nav_bar .container .link_container div[class*="_link"] div {\
+    font-weight: normal !important;\
+    color: #333;\
+    text-decoration: none;\
+    font-family: Arial;\
+    font-size: 13px;\
+    display: inline-block;\
+    margin-left: 3px;\
+    background: none;\
+    border: none;\
+    box-shadow: none;\
+    position: static;}\
+div.nav_bar .light div.drop_down_container div.container div.panel {\
+    overflow: visible;}\
+div.nav_bar .user_drop_down_menu:not(.hover) > .menu_list {\
+    display: none !important;}\
+div.nav_bar .light div.drop_down_container.user_drop_down_menu .menu_list {\
+    background-color: #CCC;\
+    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.35);\
+    border-right: 1px solid #454545;\
+    border-width: medium 1px 1px;\
+    border-style: none solid solid;\
+    border-color: -moz-use-text-color #454545 #454545;\
+    -moz-border-top-colors: none;\
+    -moz-border-right-colors: none;\
+    -moz-border-bottom-colors: none;\
+    -moz-border-left-colors: none;\
+    white-space: nowrap;\
+    font-family: Calibri;}\
 .user_toolbar .notifications_link:before {\
     content: "";}\
+.menu_list .notifications_link div:after,\
+.container .link_container .notifications_link div:after {\
+    content: " Notices";}\
 .user_toolbar .mail_link:before {\
     content: "";}\
+.menu_list .mail_link div:after,\
+.container .link_container .mail_link div:after {\
+    content: " Mail";}\
 .user_toolbar .feed_link:before {\
     content: "";}\
+.menu_list .feed_link div:after,\
+.container .link_container .feed_link div:after {\
+    content: " Feeds";}\
 .user_toolbar div[class*="_link"]:before {\
     font-family: "FontAwesome";}\
 .user_toolbar div[class*="_link"].new div {\
@@ -140,10 +201,6 @@ if (getIsLoggedIn()) {
     padding: 4px;\
     line-height: 1em;\
     display: none;}\
-.user_toolbar div[class*="_link"] div:before {\
-    content: "(";}\
-.user_toolbar div[class*="_link"] div:after {\
-    content: ")";}\
 .user_toolbar .link_container .link {\
     position: absolute;\
     left: 0px;\
@@ -152,25 +209,33 @@ if (getIsLoggedIn()) {
     bottom: 0px;\
     display: block;\
     z-index: 2;}\
-.user_toolbar div[class*="_link"].new {\
-    margin: -2px 0px -1px;}\
+.user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
+    margin: -2px 0px -1px;\
+    text-shadow: -1px -1px #A0472E;}\
+.user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] div {\
+    font-size: 13px;}\
 .user_toolbar div[class*="_link"]:not(.new) {\
     color: rgba(0, 0, 0, 0.85);\
     background-color: rgba(255, 255, 255, 0.1);}\
-.user_toolbar .user_drop_down_menu:hover > div[class*="_link"].new, .user_toolbar div[class*="_link"].new:hover {\
-    background-color: #A0472E;\
+.user_toolbar .menu_list .user_drop_down_menu:hover > .new,\
+.user_toolbar .menu_list .new:hover {\
+    background-color: #DB6209;\
     color: #FFF;\
     text-shadow: -1px -1px #803824;\
-    border-bottom: 1px solid #703120;\
-    border-left: 1px solid #803824;}\
-.user_toolbar div[class*="_link"] {\
-    min-width: 24px;\
+    margin-bottom: 0px;}\
+.user_toolbar .menu_list .user_drop_down_menu:hover > .new:before,\
+.user_toolbar .menu_list .new:before {\
+    color: #AAA;}\
+.user_toolbar .menu_list .new:not([class*="_link"]) {\
+    border-left: 1px solid #803824 !important;}\
+.user_toolbar .menu_list .user_drop_down_menu:hover > div[class*="_link"].new:before,\
+.user_toolbar .menu_list div[class*="_link"].new:hover:before {\
+    color: #2773E6;}\
+.user_toolbar > .inner > .user_drop_down_menu > div[class*="_link"] {\
     display: inline-block;\
     vertical-align: middle;\
-    background-position: right top;\
-    text-decoration: none;\
+    border-top: 1px solid rgba(0, 0, 0, 0.2);\
     font-family: Arial;\
-    font-size: 13px;\
     font-weight: bold;\
     text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
     padding-left: 12px;\
@@ -180,20 +245,40 @@ if (getIsLoggedIn()) {
     transition-duration: 0.1s;\
     border-right: 1px solid rgba(0, 0, 0, 0.2);\
     margin: -1px 0px 0px;\
-    box-shadow: 0px 0px 8px transparent inset;\
-    border-top: 1px solid rgba(0, 0, 0, 0.2);}\
+    box-shadow: 0px 0px 8px transparent inset;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"] {\
+    text-decoration: none;\
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);\
+    background-position: right top;\
+    min-width: 24px;\
+    text-align: left;\
+    text-shadow: 1px 1px rgba(255, 255, 255, 0.4);\
+    font-weight: normal;\
+    padding-left: 12px;\
+    padding-right: 12px;\
+    line-height: 38px;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu:hover div[class*="_link"]:not(.new) {\
+    background: white;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"].new:before {\
+    text-shadow: none;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"] div {\
+    margin-left: 5px;}\
+.user_toolbar .inner .user_drop_down_menu .menu_list .new,\
+.user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"].new div {\
+    color: #FFF;\
+    text-shadow: -1px -1px #A0472E;}\
 .user_toolbar .link_container:hover {\
     background-color: rgba(0, 0, 0, 0.2);}\
-div.user_toolbar div.inner > div[class*="_link"]:not(.new):hover, div.user_toolbar div.inner > div.user_drop_down_menu:hover > div[class*="_link"]:not(.new) {\
+div.user_toolbar .inner > div[class*="_link"]:not(.new):hover,\
+div.user_toolbar .inner > div.user_drop_down_menu:hover > div[class*="_link"]:not(.new) {\
     border-left: 1px solid rgba(0, 0, 0, 0.2);\
     margin-left: -1px;}\
-div.user_toolbar .drop_down_container.hover > .container > div.menu_list {\
+div.user_toolbar .drop_down_container.hover > .container > div.menu_list,\
+.drop_down_container.hover div.container {\
     display: block;\
     visibility: visible;\
     opacity: 1;\
     transition-delay: 0s;}\
-.drop_down_container.hover div.container {\
-    display: block !important;}\
 \
 .custom_button {\
     cursor: pointer;\
@@ -233,7 +318,7 @@ body:not(.editing) .nav_bar .editor,\
     border-top: 1px solid rgba(0, 0, 0, 0.5);\
     margin-top: 5px;\
     background-color: rgba(250, 240, 230, 0.6);}\
-.user_toolbar .editor a {\
+.editor a {\
     pointer-events: none;}\
 .editing_button {\
     cursor: move;}\
