@@ -225,6 +225,13 @@ div.nav_bar .light div.drop_down_container.user_drop_down_menu .menu_list {\
 .user_toolbar div[class*="_link"]:not(.new) {\
     color: rgba(0, 0, 0, 0.85);\
     background-color: rgba(255, 255, 255, 0.1);}\
+.user_toolbar .inner > .user_drop_down_menu:hover > div[class*="_link"].new {\
+    background-color: #A0472E;\
+        color: #FFF;\
+    text-shadow: -1px -1px #803824;\
+    border-bottom: 1px solid #703120;\
+    margin-bottom: -1px;\
+    border-left: 1px solid #803824;}\
 .user_toolbar .menu_list .user_drop_down_menu:hover > .new,\
 .user_toolbar .menu_list .new:hover {\
     background-color: #DB6209;\
@@ -328,7 +335,7 @@ body:not(.editing) .nav_bar .editor,\
     border-top: 1px solid rgba(0, 0, 0, 0.5);\
     margin-top: 5px;\
     background-color: rgba(250, 240, 230, 0.6);}\
-.editor a {\
+.editor a, .editor .new, #button_moving {\
     pointer-events: none;}\
 .editing_button {\
     cursor: move;}\
@@ -341,7 +348,6 @@ body:not(.editing) .nav_bar .editor,\
     background: rgba(255,255,255,0.3);\
     padding: 5px;}\
 #button_moving {\
-    pointer-events: none;\
     z-index: 100000;\
     position: fixed !important;}\
 #button_moving:after {\
