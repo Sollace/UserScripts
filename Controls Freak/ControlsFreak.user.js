@@ -312,6 +312,7 @@ body:not(.editing) .nav_bar .editor,\
 .user_toolbar > .inner > .button > i {\
         float: none !important;}\
 .inner.label {\
+    z-index: 2;\
     position: absolute;\
     background-color: inherit;\
     transition: background-color 0.5s ease 0s;\
