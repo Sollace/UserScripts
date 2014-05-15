@@ -867,38 +867,8 @@ function customButton(index) {
     var a = $('<div class="button custom_button" href="javascript:void();"><i class="bind_icon fa fa-' + customButtonData[index].icon + '" /><span class="bind_name">' + customButtonData[index].name + '</span></div>');
     node.prepend(a);
 
-    var editBox = $('<div class="editBox" />');
-    a.append(editBox);
-
-    var editName = $('<input type="text" />');
-    editBox.append(editName);
-    editName.val(customButtonData[index].name);
-    editName.change(function () {
-        var v = $(this).val();
-        customButtonData[index].name = v == '' ? 'Custom' : v;
-        a.find('.bind_name').html(customButtonData[index].name);
-        saveCustomButtons();
-    });
-    var editIcon = $('<select />');
-    editBox.append(editIcon);
-    var icons = ["ambulance", "anchor", "android", "apple", "archive", "asterisk", "ban", "bar-chart-o", "beer", "bell", "bell-o", "bolt", "book", "bookmark", "briefcase", "bug", "building-o", "bullhorn", "calendar", "camera", "certificate", "chain", "chain-broken", "check", "clipboard", "clock-o", "cloud", "cloud-download", "cloud-upload", "coffee", "comment", "comments", "compass", "credit-card", "cutlery", "dashboard", "desktop", "dollar", "download", "eject", "envelope", "envelope-o", "eraser", "euro", "exclamation", "eye", "facebook", "female", "fighter-jet", "file", "file-o", "file-text", "file-text-o", "film", "fire", "fire-extinguisher", "flag", "flag-checkered", "flag-o", "flask", "flickr", "folder", "folder-open", "frown-o", "gamepad", "gbp", "gear", "gears", "gift", "glass", "globe", "google-plus", "hdd-o", "headphones", "heart", "heart-o", "home", "hospital-o", "inbox", "info", "key", "keyboard-o", "laptop", "leaf", "legal", "lemon-o", "lightbulb-o", "linux", "list-ol", "list-ul", "lock", "magic", "magnet", "male", "medkit", "meh-o", "microphone", "minus-circle", "mobile", "money", "moon-o", "music", "pagelines", "paperclip", "pencil", "phone", "picture-o", "plane", "play-circle", "plus-circle", "power-off", "print", "puzzle-piece", "question", "quote-left", "quote-right", "refresh", "repeat", "road", "rocket", "rss", "save", "scissors", "search", "shield", "shopping-cart", "smile-o", "stack-exchange", "star", "star-half", "star-half-empty", "star-o", "stethoscope", "suitcase", "sun-o", "tablet", "tag", "tags", "thumb-tack", "thumbs-down", "thumbs-o-down", "thumbs-o-up", "thumbs-up", "ticket", "times-circle", "tint", "trash-o", "trophy", "truck", "tumblr", "twitter", "umbrella", "unlock", "upload", "user", "users", "video-camera", "warning", "wheelchair", "windows", "wrench", "youtube"];
-    for (var i = 0; i < icons.length; i++) {
-        editIcon.append('<option>' + icons[i] + '</option>');
-    }
-    editIcon.val(customButtonData[index].icon);
-    editIcon.change(function () {
-        var val = $(this).find('option:selected').text();
-        customButtonData[index].icon = val;
-        a.find('.bind_icon').attr('class', 'bind_icon fa fa-' + val);
-        saveCustomButtons();
-    });
-
-    a.dblclick(function (e) {
-        if ($(this).hasClass('editing')) {
-            $(this).removeClass('editing');
-        } else {
-            $(this).addClass('editing');
-        }
+    a.dblclick(function () {
+        makeEditButtonPopup(a, index);
     });
     new Button(true, node[0], true);
 }
@@ -962,10 +932,60 @@ function register() {
     }
 }
 
+function makeEditButtonPopup(node, index) {
+    var pop = makeGlobalPopup('Custom Button', 'fa fa-edit');
+
+    $(pop.parentNode).css('width', '700px');
+
+    var tbl = $('<tbody />');
+    $(pop).append('<table class="properties" />');
+    $('table', pop).append(tbl);
+
+    var footer = $('<div class="drop-down-pop-up-footer" />');
+    $(pop).append(footer);
+
+    var done = $('<button class="styled_button"><i class="fa fa-save" />Save</button>');
+    footer.append(done);
+
+    var row = $('<tr />');
+    $(tbl).append(row);
+
+    $(row).append('<td class="label">Folder Name</td>');
+    $(row).append('<td><div><input id="custom_folder_name" type="text" placeholder="Custom" /></div></td>');
+
+    $('#custom_folder_name', row).val(customButtonData[index].name);
+
+    row = $('<tr />');
+    $(tbl).append(row);
+
+    $(row).append('<td class="label">Folder Icon</td>');
+    var select = '<td><div><select id="custom_folder_icon">';
+    var icons = ["ambulance", "anchor", "android", "apple", "archive", "asterisk", "ban", "bar-chart-o", "beer", "bell", "bell-o", "bolt", "book", "bookmark", "briefcase", "bug", "building-o", "bullhorn", "calendar", "camera", "certificate", "chain", "chain-broken", "check", "clipboard", "clock-o", "cloud", "cloud-download", "cloud-upload", "coffee", "comment", "comments", "compass", "credit-card", "cutlery", "dashboard", "desktop", "dollar", "download", "eject", "envelope", "envelope-o", "eraser", "euro", "exclamation", "eye", "facebook", "female", "fighter-jet", "file", "file-o", "file-text", "file-text-o", "film", "fire", "fire-extinguisher", "flag", "flag-checkered", "flag-o", "flask", "flickr", "folder", "folder-open", "frown-o", "gamepad", "gbp", "gear", "gears", "gift", "glass", "globe", "google-plus", "hdd-o", "headphones", "heart", "heart-o", "home", "hospital-o", "inbox", "info", "key", "keyboard-o", "laptop", "leaf", "legal", "lemon-o", "lightbulb-o", "linux", "list-ol", "list-ul", "lock", "magic", "magnet", "male", "medkit", "meh-o", "microphone", "minus-circle", "mobile", "money", "moon-o", "music", "pagelines", "paperclip", "pencil", "phone", "picture-o", "plane", "play-circle", "plus-circle", "power-off", "print", "puzzle-piece", "question", "quote-left", "quote-right", "refresh", "repeat", "road", "rocket", "rss", "save", "scissors", "search", "shield", "shopping-cart", "smile-o", "stack-exchange", "star", "star-half", "star-half-empty", "star-o", "stethoscope", "suitcase", "sun-o", "tablet", "tag", "tags", "thumb-tack", "thumbs-down", "thumbs-o-down", "thumbs-o-up", "thumbs-up", "ticket", "times-circle", "tint", "trash-o", "trophy", "truck", "tumblr", "twitter", "umbrella", "unlock", "upload", "user", "users", "video-camera", "warning", "wheelchair", "windows", "wrench", "youtube"];
+    for (var i = 0; i < icons.length; i++) {
+        select += '<option>' + icons[i] + '</option></div></div>';
+    }
+    $(row).append(select + '</select>');
+    $('#custom_folder_icon', row).val(customButtonData[index].icon);
+
+    $(done).click(function () {
+        var v = $('#custom_folder_name', tbl).val();
+        customButtonData[index].name = v == '' ? 'Custom' : v;
+        node.find('.bind_name').html(customButtonData[index].name);
+
+        v = $('#custom_folder_icon', tbl).find('option:selected').text();
+        customButtonData[index].icon = v;
+        node.find('.bind_icon').attr('class', 'bind_icon fa fa-' + v);
+        saveCustomButtons();
+        $("#message_close_button").click();
+    });
+
+    position($(pop).parent().parent(), 'center', 'center');
+}
+
 //==API FUNCTION==//
 function getIsLoggedIn() {
     try {
-        return unsafeWindow.logged_in_user != null;
+        return (typeof (unsafeWindow) != 'undefined' ? unsafeWindow : window).logged_in_user != null;
     } catch (e) {
     }
     return false;
@@ -983,4 +1003,94 @@ function makeStyle(input, id) {
         style.id = id;
     }
     $('head').append(style);
+}
+
+//==API FUNCTION==//
+function makeGlobalPopup(title, fafaText, darken, img) {
+    var holder = document.createElement("div");
+    $("body").append(holder);
+    $(holder).addClass("drop-down-pop-up-container");
+    $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
+    $(holder).addClass('global_popup');
+
+    var dark = $("<div style=\"position: fixed;left:0px;right:0px;top:0px;bottom:0px;background-color:rgba(0,0,0,0.4); z-index:100000;\" />");
+    if (typeof (darken) == 'number') {
+        dark.css('background-color', 'rgba(0,0,0,' + (darken / 100) + ')');
+        $("body").append(dark);
+    } else if (darken == null || darken) {
+        $("body").append(dark);
+    }
+
+    var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
+    $(holder).append(pop);
+
+    var head = document.createElement("h1");
+    $(head).css("cursor", "move");
+    $(pop).append(head);
+    if (fafaText != null) {
+        $(head).append("<i class=\"" + fafaText + "\" /i>");
+    } else if (img != null) {
+        $(head).append("<img src=\"" + img + "\" style=\"width:18px;height:18px;margin-right:5px;\" /img>");
+    }
+    $(head).append(title);
+
+    head.onmousedown = function (event) {
+        var x = event.clientX - parseInt(holder.style.left.split('px')[0]);
+        var y = event.clientY - parseInt(holder.style.top.split('px')[0]);
+        document.onmousemove = function (event) {
+            position(holder, event.clientX - x, event.clientY - y, 30);
+        };
+        event.preventDefault();
+    };
+    head.onmouseup = function (e) {
+        document.onmousemove = function (e) { };
+    };
+
+    var close = document.createElement("a");
+    $(close).addClass("close_button");
+    $(close).attr("id", "message_close_button");
+    $(close).click(function (e) {
+        $(dark).remove();
+        $(holder).remove();
+    });
+    $(head).append(close);
+
+    var content = document.createElement("div");
+    $(content).addClass("drop-down-pop-up-content");
+    $(pop).append(content);
+    return content;
+}
+
+//==API FUNCTION==//
+function position(obj, x, y, buff) {
+    if (typeof x == "string" && x.toLowerCase() == "center") {
+        x = ($(window).width() - $(obj).width()) / 2;
+    }
+    if (typeof y == "string" && y.toLowerCase() == "center") {
+        y = ($(window).height() - $(obj).height()) / 2;
+    }
+    if (typeof x == 'object') {
+        var parameters = x;
+        var positioner = x.object != null ? x.object : x;
+        buff = x.buffer != null ? x.buffer : y;
+
+        y = $(positioner).offset().top - $(window).scrollTop();
+        x = $(positioner).offset().left - $(window).scrollLeft();
+
+        if (parameters.offX != null) x += parameters.offX;
+        if (parameters.offY != null) y += parameters.offY;
+    }
+
+    if (buff == null) buff = 0;
+    if (x < buff) x = buff;
+    if (y < buff) y = buff;
+
+    var maxX = $(window).width() - ($(obj).width() + buff);
+    if (x > maxX) x = maxX;
+
+    var maxY = $(window).height() - ($(obj).height() + buff);
+    if (y > maxY) y = maxY;
+
+    $(obj).css('top', y + "px");
+    $(obj).css('left', x + "px");
 }
