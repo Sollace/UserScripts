@@ -335,8 +335,6 @@ body:not(.editing) .nav_bar .editor,\
     border-top: 1px solid rgba(0, 0, 0, 0.5);\
     margin-top: 5px;\
     background-color: rgba(250, 240, 230, 0.6);}\
-.editor a, .editor .new, #button_moving {\
-    pointer-events: none;}\
 .editing_button {\
     cursor: move;}\
 .editing_button i {\
@@ -348,6 +346,7 @@ body:not(.editing) .nav_bar .editor,\
     background: rgba(255,255,255,0.3);\
     padding: 5px;}\
 #button_moving {\
+    pointer-events: none;\
     z-index: 100000;\
     position: fixed !important;}\
 #button_moving:after {\
@@ -715,15 +714,11 @@ function Button(p, index, el, handleChilds, typ) {
 
         copy.find('.menu_list').add(copy.find('.container')).remove();
         copy.find('input').remove();
-        if (this.listNode == null) {
-            result.append(copy.html());
+        var bs = copy.find('.button');
+        if (bs.length > 0) {
+            result.html($(bs[0]).html());
         } else {
-            var bs = $(copy.find('.button'));
-            if (bs.length == 1) {
-                result.html(bs[0]).html();
-            } else {
-                result.append(copy.html());
-            }
+            result.append(copy.html());
         }
 
         var subs = $('<div class="items" />');
