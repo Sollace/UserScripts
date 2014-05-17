@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.1
+// @version     1.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -1093,4 +1093,23 @@ function position(obj, x, y, buff) {
 
     $(obj).css('top', y + "px");
     $(obj).css('left', x + "px");
+}
+
+unsafeWindow.registerToolbarButton = function (obj, offsetType, index) {
+    if (offsetType == -1) {
+        index = def.children.length - index;
+    }
+
+    def.fromConfig(norm[1]);
+    def.gen(toolbar);
+    for (var i = 0; i < def.children.length; i++) {
+        if (i == index) {
+            def.children.splice(i, 0, new Button(def, i, obj, true));
+        }
+        def.children[i]._index = i;
+    }
+    norm[1] = def.getConfig();
+    def.fromConfig(conf[1]);
+    def.gen(toolbar);
+    def.getEdit();
 }
