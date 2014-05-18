@@ -190,17 +190,20 @@ $(document).ready(function () {
     .user_toolbar .notifications_link:before {\
         content: "";}\
     .menu_list .notifications_link div:after,\
-    .container .link_container .notifications_link div:after {\
+    .container .link_container .notifications_link div:after,\
+    .user_toolbar .inner .notifications_link:not(.new):after {\
         content: " Notices";}\
     .user_toolbar .mail_link:before {\
         content: "";}\
     .menu_list .mail_link div:after,\
-    .container .link_container .mail_link div:after {\
+    .container .link_container .mail_link div:after,\
+    .user_toolbar .inner .mail_link:not(.new):after {\
         content: " Mail";}\
     .user_toolbar .feed_link:before {\
         content: "";}\
     .menu_list .feed_link div:after,\
-    .container .link_container .feed_link div:after {\
+    .container .link_container .feed_link div:after,\
+    .user_toolbar .inner .feed_link:not(.new):after {\
         content: " Feeds";}\
     .user_toolbar div[class*="_link"]:before {\
         font-family: "FontAwesome";}\
@@ -223,7 +226,7 @@ $(document).ready(function () {
         text-shadow: -1px -1px #A0472E;}\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] div {\
         font-size: 13px;}\
-    .user_toolbar div[class*="_link"]:not(.new) {\
+    .user_toolbar .inner:not(.editor) div[class*="_link"]:not(.new) {\
         color: rgba(0, 0, 0, 0.85);\
         background-color: rgba(255, 255, 255, 0.1);}\
     .user_toolbar .inner > .user_drop_down_menu:hover > div[class*="_link"].new {\
@@ -248,6 +251,8 @@ $(document).ready(function () {
     .user_toolbar .menu_list .user_drop_down_menu:hover > div[class*="_link"].new:before,\
     .user_toolbar .menu_list div[class*="_link"].new:hover:before {\
         color: #2773E6;}\
+    .user_toolbar .inner div[class*="_link"]:not(.new):after {\
+        font-size: 13px;\}\
     .user_toolbar > .inner > .user_drop_down_menu > div[class*="_link"] {\
         display: inline-block;\
         vertical-align: middle;\
