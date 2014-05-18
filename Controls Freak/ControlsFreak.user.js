@@ -150,6 +150,9 @@ $(document).ready(function () {
         margin-left: 0px;}\
     .nav_bar .container .link_container div[class*="_link"] {\
         text-shadow: inherit !important;}\
+    .user_toolbar .menu_list div[class*="_link"]:before {\
+        position: absolute;\
+        right: 13px;}\
     .user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu div[class*="_link"]:not(.new):before,\
     .nav_bar .container .link_container div[class*="_link"]:before {\
         color: #AAA;\
@@ -165,16 +168,22 @@ $(document).ready(function () {
         font-family: Arial;\
         font-size: 13px;\
         display: inline-block;\
-        margin-left: 3px;\
         background: none;\
         border: none;\
         box-shadow: none;\
         position: static;}\
-    div.nav_bar .light div.drop_down_container div.container div.panel {\
-        overflow: visible;}\
-    div.nav_bar .user_drop_down_menu:not(.hover) > .menu_list {\
+    .nav_bar .container .link_container div[class*="_link"] {\
+        margin-left: 3px;}\
+    .nav_bar .container .link_container div[class*="_link"] div {\
+        margin-left: 0px;}\
+    .user_toolbar .user_drop_down_menu .menu_list div[class*="_link"] div {\
+        padding-left: 0px;}\
+    .nav_bar .light .drop_down_container .container .panel {\
+        overflow: visible !important;}\
+    .nav_bar .user_drop_down_menu:not(.hover) > .menu_list,\
+    .nav_bar .user_drop_down_menu:not(.hover) > .container {\
         display: none !important;}\
-    div.nav_bar .light div.drop_down_container.user_drop_down_menu .menu_list {\
+    .nav_bar .light .drop_down_container.user_drop_down_menu .menu_list {\
         background-color: #CCC;\
         box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.35);\
         border-right: 1px solid #454545;\
@@ -187,23 +196,28 @@ $(document).ready(function () {
         -moz-border-left-colors: none;\
         white-space: nowrap;\
         font-family: Calibri;}\
+    .nav_bar .container .container {\
+        top: 0px !important;\
+        left: 100% !important;}\
+    .nav_bar .container .container .arrow {\
+        display: none;}\
     .user_toolbar .notifications_link:before {\
         content: "";}\
     .menu_list .notifications_link div:after,\
     .container .link_container .notifications_link div:after,\
-    .user_toolbar .inner .notifications_link:not(.new):after {\
+    .user_toolbar .inner > div > .notifications_link:not(.new):after {\
         content: " Notices";}\
     .user_toolbar .mail_link:before {\
         content: "";}\
     .menu_list .mail_link div:after,\
     .container .link_container .mail_link div:after,\
-    .user_toolbar .inner .mail_link:not(.new):after {\
+    .user_toolbar .inner > div > .mail_link:not(.new):after {\
         content: " Mail";}\
     .user_toolbar .feed_link:before {\
         content: "";}\
     .menu_list .feed_link div:after,\
     .container .link_container .feed_link div:after,\
-    .user_toolbar .inner .feed_link:not(.new):after {\
+    .user_toolbar .inner > div > .feed_link:not(.new):after {\
         content: " Feeds";}\
     .user_toolbar div[class*="_link"]:before {\
         font-family: "FontAwesome";}\
