@@ -206,7 +206,7 @@ $(document).ready(function () {
     .menu_list .notifications_link div:after,\
     .container .link_container .notifications_link div:after,\
     .user_toolbar .inner > div > .notifications_link:not(.new):after {\
-        content: " Notices";}\
+        content: " Notes";}\
     .user_toolbar .mail_link:before {\
         content: "";}\
     .menu_list .mail_link div:after,\
@@ -218,7 +218,7 @@ $(document).ready(function () {
     .menu_list .feed_link div:after,\
     .container .link_container .feed_link div:after,\
     .user_toolbar .inner > div > .feed_link:not(.new):after {\
-        content: " Feeds";}\
+        content: " Feed";}\
     .user_toolbar div[class*="_link"]:before {\
         font-family: "FontAwesome";}\
     .user_toolbar div[class*="_link"].new div {\
@@ -236,7 +236,8 @@ $(document).ready(function () {
         display: block;\
         z-index: 2;}\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
-        margin: -2px 0px -1px;\
+        margin: -1px 0px -1px;\
+        line-height: 38px;\
         text-shadow: -1px -1px #A0472E;}\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] div {\
         font-size: 13px;}\
@@ -276,7 +277,7 @@ $(document).ready(function () {
         text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
         padding-left: 12px;\
         padding-right: 12px;\
-        line-height: 38px;\
+        line-height: 37px;\
         transition-property: background-color, box-shadow;\
         transition-duration: 0.1s;\
         border-right: 1px solid rgba(0, 0, 0, 0.2);\
