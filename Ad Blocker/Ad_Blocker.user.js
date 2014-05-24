@@ -11,6 +11,9 @@
 
 $('.ad_container').empty();
 $('ins[id^="aswift_"]').empty();
+var others = $('.right.list_boxes > .user-links ~ *:not(.content_box)');
+others.find('a').first().after('<ins />');
+others.remove();
 $('ins[id^="aswift_"]').add('.ad_container').append('<div class="removed_add_placeHolder" />');
 
 makeStyle('\
