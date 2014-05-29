@@ -380,6 +380,7 @@ $(document).ready(function () {
         border-radius: 5px;\
         padding: 0 5px 0 5px;\
         line-height: 20px;}\
+\
 @media all and (max-width: 700px) {\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
         margin-bottom: -1px;\
@@ -392,7 +393,9 @@ $(document).ready(function () {
         margin: -1px 0 0 0;}\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new div,\
     .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"]:after {\
-        display: none;}}');
+        display: none;}\
+    .user_toolbar .menu_list .button > span {\
+        display: initial !important;}}');
 
         var buttonRegistry = new register();
         var usedButtons = new register();
