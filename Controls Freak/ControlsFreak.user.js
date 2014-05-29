@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.2
+// @version     1.2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -379,7 +379,20 @@ $(document).ready(function () {
         background: rgba(255,255,255,0.4);\
         border-radius: 5px;\
         padding: 0 5px 0 5px;\
-        line-height: 20px;}');
+        line-height: 20px;}\
+@media all and (max-width: 700px) {\
+    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
+        margin-bottom: -1px;\
+        line-height: 1em;}\
+    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] {\
+        color: #fff !important;\
+        padding: 9px 8px 7px 8px;\
+        line-height: 1em;\
+        text-shadow: -1px -1px rgba(0, 0, 0, 0.3) !important;\
+        margin: -1px 0 0 0;}\
+    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new div,\
+    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"]:after {\
+        display: none;}}');
 
         var buttonRegistry = new register();
         var usedButtons = new register();
