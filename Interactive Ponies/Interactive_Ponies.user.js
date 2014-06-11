@@ -4,12 +4,11 @@
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
-// @include     https://www.youtube*
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
-// @version     1.4.2
+// @version     1.4.3
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------
