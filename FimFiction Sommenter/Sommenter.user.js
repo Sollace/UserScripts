@@ -5,9 +5,9 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.2
+// @version     1.2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
-// @require     https://github.com/Sollace/FimFiction-UserScripts/raw/Dev/Internal/SpecialTitles.user.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // ==/UserScript==
