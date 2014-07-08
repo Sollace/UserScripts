@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9
+// @version     1.9.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -41,7 +41,8 @@ var mainCss = '\
 .pl-header-privacy-only-me, .pl-header-privacy-everyone,\
 .feed-author-bubble, .yt-uix-button-icon-bell,\
 .yt-uix-subscription-preferences-button:hover .yt-uix-button-icon-subscription-preferences,\
-.yt-uix-button-icon-c4-grid-flow, .yt-uix-button-icon-c4-list-flow, .pl-header .yt-uix-button-icon-gear, .pl-header .yt-uix-button-icon-playlist-share,\
+.yt-uix-button-icon-c4-grid-flow, .yt-uix-button-icon-c4-list-flow, .pl-header .yt-uix-button-icon-gear,\
+.yt-uix-button-icon-icon-account-settings, .pl-header .yt-uix-button-icon-playlist-share,\
 .yt-uix-button-icon-c4-editor-plus, .yt-uix-button-icon-plus-button,\
 #storyboard .timeline-zoomslider .slider-icon, #footer .yt-uix-button-icon-footer-language {\
     background-image: url(' + resources.hitchhiker + ') !important;}\
@@ -68,7 +69,7 @@ var mainCss = '\
     background-position: -29px -808px !important;}\
 .yt-uix-button-arrow {\
     border-color: #666 transparent transparent;}\
-.pl-header .yt-uix-button-icon-gear {\
+.pl-header .yt-uix-button-icon-gear, .yt-uix-button-icon-icon-account-settings {\
     background-position: -50px -905px !important;}\
 .pl-header .yt-uix-button-icon-playlist-share {\
     background-position: 0px -336px !important;}\
@@ -540,11 +541,13 @@ display: none !important;}\
         font-size: 12px !important;}\
     #creator-sidebar .creator-sidebar-section a {\
         color: #aaa !important;}\
-    #creator-sidebar .creator-sidebar-section.selected>a.selected, #creator-sidebar .creator-sidebar-item.selected>a {\
+    #creator-sidebar .creator-sidebar-section.selected > a.selected, #creator-sidebar .creator-sidebar-item.selected > a {\
         color: #fff !important;}\
     #creator-sidebar .creator-sidebar-section.selected,\
     .creator-sidebar-section {\
         border-color: #303030 !important;}\
+    .creator-sidebar-section a:hover, .creator-sidebar-section.selected .creator-sidebar-section-link {\
+        background: #222 !important;}\
     /* Inbox */\
     #folder_title {\
         background: #1b1b1b !important;\
@@ -1091,6 +1094,8 @@ display: none !important;}\
     .watch-view-count {\
         color: #ddd !important;}\
     .account-section-setting,h3.account-section-header,\
+    .yt-masthead-account-picker,\
+    .yt-masthead-picker-info > .yt-masthead-picker-name,\
     #watch7-user-header .yt-user-videos, #watch-description-extra-info .metadata-info-title, #action-panel-addto .watch-playlists-drawer h3, .watch-playlists-drawer .playlist-addto-title-options label {\
         color: #999 !important;\
     }\
@@ -1234,6 +1239,13 @@ display: none !important;}\
     border-bottom-color: #1B1B1B !important;}\
 .create-playlist-bottom-section {\
     background: #2B2B2B !important;}\
+\
+.yt-masthead-picker-footer {\
+    background: #2B2B2B !important;}\
+.yt-masthead-account-picker-option {\
+    background: #1B1B1B !important;}\
+.yt-masthead-account-picker-option:hover {\
+    background: #1C1C1C !important;}\
 \
 /*Youtube Analytics*/\
 #analyticsCard {\
