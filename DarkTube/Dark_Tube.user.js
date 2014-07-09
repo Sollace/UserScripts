@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.1
+// @version     1.9.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -258,14 +258,6 @@ var mainCss = '\
         margin-bottom: 10px !important;\
         color: #aaa !important;\
         background: #2b2b2b !important;}\
-    .yt-uix-button {\
-        -moz-border-radius: 2px !important;\
-        -webkit-border-radius: 2px !important;\
-        border-radius: 2px !important;\
-        -moz-box-shadow: 0 0px 0 rgba(0,0,0,0.05) !important;\
-        -ms-box-shadow: 0 0px 0 rgba(0,0,0,0.05) !important;\
-        -webkit-box-shadow: 0 0px 0 rgba(0,0,0,0.05) !important;\
-        box-shadow: 0 0px 0 rgba(0,0,0,0.05) !important;}\
     .yt-uix-button-default:hover, .yt-uix-button-text:hover {\
         border-color: #444343 !important;\
         background: #222 !important;}\
@@ -343,7 +335,7 @@ var mainCss = '\
         border-color: #303030 !important;}\
     .yt-uix-button-subscribed-branded, .yt-uix-button-subscribed-branded[disabled], .yt-uix-button-subscribed-branded[disabled]:hover, .yt-uix-button-subscribed-branded[disabled]:active, .yt-uix-button-subscribed-branded[disabled]:focus, .yt-uix-button-subscribed-unbranded, .yt-uix-button-subscribed-unbranded[disabled], .yt-uix-button-subscribed-unbranded[disabled]:hover, .yt-uix-button-subscribed-unbranded[disabled]:active, .yt-uix-button-subscribed-unbranded[disabled]:focus {\
         background: transparent !important;\
-        border-width: 0px !important;}\
+        border-color: #303030 !important;}\
     .yt-uix-button-subscribe-unbranded, .yt-uix-button-subscribe-unbranded[disabled], .yt-uix-button-subscribe-unbranded[disabled]:hover, .yt-uix-button-subscribe-unbranded[disabled]:active, .yt-uix-button-subscribe-unbranded[disabled]:focus {\
         border-color: #303030 !important;\
         background: #222 !important;}\
@@ -1413,6 +1405,29 @@ var hoverCardCss = '\
 .nbc.xta.spd img {\
     background: #222;}';
 
+var subEmbedCss = '\
+.yt-subscription-button-subscriber-count-branded-horizontal:before,\
+.yt-subscription-button-subscriber-count-branded-horizontal:after,\
+.yt-subscription-button-subscriber-count-unbranded-horizontal:before,\
+.yt-subscription-button-subscriber-count-unbranded-horizontal:after {\
+    border-color: transparent #303030 !important;}\
+.yt-subscription-button-subscriber-count-branded-vertical:before,\
+.yt-subscription-button-subscriber-count-branded-vertical:after,\
+.yt-subscription-button-subscriber-count-unbranded-vertical:before,\
+.yt-subscription-button-subscriber-count-unbranded-vertical:after {\
+    border-color: #303030 transparent !important;}\
+.yt-subscription-button-subscriber-count-branded-horizontal, .yt-subscription-button-subscriber-count-branded-vertical, .yt-subscription-button-subscriber-count-unbranded-horizontal, .yt-subscription-button-subscriber-count-unbranded-vertical {\
+    color: #aaa !important;\
+    border-color: #303030 !important;}\
+.yt-subscription-button-subscriber-count-branded-horizontal, .yt-subscription-button-subscriber-count-unbranded-horizontal {\
+    background-color: #2b2b2b !important;}\
+.yt-uix-button-subscribed-branded, .yt-uix-button-subscribed-branded[disabled], .yt-uix-button-subscribed-branded[disabled]:hover, .yt-uix-button-subscribed-branded[disabled]:active, .yt-uix-button-subscribed-branded[disabled]:focus, .yt-uix-button-subscribed-unbranded, .yt-uix-button-subscribed-unbranded[disabled], .yt-uix-button-subscribed-unbranded[disabled]:hover, .yt-uix-button-subscribed-unbranded[disabled]:active, .yt-uix-button-subscribed-unbranded[disabled]:focus {\
+    background: #222 !important;\
+    border-color: #303030 !important;}\
+.yt-uix-button-subscribe-unbranded, .yt-uix-button-subscribe-unbranded[disabled], .yt-uix-button-subscribe-unbranded[disabled]:hover, .yt-uix-button-subscribe-unbranded[disabled]:active, .yt-uix-button-subscribe-unbranded[disabled]:focus {\
+    border-color: #303030 !important;\
+    background: #222 !important;}';
+
 var theme = GM_getValue("theme", "Switch");
 var head = document.getElementsByTagName("head")[0];
 var body = document.getElementsByTagName("body")[0];
@@ -1455,6 +1470,12 @@ if (window.top == window) {
     } else if (document.location.href.indexOf('https://apis.google.com') == 0 && document.location.href.indexOf('hovercard/internalcard') != -1) {
         if (theme == "Dark") {
             createStyleTag(hoverCardCss);
+        } else if (theme == "Light") {
+            removeCss();
+        }
+    } else if (document.location.href.indexOf('subscribe_embed') != -1) {
+        if (theme == "Dark") {
+            createStyleTag(subEmbedCss);
         } else if (theme == "Light") {
             removeCss();
         }
