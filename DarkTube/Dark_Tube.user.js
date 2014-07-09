@@ -69,7 +69,7 @@ var mainCss = '\
     background-position: -29px -808px !important;}\
 .yt-uix-button-arrow {\
     border-color: #666 transparent transparent;}\
-.pl-header .yt-uix-button-icon-gear, .yt-uix-button-icon-icon-account-settings {\
+.pl-header .yt-uix-button-icon-gear {\
     background-position: -50px -905px !important;}\
 .pl-header .yt-uix-button-icon-playlist-share {\
     background-position: 0px -336px !important;}\
@@ -87,6 +87,8 @@ var mainCss = '\
     background-position: -18px -1287px !important;}\
 .yt-uix-subscription-preferences-button:hover .yt-uix-button-icon-subscription-preferences {\
     background-position: -34px -970px !important;}\
+.yt-uix-button-icon-icon-account-settings {\
+    background-position: -30px -967px !important;}\
 \
 /*Developer Page*/\
 #page #yt-microsite {\
