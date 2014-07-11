@@ -166,7 +166,7 @@ var mainCss = '\
         box-shadow: 0 0px 0px #ddd !important;}\
     .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title, .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title:visited, .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title:hover {\
         color: #2793e6 !important;}\
-    .yt-uix-button-default, .yt-uix-button-default[disabled], .yt-uix-button-default[disabled]:hover, .yt-uix-button-default[disabled]:active, .yt-uix-button-default[disabled]:focus {\
+    .yt-uix-expander-head .yt-uix-button, .yt-uix-button-default, .yt-uix-button-default[disabled], .yt-uix-button-default[disabled]:hover, .yt-uix-button-default[disabled]:active, .yt-uix-button-default[disabled]:focus {\
         border-color: #303030 !important;\
         background: #242323 !important;\
         color: #aaa !important;}\
