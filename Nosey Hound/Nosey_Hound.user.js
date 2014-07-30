@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1
+// @version     1.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -11,9 +11,6 @@
 
 var TESTING = false;
 
-function replaceAll(find,replace,me){
-    var escapeRegExp=function(str){return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,"\\$&");}
-    return me.replace(new RegExp(escapeRegExp(find),'g'),replace);}
 function urlSafe(me){return me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');}
 
 try {
@@ -22,9 +19,14 @@ if (getIsLoggedIn() && $('.module_container.module_locked .user-links a').length
     var userName = $('.module_container.module_locked .user-box-level-1 a').text();
     var userId = $('.module_container.module_locked .user-links a').first().attr('href').split('user=').reverse()[0].split('&')[0];
     var oldFollowers = TESTING ? [{id:'dsfoj',name:'testee0'},{id:'sk',name:'testee1'},{id:'110493',name:'testee2'}] : getFollowers();
-    $('.bio_followers > h3').first().append(' - ');
+
     var sniffer = $('<a href="javascript:void();">Sniff</a>');
+    if ($('#follower_list').length == 0) {
+        $('.bio_followers').prepend('<h3 style="border-bottom:none;"><b>' + $('.user_sub_info .fa-eye').next().text() + '</b> members follow ' + userName + '</h3>');
+    }
+    $('.bio_followers > h3').first().append(' - ');
     $('.bio_followers > h3').first().append(sniffer);
+
     sniffer.click(function() {
         var pop = $(makeGlobalPopup(myPage ? 'Results' : 'Results for ' + userName, 'fa fa-table'));
         pop.css({ width: '300px', height: '300px'});
@@ -92,7 +94,7 @@ if (getIsLoggedIn() && $('.module_container.module_locked .user-links a').length
             pop.append('<div data_id="2" class="tab shown" ><b>Total Lost:</b> ' + localeL + '<div class="main">' + list(lost) + '</div></div>');
         }
         tabs.append('<div data_tab="4" class="button hidden">List</div>');
-        pop.append('<div data_id="4" class="tab hidden">' + listing(oldFollowers) + '</div>');
+        pop.append(listing(oldFollowers, '<div data_id="4" class="tab hidden" />'));
         
         $('.button', tabs).click(function() {
             var id = $(this).attr('data_tab');
@@ -112,25 +114,41 @@ if (getIsLoggedIn() && $('.module_container.module_locked .user-links a').length
         pop.on('mouseenter', 'a', function() {
             $('#infocard').css('z-index', '9999999999');
             unsafeWindow.infocard_hover_over.apply(this);
-        });//
+        });
         pop.on('mouseleave', 'a', function() {
             unsafeWindow.infocard_hover_off.apply(this);
             $('#infocard').css('z-index', '');
         });
     }
     
-    function listing(followers) {
-        var list = '<div class="list"><ol>';
+    function listing(followers, node) {
+        node = $(node);
+        var list = $('<div class="list">');
+        var search = $('<input type="text" placeholder="search followers" />');
+        $(search).on('input', function () {
+            var content = '<ol>';
+            for (var i = 0; i < followers.length; i++) {
+                if (followers[i].name.replace(/\+/g, ' ').toUpperCase().indexOf($(this).val().toUpperCase()) != -1) {
+                    content += '<li><a target="_blank" href="/user/' + followers[i].name + '">' + followers[i].name.replace(/\+/g, ' ') + '</a></li>';
+                }
+            }
+            list.html(content + '</ol>');
+        });
+        node.append(search);
+        node.append(list);
+
+        var content = '<ol>';
         for (var i = 0; i < followers.length; i++) {
-            list += '<li><a target="_blank" href="/user/' + followers[i].name + '">' + replaceAll('+', ' ', followers[i].name) + '</a></li>';
+            content += '<li><a target="_blank" href="/user/' + followers[i].name + '">' + followers[i].name.replace(/\+/g, ' ') + '</a></li>';
         }
-        return list + '</ol></div>';
+        list.html(content + '</ol>');
+        return node;
     }
     
     function list(arr) {
         var result = '<div class="list"><ol>';
         for (var i = 0; i < arr.length; i++) {
-            result += '<li><a target="_blank" href="/user/' + arr[i] + '">' + replaceAll('+', ' ', arr[i]) + '</a></li>';
+            result += '<li><a target="_blank" href="/user/' + arr[i] + '">' + arr[i].replace(/\+/g, ' ') + '</a></li>';
         }
         return result + '</ol></div>';
     }
@@ -172,7 +190,7 @@ if (getIsLoggedIn() && $('.module_container.module_locked .user-links a').length
             result += '<b>Name changes (' + N + '):</b>';
             result += '<div class="main"><ol>';
             for (var i = 0; i < n.length; i++) {
-                result += '<li>' + replaceAll('+', ' ', n[i].oldName) + ' is now known as <a target="_blank" href="/user/' + n[i].name + '">' + replaceAll('+', ' ', n[i].name) + '</a></li>';
+                result += '<li>' + n[i].oldName.replace(/\+/g, ' ') + ' is now known as <a target="_blank" href="/user/' + n[i].name + '">' + n[i].name.replace(/\+/g, ' ') + '</a></li>';
             }
             result += '</ol></div>';
         }
@@ -431,7 +449,7 @@ function isMyPage() {
     if (document.location.href.split('/user/').reverse()[0] == getUserNameEncoded()) {
         return true;
     }
-    return document.location.href.split('/user/').reverse()[0] == replaceAll(' ', '+', getUserName());
+    return document.location.href.split('/user/').reverse()[0] == getUserName().replace(/ /g, '+');
 }
 
 //==API FUNCTION==//
@@ -459,7 +477,7 @@ function getIsLoggedIn() {
 //==API FUNCTION==//
 function makeStyle(input, id) {
     while (input.indexOf('  ') != -1) {
-        input = replaceAll('  ',' ', input);
+        input = input.replace(/  /g, ' ');
     }
     var style = document.createElement('style');
     $(style).attr('type', 'text/css');

@@ -43,7 +43,7 @@ function replaceAll(find,replace,me){
 //==API FUNCTION==//
 function makeStyle(input, id) {
     while (contains(input, '  ')) {
-        input = replaceAll('  ',' ', input);
+        input = input.replace(/  /g, ' ');
     }
     var style = document.createElement('style');
     $(style).attr('type', 'text/css');
