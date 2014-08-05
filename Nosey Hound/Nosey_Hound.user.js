@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.1
+// @version     1.1.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -21,7 +21,7 @@ if (getIsLoggedIn() && $('.module_container.module_locked .user-links a').length
     var oldFollowers = TESTING ? [{id:'dsfoj',name:'testee0'},{id:'sk',name:'testee1'},{id:'110493',name:'testee2'}] : getFollowers();
 
     var sniffer = $('<a href="javascript:void();">Sniff</a>');
-    if ($('#follower_list').length == 0) {
+    if ($('.bio_followers > h3').first().text().indexOf(userName + ' follows') == 0) {
         $('.bio_followers').prepend('<h3 style="border-bottom:none;"><b>' + $('.user_sub_info .fa-eye').next().text() + '</b> members follow ' + userName + '</h3>');
     }
     $('.bio_followers > h3').first().append(' - ');
