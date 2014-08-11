@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.2
+// @version     1.9.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -261,6 +261,12 @@ var mainCss = '\
     .yt-uix-button-default:hover, .yt-uix-button-text:hover {\
         border-color: #444343 !important;\
         background: #222 !important;}\
+\
+.share-panel .yt-uix-button {\
+    color: #888;}\
+.share-panel .yt-uix-button:hover {\
+    background: none !important;}\
+    \
     #watch7-secondary-actions .yt-uix-button:hover, #watch7-secondary-actions .yt-uix-button:active, #watch7-secondary-actions .yt-uix-button.yt-uix-button-active, #watch7-secondary-actions .yt-uix-button.yt-uix-button-toggled {\
         border-bottom-color: #930 !important;\
         background: transparent !important;\
