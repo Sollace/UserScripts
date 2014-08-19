@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.3
+// @version     1.9.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -24,7 +24,7 @@ var mainCss = '\
 \
 #masthead-positioner:hover #appbar-guide-button .yt-uix-button-arrow {\
     border-top-color: #B8B8B8 !important;}\
-.yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit {\
+.yt-uix-inlineedit-form, .yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit {\
     border-color: #303030 !important;}\
 \
 #creator-page-content.yt-card {\
@@ -35,6 +35,11 @@ var mainCss = '\
     background: #222 !important;}\
 .video-list .video-list-item .stat {\
     color: #666;}\
+\
+/*Overlays*/\
+.yt-uix-inlineedit-loading-overlay, .yt-dialog-working-overlay, #dashboard-no-videos-overlay {\
+    background-color: rgba(20,20,20,0.89);\
+    border: #303030;}\
 \
 /*Icon/Texture replacement*/\
 #yt-masthead #logo, #masthead-logo, #footer-logo img, .footer-container .footer-logo, .yt-uix-button-icon-appbar-guide,\
@@ -505,8 +510,8 @@ display: none !important;}\
         padding-right: 11px !important;}\
     .c4-shelf-preview+.preview-click-guard {\
         background: #000 !important;}\
-    #c4-about-tab .c4-module-is-editable:hover {\
-        background-color: #222 !important;}\
+.c4-module-is-editable:hover {\
+    background-color: #222 !important;}\
     #c4-about-tab .about-metadata .yt-uix-button-c4-view-action {\
         border-top-color: #303030 !important;}\
     .yt-uix-form-legend, .yt-uix-form-label {\
@@ -523,9 +528,6 @@ display: none !important;}\
     .yt-uix-overlay-actions {\
         border-top-color: #303030 !important;\
         background: transparent !important;}\
-    .yt-dialog-working-overlay, #dashboard-no-videos-overlay {\
-        background-color: rgba(20,20,20,0.89);\
-        border: #303030;}\
     .yt-dialog-working-bubble {\
         background-color: #333;\
         border-color: #303030;}\
@@ -951,8 +953,6 @@ display: none !important;}\
         border: 1px solid #303030 !important;}\
     .gssb_i td {\
         background: #222 !important;}\
-    .yt-uix-button-icon-addto {\
-        background: no-repeat url(http://i.imgur.com/VirN1wE.pngp) -172px -221px !important;}\
     #watch7-sidebar .video-list .video-list-item .title {\
         color: #999 !important;}\
     #watch7-sidebar .video-list .video-list-item .title:hover {\
