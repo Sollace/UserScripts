@@ -1100,6 +1100,8 @@ display: none !important;}\
         word-wrap: break-word;}\
     #watch7-headline h1 .long-title {\
         color: #999 !important;}\
+#action-panel-details a {\
+    transition:color 0.7s ease;}\
     .yt-uix-button-subscribed-branded:hover .yt-uix-button-content span, .yt-uix-button-subscribe-branded:hover .yt-uix-button-content, .yt-uix-expander-head {\
         color: #ccc !important;}\
     .watch-view-count {\
