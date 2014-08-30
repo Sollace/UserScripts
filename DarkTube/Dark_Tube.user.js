@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.5
+// @version     1.9.6
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -264,11 +264,9 @@ var mainCss = '\
     background-color: #333232;}\
     .player-unavailable {\
         float: inherit !important;}\
-    #watch7-main-container {\
-        padding-top: 5px !important;}\
     .watch-branded-banner .player-branded-banner {\
         height: 0px !important;}\
-    .action-panel-content, .watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-contents, #watch7-content {\
+    .action-panel-content, .watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-contents {\
         background: #1b1b1b !important;}\
     .watch-action-buttons {\
         border-color: #444343 !important;}\
@@ -378,8 +376,7 @@ display: none !important;}\
     #watch7-action-panels #watch7-action-panel-footer {\
         height: 5px!important;}\
     #comments-view hr {\
-        border-top: 5px solid #151515 !important;\
-        margin: 0 -14px !important;}\
+        border-top: 5px solid #151515 !important;}\
     /*Guide*/\
     .guide-section-separator {\
         border-bottom-color: #555 !important;}\
@@ -393,16 +390,8 @@ display: none !important;}\
         color: #bbb !important;}\
     	/* Main Guide */\
     	/* Watch Page */\
-    .site-left-aligned #page.watch #guide-container {\
-        padding: 5px 0 5px 5px !important;}\
-    .guide-module {\
-        margin-bottom: 0px !important;}\
-    #watch-context-container {\
-        margin-top: 8px !important;}\
     #guide-main .guide-module-toggle-label h3 {\
         line-height: 28px !important;}\
-    #guide-main .guide-module-toggle-icon {\
-        margin-top: 0px !important;}\
     		/* Context Dropdown */\
     .yt-scrollbar ::-webkit-scrollbar-thumb {\
         border-left-width: 0px !important;\
@@ -924,12 +913,6 @@ display: none !important;}\
     #interstitial-editor h3 {\
         color: #aaa !important;}\
     /* Watch Sidebar */\
-    #watch7-sidebar {\
-        margin-top: -395px !important;\
-        background: transparent !important;}\
-    #watch7-sidebar-contents {\
-        margin-top: 0px !important;\
-        padding-right: 0px !important;}\
     #watch7-sidebar .watch-sidebar-section {\
         background: #1b1b1b !important;\
         border-top: 10px solid #1b1b1b !important;\
@@ -938,15 +921,6 @@ display: none !important;}\
         border-bottom: 10px solid #1b1b1b !important;}\
     .watch-branded #watch7-sidebar {\
         background: transparent !important;}\
-    .watch-branded-banner #watch7-sidebar {\
-        margin-top: -400px !important;}\
-    .watch-wide #watch7-sidebar {\
-        margin-top: 0 !important;}\
-    .watch-wide #watch7-sidebar, .watch-playlist #watch7-sidebar, .watch-branded #watch7-sidebar {\
-        padding-top: 0px !important;}\
-	.custom-medium + div #watch-appbar-playlist,\
-    .watch-medium + div #watch-appbar-playlist {\
-        margin-left: 10px !important;}\
     #watch-channel-brand-div {\
         display: none !important;}\
     #watch7-sidebar .watch-sidebar-head, #watch7-sidebar .watch-sidebar-foot {\
@@ -1100,8 +1074,6 @@ display: none !important;}\
         word-wrap: break-word;}\
     #watch7-headline h1 .long-title {\
         color: #999 !important;}\
-#action-panel-details a {\
-    transition:color 0.7s ease;}\
     .yt-uix-button-subscribed-branded:hover .yt-uix-button-content span, .yt-uix-button-subscribe-branded:hover .yt-uix-button-content, .yt-uix-expander-head {\
         color: #ccc !important;}\
     .watch-view-count {\
@@ -1273,6 +1245,13 @@ display: none !important;}\
     background: #242323 !important;}\
 #analyticsCard button[role="button"] {\
     box-shadow: none!important;}\
+\
+/*Transitions*/\
+#watch-description-text {\
+    max-height: 1000px;\
+    transition: max-height 0.5s ease;}\
+#action-panel-details a {\
+    transition:color 0.7s ease;}\
 \
 /*Stats Table*/\
 .watch-actions-stats-rats .stats-chart-menu {\
