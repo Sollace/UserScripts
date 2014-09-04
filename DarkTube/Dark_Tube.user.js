@@ -205,12 +205,11 @@ var mainCss = '\
     .branded-page-v2-primary-col {\
         border-right-color: #303030 !important;\
         border-bottom-color: #303030 !important;\
-        border-left-color: #303030 !important;\
-        background-color: #1b1b1b !important;}\
+        border-left-color: #303030 !important;}\
     .branded-page-v2-secondary-col > div, .branded-page-related-channels {\
         background-color: #1b1b1b !important;}\
     .branded-page-v2-primary-col > .yt-card {\
-        background: none !important;}\
+        background: #1b1b1b !important;}\
     .branded-page-v2-primary-col .branded-page-box {\
         border-bottom-color: #303030 !important;}\
     .branded-page-v2-has-solid-bg .branded-page-v2-col-container {\
