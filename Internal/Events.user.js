@@ -56,32 +56,26 @@
       }
     }
   }
-  function getSplitData(data) {
-    data = data.split('&');
-    var result = {};
-    for (var i = 0; i < data.length; i++) {
-      result[data[i].split('=')[0]] = data[i].split('=')[data[i].split('=').length > 1 ? 1 : 0];
-    }
-    return result;
-  }
   
   if (startup) {
     win.$.ajax = (function() {
       win.$.__ajax = win.$.ajax;
-      return function(param) {
+      return function(param, n) {
         var event = win.FimFicEvents.getEventName(param.url);
         if (event != null) {
           var __success = param.success;
           param.success = function() {
             event.result = arguments[0];
-            event.data = getSplitData(param.data);
+            event.url = param.url;
+            event.data = param.data;
             win.FimFicEvents.trigger('before' + event.eventName, event);
             arguments[0] = event.result;
-            __success.apply(this,argumants);
+            __success.apply(this,arguments);
             win.FimFicEvents.trigger('after' + event.eventName, event);
           };
         }
-        win.$.__ajax(param);
+        win.$.__ajax(param, n);
       };
     })();
+  }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
