@@ -13,59 +13,32 @@
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
-  function Events(original) {
-    var registered = original === undefined ? {} : original.__getRegistered();
-    
-    return {
+  if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
+    win.FimFicEvents = {
       'version': function() {
         return ver;
       },
-      '__getRegistered': function() {
-        return registered;
-      },
       'on': function(name, func) {
-        name = name.split(', ');
-        for (var i = 0; i < name.length; i++){
-          if (registered[name[i]] === undefined) {
-            registered[name[i]] = [];
-          }
-          registered[name[i]].push(func);
-        }
+        $(document).on(name,func);
       },
       'off': function(name, event) {
-        if (registered[name] != undefined) {
-          if (event === undefined) {
-            for (var i in registered) {
-              registered[i] = undefined;
-            }
-          } else {
-            if (typeof event == 'function') {
-              for (var i = 0; i < registered[name].length; i++) {
-                if (registered[name][i] == event) {
-                  registered[name] = registered[name].splice(i, 1);
-                }
-              }
-            }
-          }
-        }
+        $(document).off(name,event);
       },
       'trigger': function(name, e) {
-        for (var i in registered) {
-          if (i.split('.')[0] == name) {
-            for (var j = 0; j < registered[i].length; j++) {
-              registered[i][j](e);
-            }
-          }
+        $(document).trigger(name, [e]);
+      },
+      'getEventName': function(url) {
+        switch (url){
+          case '/ajax/fetch_comments.php': return {'eventName': 'pagechange'};
+          case '/ajax/edit_comment.php': return {'eventName': 'editcomment'};
+          case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
         }
+        if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
+          return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
+        }
+        return null;
       }
-    }
-  }
-  if (typeof (win.FimFicEvents) !== 'undefined') {
-    if (win.FimFicEvents.version() < ver) {
-      win.FimFicEvents = Events(win.FimFicEvents);
-    }
-  } else {
-    win.FimFicEvents = Events();
+    };
   }
   if (win != window) {
     window.FimFicEvents = {
@@ -77,6 +50,9 @@
       },
       'trigger': function(name, e) {
         win.FimFicEvents.trigger(name, e);
+      },
+      'getEventName': function(url) {
+        return win.FimFicEvents.getEventname(url);
       }
     }
   }
@@ -90,37 +66,22 @@
   }
   
   if (startup) {
-    win.$.get = (function() {
-      win.$.__get = win.$.get;
-      return function(url, data, success, dataType) {
-        if (url == '/ajax/fetch_comments.php') {
-          win.$.__get(url, data, function(d,e,f) {
-            var event = {'result':d,'data':data};
-            win.FimFicEvents.trigger('onPageChange', event);
-            d = event.result;
-            success(d,e,f);
-            win.FimFicEvents.trigger('pageChanged', event);
-          }, dataType);
-        } else {
-          win.$.__get(url, data, success, dataType);
+    win.$.ajax = (function() {
+      win.$.__ajax = win.$.ajax;
+      return function(param) {
+        var event = win.FimFicEvents.getEventName(param.url);
+        if (event != null) {
+          var __success = param.success;
+          param.success = function() {
+            event.result = arguments[0];
+            event.data = getSplitData(param.data);
+            win.FimFicEvents.trigger('before' + event.eventName, event);
+            arguments[0] = event.result;
+            __success.apply(this,argumants);
+            win.FimFicEvents.trigger('after' + event.eventName, event);
+          };
         }
+        win.$.__ajax(param);
       };
     })();
-    win.$.post = (function() {
-      win.$.__post = win.$.post;
-      return function(url, data, success, dataType) {
-        if (url == '/ajax/edit_comment.php') {
-          win.$.__post(url, data, function(d,e,f) {
-            var event = {'result':d,'data':getSplitData(data)};
-            win.FimFicEvents.trigger('onEditComment', event);
-            d = event.result;
-            success(d,e,f);
-            win.FimFicEvents.trigger('editComment', event);
-          }, dataType);
-        } else {
-          win.$.__post(url, data, success, dataType);
-        }
-      };
-    })();
-  }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
