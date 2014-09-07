@@ -68,13 +68,17 @@
             event.result = arguments[0];
             event.url = param.url;
             event.data = param.data;
-            win.FimFicEvents.trigger('before' + event.eventName, event);
-            arguments[0] = event.result;
-            __success.apply(this,arguments);
-            win.FimFicEvents.trigger('after' + event.eventName, event);
+            if (__success != null) {
+              win.FimFicEvents.trigger('before' + event.eventName, event);
+              arguments[0] = event.result;
+              __success.apply(this,arguments);
+              win.FimFicEvents.trigger('after' + event.eventName, event);
+            } else {
+              win.FimFicEvents.trigger(event.eventName, event);
+            }
           };
         }
-        win.$.__ajax(param, n);
+        return win.$.__ajax(param, n);
       };
     })();
   }
