@@ -2,14 +2,14 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0
+// @version     b1.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
 (function (win) {
-  var ver = 1.0;
+  var ver = 1.1;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -32,6 +32,7 @@
           case '/ajax/fetch_comments.php': return {'eventName': 'pagechange'};
           case '/ajax/edit_comment.php': return {'eventName': 'editcomment'};
           case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
+          case '/ajax/add_comment.php': return {'eventName': 'addcomment'};
         }
         if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
           return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
