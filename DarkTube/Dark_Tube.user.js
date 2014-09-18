@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.6
+// @version     1.9.8
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -54,6 +54,7 @@ var mainCss = '\
     background-image: url(' + resources.hitchhiker + ') !important;}\
 \
 .yt-uix-button-icon-action-panel-addto,\
+.yt-uix-button-icon-action-panel-none-addto,\
 .yt-uix-button-icon-action-panel-share,\
 .yt-uix-button-icon-action-panel-overflow,\
 .playlist-status {\
@@ -62,7 +63,7 @@ var mainCss = '\
 .dashboard-widget-handle {\
     background-image: url(' + resources.videomanager + ') !important;}\
 \
-.yt-uix-button-icon-action-panel-addto {\
+.yt-uix-button-icon-action-panel-addto, .yt-uix-button-icon-action-panel-none-addto {\
     background-position: 0px -4px !important;}\
 .yt-uix-button-icon-action-panel-share {\
     background-position: -60px -4px !important;}\
@@ -1246,9 +1247,6 @@ display: none !important;}\
     box-shadow: none!important;}\
 \
 /*Transitions*/\
-#watch-description-text {\
-    max-height: 1000px;\
-    transition: max-height 0.5s ease;}\
 #action-panel-details a {\
     transition:color 0.7s ease;}\
 \
