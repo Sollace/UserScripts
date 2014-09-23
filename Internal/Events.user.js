@@ -57,18 +57,7 @@
       }
     }
   }
-  
-  function getInternalHandlerHook(event, original) {
-    return function() {
-      event.result = arguments[0];
-      win.FimFicEvents.trigger('before' + event.eventName, event);
-      arguments[0] = event.result;
-      original.apply(this,arguments);
-      win.FimFicEvents.trigger('after' + event.eventName, event);
-      arguments[0] = event.result;
-    };
-  }
-  
+    
   if (startup) {
     win.$.ajax = (function() {
       win.$.__ajax = win.$.ajax;
@@ -77,12 +66,24 @@
         if (event != null) {
           event.url = param.url;
           event.data = param.data;
-          if (param.success != null) {
-            param.success = getInternalHandlerHook(event, param.success);
-          }
-          if (param.complete != null) {
-            param.complete = getInternalHandlerHook(event, param.complete);
-          }
+          var __success = param.success;
+          param.success = function() {
+            event.result = arguments[0];
+            win.FimFicEvents.trigger('before' + event.eventName, event);
+            arguments[0] = event.result;
+            if (__success != null) {
+              __success.apply(this,arguments);
+            }
+          };
+          var __complete = param.complete;
+          param.complete = function() {
+            if (__complete != null) {
+              __complete.apply(this,arguments);
+            }
+            event.result = arguments[0];
+            win.FimFicEvents.trigger('after' + event.eventName, event);
+            arguments[0] = event.result;
+          };
         }
         return win.$.__ajax(param, n);
       };
