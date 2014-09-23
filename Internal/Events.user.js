@@ -77,6 +77,7 @@
             } else {
               win.FimFicEvents.trigger(event.eventName, event);
             }
+            arguments[0] = event.result;
           };
         }
         return win.$.__ajax(param, n);
