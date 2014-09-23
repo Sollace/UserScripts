@@ -58,27 +58,31 @@
     }
   }
   
+  function getInternalHandlerHook(event, original) {
+    return function() {
+      event.result = arguments[0];
+      win.FimFicEvents.trigger('before' + event.eventName, event);
+      arguments[0] = event.result;
+      original.apply(this,arguments);
+      win.FimFicEvents.trigger('after' + event.eventName, event);
+      arguments[0] = event.result;
+    };
+  }
+  
   if (startup) {
     win.$.ajax = (function() {
       win.$.__ajax = win.$.ajax;
       return function(param, n) {
         var event = win.FimFicEvents.getEventName(param.url);
         if (event != null) {
-          var __success = param.success;
-          param.success = function() {
-            event.result = arguments[0];
-            event.url = param.url;
-            event.data = param.data;
-            if (__success != null) {
-              win.FimFicEvents.trigger('before' + event.eventName, event);
-              arguments[0] = event.result;
-              __success.apply(this,arguments);
-              win.FimFicEvents.trigger('after' + event.eventName, event);
-            } else {
-              win.FimFicEvents.trigger(event.eventName, event);
-            }
-            arguments[0] = event.result;
-          };
+          event.url = param.url;
+          event.data = param.data;
+          if (param.success != null) {
+            param.success = getInternalHandlerHook(event, param.success);
+          }
+          if (param.complete != null) {
+            param.complete = getInternalHandlerHook(event, param.complete);
+          }
         }
         return win.$.__ajax(param, n);
       };
