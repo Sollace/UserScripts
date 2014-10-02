@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.9.8
+// @version     1.10
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -467,14 +467,20 @@ display: none !important;}\
     .subscriptions-filter .filter-field-container {\
         border-color: #303030 !important;\
         background: #000 !important;}\
-    #subscription-manager-container .even td, .pl-video-list-editable .pl-video:hover .pl-video-handle, .yt-uix-dragdrop-cursor-follower, .yt-uix-dragdrop-cursor-follower tr, .yt-uix-dragdrop-cursor-follower .pl-video-handle {\
+    #subscription-manager-container .even td, .pl-video-list-editable .pl-video:hover .pl-video-handle, .yt-uix-dragdrop-cursor-follower, .yt-uix-dragdrop-cursor-follower tr, .yt-uix-dragdrop-cursor-follower .pl-video-handle,\
+    #collections-container, #subscriptions-container {\
         background: #222 !important;\
         border-color: #303030 !important;}\
-    #subscription-manager-container .subscription-title, #subscription-manager-container .collection-title,\
+#subscription-manager-container .subscription-title, #subscription-manager-container .collection-title,\
     .pl-video-title-link:not(:hover){\
         color: #aaa !important;}\
-    .subscription-item:first-child {\
-        border-top: 1px solid #303030 !important;}\
+.subscription-table-header, .empty-message, .subscription-item {\
+    border-color: #303030 !important;}\
+.info-popup {\
+    background: #444;\
+    color: #eee;\
+    border-color: #666;\
+    box-shadow: 0px 4px 16px 5px #000;}\
     .subscription-picker-header,\
     #pl-video-list .pl-video, #browse-items-primary .display-message {\
         border-color: #303030 !important;}\
