@@ -164,7 +164,7 @@ var mainCss = '\
     #upload-btn:hover, #appbar-guide-button:hover,\
     .show-guide #appbar-guide-button {\
         border-color: #404040 !important;}\
-    #upload-btn, #appbar-guide-button, .appbar-content-trigger > div, .featured-channels {\
+    #upload-btn, #appbar-guide-button, .appbar-content-trigger > div, .featured-channels, .guide-flyout {\
         background: #1b1b1b !important;\
         border-color: #292929 !important;}\
     body #masthead-expanded-container {\
