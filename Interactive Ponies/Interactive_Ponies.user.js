@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        Interactive Ponies
 // @description Adds more Interactive Ponies to FimFiction.net
 // @author      Sollace
@@ -8,7 +8,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js
-// @version     1.4.5
+// @version     1.4.6
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------
@@ -486,6 +486,18 @@ function setupMorePonies() {
     makeStyle('\
        .interactive_pony .speech_container {\
               pointer-events: none;}\
+        @-webkit-keyframes wub {\
+            0% {transform: scale(1,1);}\
+            10% {transform: scale(1.00125,1.00125);}\
+            20% {transform: scale(1.0125,1.0125);}\
+            30% {transform: scale(1.00125,1.00125);}\
+            40% {transform: scale(1.0125,1.0125);}\
+            50% {transform: scale(1.00125,1.00125);}\
+            60% {transform: scale(1,1);}\
+            70% {transform: scale(0.99985,0.99985);}\
+            80% {transform: scale(1,1);}\
+            90% {transform: scale(1.0125,1.0125);}\
+            100% {transform: scale(1.00125,1.00125);}}\
         @keyframes wub {\
             0% {transform: scale(1,1);}\
             10% {transform: scale(1.00125,1.00125);}\
