@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.10
+// @version     1.10.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -272,7 +272,7 @@ var mainCss = '\
         float: inherit !important;}\
     .watch-branded-banner .player-branded-banner {\
         height: 0px !important;}\
-    .action-panel-content, .watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-contents {\
+    .action-panel-content, .watch-action-panels, #watch-header, #watch7-sidebar-discussion, #watch7-sidebar-contents {\
         background: #1b1b1b !important;}\
     .watch-action-buttons {\
         border-color: #444343 !important;}\
@@ -316,9 +316,6 @@ var mainCss = '\
         background: #313131 !important;}\
     .branded-page-v2-body #channel-feed-post-form {\
         border-bottom-color: #303030 !important;}\
-    #watch-discussion {\
-        padding: 10px 14px !important;\
-        border-width: 0px !important;}\
     #watch-description.yt-uix-expander-collapsed #watch-description-content, #watch-description-clip {\
         color: #aaa !important;}\
     #watch-response {\
@@ -329,15 +326,13 @@ var mainCss = '\
         border-bottom-color: #303030;}\
     #watch-response-header-content p a, .watch-response-item-content p a {\
         color: inherit !important;}\
-    #watch-discussion {\
-        color: #777 !important; }\
     .context clearfix em {\
         color: #830 !important;}\
     li.comment.removed .content.clearfix, li.comment.flagged .content.clearfix {\
         margin-left: 0px !important;}\
     #watch-description-extras .title {\
         color: #555 !important;}\
-    .live-comments-setting {\
+    .live-comments-setting, #comments-scroller {\
         border-color: #303030 !important;}\
     .subscribe-label {\
         color: #fff !important;}\
@@ -1048,6 +1043,7 @@ display: none !important;}\
         color: #aaa !important;}\
     .yt-uix-button-icon-action-panel-transcript {\
         background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -172px -159px !important;}\
+.yt-uix-button-icon-comment-actions-menu,\
     .yt-uix-button-icon-action-panel-report {\
         background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -81px -62px !important;}\
     .yt-uix-button-icon-action-panel-stats {\
