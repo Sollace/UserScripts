@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.2.1
+// @version     2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js
 // @grant       GM_getValue
@@ -20,11 +20,11 @@ function replaceAll(find, replace, me) {
 
 var interactiveP = $('input[name="show_interactive_pony"]');
 if (interactiveP.length > 0) {
-    interactiveP = interactiveP.parent().parent().parent();
+    interactiveP = interactiveP.parent().parent().parent().parent();
     var Option = $('<input type="checkbox" name="pin_comments">');
 
-    var row = $('<tr><td class="label">Pin Comment Section on load</td><td><div id="pin_commDiv" /></td></tr>');
-    row.find('#pin_commDiv').append(Option);
+    var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
+    row.find('.toggleable-switch').prepend(Option);
     interactiveP.before(row);
 
     Option.attr('checked', getPinComments());

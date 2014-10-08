@@ -8,7 +8,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js
-// @version     1.4.6
+// @version     1.5
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ function Pony(name, key, sayings, args) {
 function setupMorePonies() {
     var interactiveP = $('input[name="show_interactive_pony"]');
     if (interactiveP.length > 0) {
-        interactiveP = interactiveP.parent().parent().parent();
+        interactiveP = interactiveP.parent().parent().parent().parent();
         var InteractivePonyType = '<select name="interactive_pony_type">';
         for (var i = 0; i < Ponies.length; i++) {
             if (Ponies[i].Name != '~coming soon~') {
