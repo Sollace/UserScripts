@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.2.1
+// @version     1.2.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -643,8 +643,8 @@ $(document).ready(function () {
 
         this.originalParent = $($(el).parent());
         this.originalIndex = this.originalElement.index();
-
-        if (handleChilds && $(el).prop('tagName') == 'DIV' && $($(this.originalElement).children()[0]).attr('href') != '/index.php?view=category&read_it_later') {
+        
+        if (handleChilds && $(el).prop('tagName') == 'DIV' && !$(this.originalElement).find('.bookshelves').length) {
             this.listNode = $(this.originalElement.find('.menu_list')[0]);
             if (this.listNode.length == 0) {
                 this.listNode = $(this.originalElement.find('.container > .menu_list')[0]);
