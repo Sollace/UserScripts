@@ -1,15 +1,24 @@
+/*
+ * This is a JavaScript Scratchpad.
+ *
+ * Enter some JavaScript, then Right Click or choose from the Execute Menu:
+ * 1. Run to evaluate the selected text (Ctrl+R),
+ * 2. Inspect to bring up an Object Inspector on the result (Ctrl+I), or,
+ * 3. Display to insert the result in a comment after the selection. (Ctrl+L)
+ */
+
 // ==UserScript==
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0
+// @version     1.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
 (function (win) {
-  var ver = 1;
+  var ver = 1.1;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -28,17 +37,19 @@
         $(document).trigger(name, [e]);
       },
       'getEventName': function(url) {
-        switch (url){
-          case '/ajax/fetch_comments.php': return {'eventName': 'pagechange'};
-          case '/ajax/edit_comment.php': return {'eventName': 'editcomment'};
-          case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
-          case '/ajax/add_comment.php': return {'eventName': 'addcomment'};
-          case '/compose_private_message.php': return {'eventName':'composepm'};
+        if (typeof(url) == 'string') {
+          switch (url){
+            case '/ajax/fetch_comments.php': return {'eventName': 'pagechange'};
+            case '/ajax/edit_comment.php': return {'eventName': 'editcomment'};
+            case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
+            case '/ajax/add_comment.php': return {'eventName': 'addcomment'};
+            case '/compose_private_message.php': return {'eventName':'composepm'};
+          }
+          if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
+            return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
+          }
+          return null;
         }
-        if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
-          return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
-        }
-        return null;
       }
     };
   }
