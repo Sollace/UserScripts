@@ -5,9 +5,8 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2
+// @version     2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/SpecialTitles.user.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // ==/UserScript==
@@ -36,7 +35,6 @@ if (interactiveP.length > 0) {
 var commentBox = $("#add_comment_box a[title='Text Color']");
 if (commentBox.length > 0) {
     setupTogglePin(commentBox.parent()[0]);
-
     $(document).ready(function () {
         $('#add_comment_box .form_submitter').on('click', function () {
             $('body.pin_comment #comment_preview').css('opacity', 0);
@@ -49,6 +47,17 @@ if (commentBox.length > 0) {
     });
 }
 
+unsafeWindow.AddQuote = function(id, shift) {};
+$(document).on("click",".comment .reply_button",function(a){AddQuote($(this).data("comment-id"),a.shiftKey || $('body.pin_comment').length > 0)});
+
+function AddQuote(a, b) {
+  unsafeWindow.InsertTextAt($('#comment_entry textarea') [0], (0 < $('#comment_entry textarea').val().length ? '\n' : '') + '>>' + a + ' ');
+  b || $('html, body').animate({
+    scrollTop: $('#new_comment').offset().top
+  }, 300)
+}
+
+
 makeStyle(".comments_pinner:before {\
         content: '';}\
 body.pin_comment .comments_pinner:before {\
@@ -59,38 +68,40 @@ body.pin_comment #add_comment_box {\
         bottom: -30px;\
         left: 0px;\
         width: 100%;\
-    z-index: 99999;}\
-body.pin_comment #add_comment_form {\
+        border-radius: 0px;\
+        z-index: 99999;}\
+body.pin_comment #comment_entry {\
         height: 90px;}\
-body.pin_comment #add_comment_form:hover,\
-body.pin_comment.hold_comment #add_comment_form {\
+body.pin_comment #comment_entry:hover,\
+body.pin_comment.hold_comment #comment_entry {\
         transition: height 0.45s ease !important;\
         height: 350px;}\
-body.pin_comment #add_comment_box:hover .dark_toolbar,\
-body.pin_comment.hold_comment #add_comment_box .dark_toolbar {\
+body.pin_comment #comment_entry:hover .dark_toolbar,\
+body.pin_comment.hold_comment #comment_entry .dark_toolbar {\
         transition: bottom 0.45s ease;}\
-body.pin_comment #add_comment_form .dark_toolbar {\
+body.pin_comment #comment_entry .dark_toolbar {\
         position: absolute;\
         bottom: 70px;\
         background: none;\
         border: none;}\
-body.pin_comment #add_comment_form:hover .dark_toolbar,\
-body.pin_comment.hold_comment #add_comment_form .dark_toolbar {\
+body.pin_comment #comment_entry:hover .dark_toolbar,\
+body.pin_comment.hold_comment #comment_entry .dark_toolbar {\
         bottom: 330px;}\
-body.pin_comment #add_comment_form textarea {\
+body.pin_comment #comment_entry textarea {\
         resize: none;}\
-body.pin_comment #add_comment_form:hover textarea,\
-body.pin_comment.hold_comment #add_comment_form textarea {\
+body.pin_comment #comment_entry:hover textarea,\
+body.pin_comment.hold_comment #comment_entry textarea {\
         margin-top: 5px;\
         height: 285px !important;}\
-body.pin_comment:not(.hold_comment) #add_comment_form:not(:hover) textarea {\
+body.pin_comment:not(.hold_comment) #comment_entry:not(:hover) textarea {\
         position: absolute;\
         bottom: 0px;\
-    min-height: 85px !important;\
+        min-height: 85px !important;\
         height: 85px !important;}\
 body.pin_comment #add_comment_box .emoticons_panel {\
+        max-height: 350px;\
         transition: width 1s ease, opacity 2s ease 0.5s;}\
-body.pin_comment:not(.hold_comment) #add_comment_form:not(:hover) .emoticons_panel {\
+body.pin_comment:not(.hold_comment) #comment_entry:not(:hover) .emoticons_panel {\
         width: 0px;\
         opacity: 0;\
         transition: none;}\
