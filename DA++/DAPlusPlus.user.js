@@ -12,21 +12,8 @@
 var ready = false;
 document.onmousemove = document.onready = run;
 setWhen(function() {
-    var shop = document.getElementById('oh-menu-shop');
-    var el = document.getElementById('oh-menu-split');
-    el.style.background = 'none';
-    shop.parentNode.insertBefore(el, shop.nextSibling);
-    el = document.getElementsByClassName('oh-mc-split');
-    if (el != null && el.length > 0) {
-        for (var i = 0; i < el.length; i++) {
-            el[i].style.background = 'none';
-            shop.parentNode.insertBefore(el[i], shop.nextSibling);
-        }
-    }
-    el = document.getElementById('oh-menu-deviant');
-    el.style.background = 'none';
-    shop.parentNode.insertBefore(el, shop.nextSibling);
-    el = document.getElementById('gmi-MessageCenterDockAd');
+    move('oh-menu-shop', 'oh-loginbutton').move('oh-menu-join').move('oh-menu-split').move('oh-mc-split').move('oh-menu-deviant');
+    var el = document.getElementById('gmi-MessageCenterDockAd');
     if (el != null) {
         el.parentNode.parentNode.removeChild(el.parentNode);
     }
@@ -34,13 +21,13 @@ setWhen(function() {
     return document.getElementById('oh-menu-shop') || ready;
 });
 
-makeStyle('.navbar-menu-inner * {\
+move().style('.navbar-menu-inner * {\
   font-size: 10px !important;}\
 .navbar-menu-inner, #navbar-menu {\
   height: 25px !important;}\
 #navbar-menu {\
   box-shadow: 0 0 5px 5px #526054;}\
-#navbar-menu * {\
+#navbar-menu *:not(.sticky) {\
   height: 15px !important;}\
 #friendslink, #collectlink {\
     transition: color 0.5s ease;}\
@@ -70,40 +57,6 @@ function run() {
     ready = true;
 }
 
-function setWhen(func, check) {
-    var id = null;
-    if (typeof (check) !== 'undefined') {
-        if (typeof(check) == 'function') {
-            if (check()) {
-                func();
-                return;
-            }
-        } else if (check) {
-            func();
-            return;
-        }
-        id = setInterval(function() {
-            if (typeof(check) == 'function') {
-                if (check()) {
-                    func();
-                    clearInterval(id);
-                }
-            } else if (check) {
-                func();
-                clearInterval(id);
-            }
-        }, 30);
-    }
-    return id;
-}
-
-function makeStyle(css) {
-    var tag = document.createElement('STYLE');
-    tag.type = 'text/css';
-    tag.innerHTML = css;
-    document.head.appendChild(tag);
-}
-
 function reref() {
     $(this).removeClass('external');
     var locs = $(this).attr('href').split('?');
@@ -130,4 +83,54 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
     .sleekadfooter,\
     #fake-col-left,\
     #fake-col-left + #gruze-columns > .gruze-sidebar:first-child').remove();
+}
+
+function move(ref, id) {
+    if (typeof ref === 'string') ref = document.getElementById(ref);
+    return {
+        move: function(button) {
+            if (button !== undefined && ref !== null) {
+                button = document.getElementById(button);
+                if (button != null) {
+                    button.style.background = 'none';
+                    ref.parentNode.insertBefore(button, ref.nextSibling);
+                }
+            }
+            return this;
+        },
+        style: function(css) {
+            var tag = document.createElement('STYLE');
+            tag.type = 'text/css';
+            tag.innerHTML = css;
+            document.head.appendChild(tag);
+            return this;
+        }
+    }.move(id);
+}
+
+function setWhen(func, check) {
+    var id = null;
+    if (typeof (check) !== 'undefined') {
+        if (typeof(check) == 'function') {
+            if (check()) {
+                func();
+                return;
+            }
+        } else if (check) {
+            func();
+            return;
+        }
+        id = setInterval(function() {
+            if (typeof(check) == 'function') {
+                if (check()) {
+                    func();
+                    clearInterval(id);
+                }
+            } else if (check) {
+                func();
+                clearInterval(id);
+            }
+        }, 30);
+    }
+    return id;
 }
