@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     2
+// @version     2.0.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -1462,7 +1462,7 @@ function run() {
         } else if (theme == "Light") {
             switchToLight();
         }
-    } else if ($('#player').length == 0) {
+    } else if (document.getElementById('player') == null) {
         if (document.location.href.indexOf('https://plus.google.com/_/up/widget') == 0) {
             if (document.location.href.indexOf('parent=https%3A%2F%2Fwww.youtube.com') != -1) {
                 if (theme == "Dark") {
@@ -1516,7 +1516,7 @@ function switchToLight() {
 
 function reloadComments() {
     try {
-        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id');
+        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id");
         comments = comments.find("iframe").each(function () {
             var split = this.src.split("?");
             var oldsrc = split[0] + "?r=2&" + split[1];
