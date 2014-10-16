@@ -6,10 +6,11 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     1.10.1
+// @version     2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
+// @run-at      document-start
 // ==/UserScript==
 
 var resources = {
@@ -272,7 +273,7 @@ var mainCss = '\
         float: inherit !important;}\
     .watch-branded-banner .player-branded-banner {\
         height: 0px !important;}\
-    .action-panel-content, .watch-action-panels, #watch-header, #watch7-sidebar-discussion, #watch7-sidebar-contents {\
+    .action-panel-content, .watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-discussion, #watch7-sidebar-contents {\
         background: #1b1b1b !important;}\
     .watch-action-buttons {\
         border-color: #444343 !important;}\
@@ -1174,9 +1175,11 @@ display: none !important;}\
 #comment-settings input {\
     background-color: #333 !important;}\
 .add-widget-menu-item, .add-widget-menu-item.added:hover, .add-widget-menu-content.widget-limit .add-widget-menu-item:hover,\
-.add-widget-menu-item {\
+.add-widget-menu-item, .howto-promo-container {\
     color: #666 !important;\
     background: none !important;}\
+.howto-circle {\
+    color: #000;}\
 .add-widget-menu-item:hover {\
     color: #AAA !important;\
     background-color: #333 !important;}\
@@ -1185,19 +1188,23 @@ display: none !important;}\
 .track .container {\
     background-color: #CFCFCF;}\
 .storyboard-icon, .menu-tab img {\
-    background-image: url(http://i.imgur.com/7MKyXvO.png) !important;}\.video-dds, .tabs-wrapper {\
+    background-image: url(http://i.imgur.com/7MKyXvO.png) !important;}\
+.video-dds, .tabs-wrapper {\
     border-color: #303030 !important;}\
 .video-dds .list {\
-    background: none repeat scroll 0% 0% #222 !important;\
+    background: #222 !important;\
     border-color: #303030 !important;}\
 .video-dds .entry:hover .highlight {\
     background-color: #333;\
     color: #aaa;}\
 .video-dds .topline {\
-    background: none repeat scroll 0% 0% #222 !important;}\
-.tab, #message_reading {\
-    border-color: #303030 !important;\
+    background: #222 !important;}\
+.tab, #message_reading, .channel-ad-fan-finder-banner {\
     background: #1B1B1B !important;}\
+.tab, #message_reading, .channel-ad-description, #creator-subheader {\
+    border-color: #303030 !important;}\
+#creator-subheader-text {\
+    color: #888 !important;}\
 .tab.active {\
     border-top-color: #CC181E !important;\
     color: #aaa !important;}\
@@ -1424,61 +1431,64 @@ var subEmbedCss = '\
     background: #222 !important;}';
 
 var theme = GM_getValue("theme", "Switch");
-var head = document.getElementsByTagName("head")[0];
-var body = document.getElementsByTagName("body")[0];
+run();
 
-if (window.top == window) {
-    var ls = document.createElement("style");
-    ls.setAttribute("type", "text/css");
-    ls.innerHTML = largePlayerCss;
-    head.appendChild(ls);
+function run() {
+    if (window.top == window) {
+        var ls = document.createElement("style");
+        ls.setAttribute("type", "text/css");
+        ls.innerHTML = largePlayerCss;
+        document.head.appendChild(ls);
 
-    var but = createButton();
-    body.appendChild(but);
-    but.setAttribute("style", "position:fixed;bottom:11px;right:11px;width:59px;z-index:999999999;");
-    but.name = "themeButton";
-    but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
-
-    but.onclick = function () {
-        if (theme == "Dark") {
-            switchToLight();
-        } else {
-            switchToDark();
+        var but = createButton();
+        document.ready = function() {
+            document.body.appendChild(but);
         }
-        this.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
-    }
+        but.setAttribute("style", "position:fixed;bottom:11px;right:11px;width:59px;z-index:999999999;");
+        but.name = "themeButton";
+        but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
 
-    if (theme == "Dark") {
-        switchToDark();
-    } else if (theme == "Light") {
-        switchToLight();
-    }
-} else if ($('#player').length == 0) {
-    if (document.location.href.indexOf('https://plus.google.com/_/up/widget') == 0) {
-        if (document.location.href.indexOf('parent=https%3A%2F%2Fwww.youtube.com') != -1) {
+        but.onclick = function () {
             if (theme == "Dark") {
-                createStyleTag(googlePlusCss);
+                switchToLight();
+            } else {
+                switchToDark();
+            }
+            this.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
+        }
+
+        if (theme == "Dark") {
+            switchToDark();
+        } else if (theme == "Light") {
+            switchToLight();
+        }
+    } else if ($('#player').length == 0) {
+        if (document.location.href.indexOf('https://plus.google.com/_/up/widget') == 0) {
+            if (document.location.href.indexOf('parent=https%3A%2F%2Fwww.youtube.com') != -1) {
+                if (theme == "Dark") {
+                    createStyleTag(googlePlusCss);
+                } else if (theme == "Light") {
+                    removeCss();
+                }
+            }
+        } else if (document.location.href.indexOf('https://apis.google.com') == 0 && document.location.href.indexOf('hovercard/internalcard') != -1) {
+            if (theme == "Dark") {
+                createStyleTag(hoverCardCss);
             } else if (theme == "Light") {
                 removeCss();
             }
-        }
-    } else if (document.location.href.indexOf('https://apis.google.com') == 0 && document.location.href.indexOf('hovercard/internalcard') != -1) {
-        if (theme == "Dark") {
-            createStyleTag(hoverCardCss);
-        } else if (theme == "Light") {
-            removeCss();
-        }
-    } else if (document.location.href.indexOf('subscribe_embed') != -1) {
-        if (theme == "Dark") {
-            createStyleTag(subEmbedCss);
-        } else if (theme == "Light") {
-            removeCss();
-        }
-    } else {
-        if (theme == "Dark") {
-            createStyleTag(commentsCss);
-        } else if (theme == "Light") {
-            removeCss();
+        } else if (document.location.href.indexOf('subscribe_embed') != -1) {
+            if (theme == "Dark") {
+                createStyleTag(subEmbedCss);
+            } else if (theme == "Light") {
+                removeCss();
+            }
+        } else {
+            if (theme == "Dark") {
+                createStyleTag(commentsCss);
+            } else if (theme == "Light") {
+                removeCss();
+            }
         }
     }
 }
@@ -1506,7 +1516,7 @@ function switchToLight() {
 
 function reloadComments() {
     try {
-        var comments = $("#comments-test-iframe").add('#gplus-signup-iframe-id');
+        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id');
         comments = comments.find("iframe").each(function () {
             var split = this.src.split("?");
             var oldsrc = split[0] + "?r=2&" + split[1];
@@ -1535,5 +1545,5 @@ function createStyleTag(sheet) {
     result.setAttribute("type", "text/css");
     result.setAttribute("name", "darkYouTubeTheme");
     result.innerHTML = sheet;
-    head.appendChild(result);
+    document.head.appendChild(result);
 }
