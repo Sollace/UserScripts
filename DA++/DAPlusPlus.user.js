@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1
+// @version     1.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -12,13 +12,13 @@
 var ready = false;
 document.onmousemove = document.onready = run;
 setWhen(function() {
-    move('oh-menu-shop', 'oh-loginbutton').move('oh-menu-join').move('oh-menu-split').move('oh-mc-split').move('oh-menu-deviant');
+    move('#oh-menu-shop', '#oh-loginbutton').move('#oh-menu-join').move('#oh-menu-split').move('.oh-mc-split').move('#oh-menu-deviant');
     var el = document.getElementById('gmi-MessageCenterDockAd');
     if (el != null) {
         el.parentNode.parentNode.removeChild(el.parentNode);
     }
 }, function() {
-    return document.getElementById('oh-menu-shop') || ready;
+    return document.getElementById('oh-menu-shop') != null && (document.getElementById('oh-menu-split') != null || document.getElementById('oh-menu-loginButton')) || ready;
 });
 
 move().style('.navbar-menu-inner * {\
@@ -86,14 +86,35 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 }
 
 function move(ref, id) {
-    if (typeof ref === 'string') ref = document.getElementById(ref);
+    function el(select) {
+        if (select.indexOf('#') == 0) {
+            return [document.getElementById(select.replace('#', ''))];
+        } else if (select.indexOf('.') == 0) {
+            return document.getElementsByClassName(select.replace('.',''));
+        }
+        return document.getElementsByTagName(select);
+    }
+    var element;
+    if (typeof ref === 'string') {
+        element = el(ref);
+        ref = element[0];
+    } else {
+        element = [ref];
+    }
     return {
+        length: function() {
+            return element.length;
+        },
         move: function(button) {
+            console.log(ref);
             if (button !== undefined && ref !== null) {
-                button = document.getElementById(button);
-                if (button != null) {
-                    button.style.background = 'none';
-                    ref.parentNode.insertBefore(button, ref.nextSibling);
+                button = el(button);
+                for (var i = 0; i < button.length; i++) {
+                    console.log(button[i]);
+                    if (button[i] != null) {
+                        button[i].style.background = 'none';
+                        ref.parentNode.insertBefore(button[i], ref.nextSibling);
+                    }
                 }
             }
             return this;
