@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     2.0.1
+// @version     2.0.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -261,14 +261,14 @@ var mainCss = '\
         background: no-repeat url(http://i.imgur.com/VirN1wE.png) -170px -201px !important;}\
     #player, .yt-ui-ellipsis, .yt-uix-expander-ellipsis {\
         background: transparent !important;}\
-.yt-ui-menu-content, .add-to-widget .playlists {\
-    background: #222;\
-    border-color: #444343;}\
-.yt-ui-menu-content * {\
+.yt-ui-menu-content, #yt-uix-videoactionmenu-menu, .add-to-widget .playlists {\
+    background: #222 !important;\
+    border-color: #444343 !important;}\
+.yt-ui-menu-content h3, .yt-uix-button-menu-item, .yt-ui-menu-item {\
     color: #888 !important;}\
-.add-to-widget .addto-playlist-item:hover, .add-to-widget .create-playlist-item:hover,\
+#yt-uix-videoactionmenu-menu .addto-playlist-item:hover, #yt-uix-videoactionmenu-menu .create-playlist-item:hover,\
 .yt-uix-menu-trigger-selected .yt-ui-menu-item, .yt-ui-menu-item:hover {\
-    background-color: #333232;}\
+    background-color: #333232 !important;}\
     .player-unavailable {\
         float: inherit !important;}\
     .watch-branded-banner .player-branded-banner {\
