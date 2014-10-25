@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.1
+// @version     1.2
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -29,9 +29,10 @@ move().style('.navbar-menu-inner * {\
   box-shadow: 0 0 5px 5px #526054;}\
 #navbar-menu *:not(.sticky) {\
   height: 15px !important;}\
-#friendslink, #collectlink {\
+#friendslink, #collectlink, #oh-menu-split .icon {\
     transition: color 0.5s ease;}\
-#friendslink:hover, #friendslink.active {\
+#friendslink:hover, #friendslink.active,\
+#oh-menu-split.mmhover .icon {\
     color: lightblue;}\
 #collectlink:hover, #collectlink.active {\
     color: yellow !important;}\
@@ -46,9 +47,10 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
     .tower-ad-header,\
     .sleekadfooter,\
     #gmi-MessageCenterDockAd,\
-    #fake-col-left,\
-#fake-col-left + #gruze-columns > .gruze-sidebar:first-child {\
-display: none;}');
+    #fake-col-left {\
+display: none;}\
+#oh-menu-submit:not(.mmhover) > a > span {\
+    background: none repeat scroll 0% 0% rgba(0,0,0,0.1) !important;}');
 
 
 function run() {
@@ -80,9 +82,10 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
     .da-custom-ad-box,\
     .dac-ad-frontpage-banner,\
     .tower-ad-header,\
-    .sleekadfooter,\
-    #fake-col-left,\
-    #fake-col-left + #gruze-columns > .gruze-sidebar:first-child').remove();
+    .sleekadfooter').remove();
+    if ($('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child iframe').length) {
+        $('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child, #fake-col-left').remove();
+    }
 }
 
 function move(ref, id) {
