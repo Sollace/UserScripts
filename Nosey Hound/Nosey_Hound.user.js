@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.2
+// @version     1.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -470,7 +470,7 @@ function getUserName() {
 
 //==API FUNCTION==//
 function getUserButton() {
-    return $('.user_toolbar div.user_drop_down_menu a[href^="/user/"]')[0];
+    return $('.user_toolbar a.button[href^="/user/"]')[0];
 }
 
 //==API FUNCTION==//
