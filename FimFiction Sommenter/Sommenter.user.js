@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.1
+// @version     2.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -32,9 +32,9 @@ if (interactiveP.length > 0) {
     });
 }
 
-var commentBox = $("#add_comment_box a[title='Text Color']");
+var commentBox = $("#add_comment_box .toolbar_buttons");
 if (commentBox.length > 0) {
-    setupTogglePin(commentBox.parent()[0]);
+    setupTogglePin(commentBox[0]);
     $(document).ready(function () {
         $('#add_comment_box .form_submitter').on('click', function () {
             $('body.pin_comment #comment_preview').css('opacity', 0);
@@ -162,8 +162,8 @@ function setPinComments(val) {
 //==API FUNCTION==//
 function makeButton(a, text, img) {
     var b = document.createElement("li");
-    $(b).append("<a href=\"javascript:void();\" title=\"" + text + "\"><i class=\"" + img + "\"></i></a>");
-    $(a.parentNode).append(b);
+    $(b).append("<button title=\"" + text + "\"><i class=\"" + img + "\"></i></button>");
+    $(a).append(b);
     return b;
 }
 
