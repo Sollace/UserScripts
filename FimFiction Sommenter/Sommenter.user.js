@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2
+// @version     2.2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -25,7 +25,6 @@ if (interactiveP.length > 0) {
     var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
     row.find('.toggleable-switch').prepend(Option);
     interactiveP.before(row);
-
     Option.attr('checked', getPinComments());
     Option.click(function () {
         setPinComments(this.checked);
@@ -61,8 +60,7 @@ function AddQuote(a, b) {
 makeStyle(".comments_pinner:before {\
         content: '';}\
 body.pin_comment .comments_pinner:before {\
-        content: '';\
-        color: yellow;}\
+        content: '';}\
 body.pin_comment #add_comment_box {\
         position: fixed;\
         bottom: -30px;\
