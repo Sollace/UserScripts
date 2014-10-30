@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.3
+// @version     1.3.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -454,10 +454,9 @@ function position(obj, x, y, buff) {
 
 //==API FUNCTION==//
 function isMyPage() {
-    if (document.location.href.split('/user/').reverse()[0] == getUserNameEncoded()) {
-        return true;
-    }
-    return document.location.href.split('/user/').reverse()[0] == getUserName().replace(/ /g, '+');
+    var locationCheck = document.location.href.replace('http:','').replace('https:','');
+    if (locationCheck.indexOf('//www.fimfiction.net/user/' + getUserNameEncoded()) == 0) return true;
+    return locationCheck.indexOf('//www.fimfiction.net/user/' + getUserName().replace(/ /g, '+')) == 0;
 }
 
 //==API FUNCTION==//

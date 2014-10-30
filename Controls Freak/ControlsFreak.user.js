@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.2.2
+// @version     1.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -15,7 +15,7 @@ $(document).ready(function () {
         this.children = [];
 
         for (var i = 0; i < buttons.length; i++) {
-            if (buttons[i].tagName == 'DIV' || buttons[i].tagName == 'A' || buttons[i].tagName == 'LABEL') {
+            if (buttons[i].tagName == 'LI') {
                 this.children.push(new Button(this, i, buttons[i], true));
             } else {
                 this.children.push(new Baggage(buttons[i]));
@@ -29,7 +29,7 @@ $(document).ready(function () {
             var addedClass = false;
             for (var i = 0; i < this.children.length; i++) {
                 var nod = this.children[i].genNode();
-                if (!addedClass && ($(nod).prop('tagName') == 'DIV' || $(nod).prop('tagName') == 'A')) {
+                if (!addedClass && $(nod).prop('tagName') == 'LI') {
                     $(nod).addClass('button-first');
                     addedClass = true;
                 } else if (i > 0) {
@@ -47,7 +47,7 @@ $(document).ready(function () {
     }
     ToolBar.prototype.getContainer = function (holder, classes, allow) {
         if (this.container == null) {
-            this.container = $('<div class="editor" />');
+            this.container = $('<ul class="editor" />');
             var me = this;
             $(holder).after(this.container);
             $(this.container).click(function () {
@@ -77,14 +77,14 @@ $(document).ready(function () {
     }
     ToolBar.prototype.fromConfig = function (config) {
         config = JSON.parse(config);
-
+        
         var childs = [];
         for (var i = 0; i < this.children.length; i++) {
             if (this.children[i].type == 'hidden') {
                 childs.push(this.children[i]);
             }
         }
-
+        
         for (var i = 0; i < config.length; i++) {
             var b = getButton(config[i]);
             if (b != null) {
@@ -103,308 +103,507 @@ $(document).ready(function () {
             }
         }
     }
+    ToolBar.prototype.flush = function() {
+        for (var i = 0; i < this.children.length; i++) {
+            this.children[i].originalElement.detach();
+        }
+    }
 
     function Deck() {
         this.container = null;
         this.children = [];
-
-        this.deckStart = $('#home_link + .link_container');
-
-        this.children.push(new Button(this, 0, $('.nav_bar .light .mail_link').parent(), false, 'pin'));
-        this.children.push(new Button(this, 1, $('.nav_bar .light .feed_link').parent(), false, 'pin'));
-        this.children.push(new Button(this, 2, $('.nav_bar .light .notifications_link').parent(), true, 'pin'));
+        this.deckStart = $('#home_link + li')[0];
+        this.children.push(new Button(this, 0, $('#private-message-drop-down'), false, 'pin'));
+        this.children.push(new Button(this, 1, $('.nav-bar-list .feed-link').parent(), false, 'pin'));
+        this.children.push(new Button(this, 2, $('#notifications-drop-down'), false, 'pin'));
+        this.children.push(new Button(this, 3, $('#form_search_sidebar'), false, 'pin'));
 
         this.gen = function () {
             for (var i = this.children.length - 1; i >= 0; i--) {
-                if (this.children[i].type = 'pin') {
-                    this.deckStart.after(this.children[i].genNode(i));
+                if (this.children[i].isPinnable()) {
+                    $(this.deckStart).after(this.children[i].genNode(i));
                 }
             }
         }
     }
     Deck.prototype = ToolBar.prototype;
-
+    
     if (getIsLoggedIn()) {
-
+        preInit();
         makeStyle('\
-    .nav_bar .menu_list .user_drop_down_menu {\
-        display: block !important;}\
-    .nav_bar .menu_list i {\
-        float: left !important;\
-        width: 23px;}\
-    .user_toolbar .menu_list i {\
-        float: right !important;\
-        width: initial !important;}\
-    .nav_bar .container .link_container {\
-        background-color: rgba(255, 255, 255, 0.1);\
-        padding-left: 6px;\
-        padding-right: 12px;\
-        transition-property: none;\
-        transition-duration: 0s;\
-        text-shadow: 1px 1px rgba(255, 255, 255, 0.4);\
-        box-shadow: none;\
-        border: none;\
-        border-bottom: solid 1px #DDD;}\
-    .nav_bar .container .link_container:hover {\
-        background-color: #FFF;\
-        margin-left: 0px;}\
-    .nav_bar .container .link_container div[class*="_link"] {\
-        text-shadow: inherit !important;}\
-    .user_toolbar .menu_list div[class*="_link"]:before {\
-        position: absolute;\
-        right: 13px;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu div[class*="_link"]:not(.new):before,\
-    .nav_bar .container .link_container div[class*="_link"]:before {\
-        color: #AAA;\
-        text-shadow: inherit !important;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu:hover div[class*="_link"]:not(.new):before,\
-    .nav_bar .container .link_container:hover div[class*="_link"]:before {\
-        color: #2773E6 !important;}\
-    .user_toolbar .user_drop_down_menu .menu_list div[class*="_link"] div,\
-    .nav_bar .container .link_container div[class*="_link"] div {\
-        font-weight: normal !important;\
-        color: #333;\
-        text-decoration: none;\
-        font-family: Arial;\
-        font-size: 13px;\
-        display: inline-block;\
-        background: none;\
-        border: none;\
-        box-shadow: none;\
-        position: static;}\
-    .nav_bar .container .link_container div[class*="_link"] {\
-        margin-left: 3px;}\
-    .nav_bar .container .link_container div[class*="_link"] div {\
-        margin-left: 0px;}\
-    .user_toolbar .user_drop_down_menu .menu_list div[class*="_link"] div {\
-        padding-left: 0px;}\
-    .nav_bar .light .drop_down_container .container .panel {\
-        overflow: visible !important;}\
-    .nav_bar .user_drop_down_menu:not(.hover) > .menu_list,\
-    .nav_bar .user_drop_down_menu:not(.hover) > .container {\
-        display: none !important;}\
-    .nav_bar .light .drop_down_container.user_drop_down_menu .menu_list {\
-        background-color: #CCC;\
-        box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.35);\
-        border-right: 1px solid #454545;\
-        border-width: medium 1px 1px;\
-        border-style: none solid solid;\
-        border-color: -moz-use-text-color #454545 #454545;\
-        -moz-border-top-colors: none;\
-        -moz-border-right-colors: none;\
-        -moz-border-bottom-colors: none;\
-        -moz-border-left-colors: none;\
-        white-space: nowrap;\
-        font-family: Calibri;}\
-    .nav_bar .container .container {\
-        top: 0px !important;\
-        left: 100% !important;}\
-    .nav_bar .container .container .arrow {\
-        display: none;}\
-    .user_toolbar .notifications_link:before {\
-        content: "";}\
-    .menu_list .notifications_link div:after,\
-    .container .link_container .notifications_link div:after,\
-    .user_toolbar .inner > div > .notifications_link:not(.new):after {\
-        content: " Notes";}\
-    .user_toolbar .mail_link:before {\
-        content: "";}\
-    .menu_list .mail_link div:after,\
-    .container .link_container .mail_link div:after,\
-    .user_toolbar .inner > div > .mail_link:not(.new):after {\
-        content: " Mail";}\
-    .user_toolbar .feed_link:before {\
-        content: "";}\
-    .menu_list .feed_link div:after,\
-    .container .link_container .feed_link div:after,\
-    .user_toolbar .inner > div > .feed_link:not(.new):after {\
-        content: " Feed";}\
-    .user_toolbar div[class*="_link"]:before {\
-        font-family: "FontAwesome";}\
-    .user_toolbar div[class*="_link"].new div {\
-        display: inline-block;}\
-    .user_toolbar div[class*="_link"] div {\
-        padding: 4px;\
-        line-height: 1em;\
-        display: none;}\
-    .user_toolbar .link_container .link {\
-        position: absolute;\
-        left: 0px;\
-        right: 0px;\
-        top: 0px;\
-        bottom: 0px;\
-        display: block;\
-        z-index: 2;}\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
-        margin: -1px 0px -1px;\
-        line-height: 38px;\
-        text-shadow: -1px -1px #A0472E;}\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] div {\
-        font-size: 13px;}\
-    .user_toolbar .inner:not(.editor) div[class*="_link"]:not(.new) {\
-        color: rgba(0, 0, 0, 0.85);\
-        background-color: rgba(255, 255, 255, 0.1);}\
-    .user_toolbar .inner > .user_drop_down_menu:hover > div[class*="_link"].new {\
-        background-color: #A0472E;\
-            color: #FFF;\
-        text-shadow: -1px -1px #803824;\
-        border-bottom: 1px solid #703120;\
-        margin-bottom: -1px;\
-        border-left: 1px solid #803824;}\
-    .user_toolbar .menu_list .user_drop_down_menu:hover > .new,\
-    .user_toolbar .menu_list .new:hover {\
-        background-color: #DB6209;\
-        color: #FFF;\
-        text-shadow: -1px -1px #803824;\
-        border-bottom: 1px #FFF !important;\
-        margin-bottom: 1px !important;}\
-    .user_toolbar .menu_list .user_drop_down_menu:hover > .new:before,\
-    .user_toolbar .menu_list .new:before {\
-        color: #AAA;}\
-    .user_toolbar .menu_list .new:not([class*="_link"]) {\
-        border-left: 1px solid #803824 !important;}\
-    .user_toolbar .menu_list .user_drop_down_menu:hover > div[class*="_link"].new:before,\
-    .user_toolbar .menu_list div[class*="_link"].new:hover:before {\
-        color: #2773E6;}\
-    .user_toolbar .inner div[class*="_link"]:not(.new):after {\
-        font-size: 13px;\}\
-    .user_toolbar > .inner > .user_drop_down_menu > div[class*="_link"] {\
-        display: inline-block;\
-        vertical-align: middle;\
-        border-top: 1px solid rgba(0, 0, 0, 0.2);\
-        font-family: Arial;\
-        font-weight: bold;\
-        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
-        padding-left: 12px;\
-        padding-right: 12px;\
-        line-height: 37px;\
-        transition-property: background-color, box-shadow;\
-        transition-duration: 0.1s;\
-        border-right: 1px solid rgba(0, 0, 0, 0.2);\
-        margin: -1px 0px 0px;\
-        box-shadow: 0px 0px 8px transparent inset;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"] {\
-        text-decoration: none;\
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);\
-        background-position: right top;\
-        min-width: 24px;\
-        text-align: left;\
-        text-shadow: 1px 1px rgba(255, 255, 255, 0.4);\
-        font-weight: normal;\
-        padding-left: 12px;\
-        padding-right: 12px;\
-        line-height: 38px;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list .user_drop_down_menu:hover div[class*="_link"]:not(.new) {\
-        background: white;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"].new:before {\
-        text-shadow: none;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"] div {\
-        margin-left: 5px;}\
-    .user_toolbar .inner .user_drop_down_menu .menu_list .new,\
-    .user_toolbar .inner .user_drop_down_menu .menu_list div[class*="_link"].new div {\
-        color: #FFF;\
-        text-shadow: -1px -1px #A0472E;}\
-    .user_toolbar .link_container:hover {\
-        background-color: rgba(0, 0, 0, 0.2);}\
-    div.user_toolbar .inner > div[class*="_link"]:not(.new):hover,\
-    div.user_toolbar .inner > div.user_drop_down_menu:hover > div[class*="_link"]:not(.new) {\
-        border-left: 1px solid rgba(0, 0, 0, 0.2);\
-        margin-left: -1px;}\
-    div.user_toolbar .drop_down_container.hover > .container > div.menu_list,\
-    .drop_down_container.hover div.container {\
-        display: block;\
-        visibility: visible;\
-        opacity: 1;\
-        transition-delay: 0s;}\
-    \
-    .custom_button {\
-        cursor: pointer;\
-        -webkit-user-select: none;\
-        -moz-user-select: none;}\
-    .button:not(.editing) .editBox {\
-        display: none;}\
-    .button.editing + div.menu_list {\
-        display: block;\
-        visibility: visible;\
-        opacity: 1;}\
-    body.editing .nav_bar,\
-    body.editing .editor:not(.label) {\
-        min-height: 40px;\
-        height: auto !important;}\
-    body.editing .user_toolbar > .inner:not(.editor),\
-    body.editing .nav_bar > .light:not(.editor),\
-    body:not(.editing) .user_toolbar .editor,\
-    body:not(.editing) .nav_bar .editor,\
-    .user_toolbar .bin .items {\
-        display: none;}\
-    .user_toolbar > .inner > .button > i {\
-            float: none !important;}\
-    .inner.label {\
-        z-index: 2;\
-        position: absolute;\
-        background-color: inherit;\
-        transition: background-color 0.5s ease 0s;\
-        border-radius: 0 4px 20px 0;\
-        border: 1px solid rgba(0, 0, 0, 0.2);\
-        border-top: none;\
-        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);\
-        left: 0px;\
-        padding: 6px;\
-        padding-right: 20px;\
-        bottom: -30px;}\
-    .user_toolbar .bin {\
-        border-top: 1px solid rgba(0, 0, 0, 0.5);\
-        margin-top: 5px;\
-        background-color: rgba(250, 240, 230, 0.6);}\
-    .editing_button {\
-        cursor: move;}\
-    .editing_button i {\
-        float: none !important;}\
-    .editing_button .items {\
-        cursor: default;\
-        min-height: 50px;\
-        min-width: 200px;\
-        background: rgba(255,255,255,0.3);\
-        padding: 5px;}\
-    #button_moving {\
-        pointer-events: none;\
-        z-index: 100000;\
-        position: fixed !important;}\
-    #button_moving:after {\
-        content: "Click to place, ESC to cancel";\
-        display: block;\
-        position: absolute;\
-        white-space: nowrap;\
-        top: -20px;\
-        background: rgba(255,255,255,0.4);\
-        border-radius: 5px;\
-        padding: 0 5px 0 5px;\
-        line-height: 20px;}\
+.editing_button > .button {\
+    padding: 0px 10px;}\
+.iconize, .mail-link:before, .notifications-link:before, .feed-link:before {\
+    line-height: 45px;\
+    text-align: center;\
+    display: inline-block;\
+    font-family: FontAwesome;\
+    font-weight: normal;}\
+.user_toolbar > ul > li > .iconize, .user_toolbar > ul > li > .notifications-link:before, .user_toolbar > ul > li > .mail-link:before, .user_toolbar > ul > li > .feed-link:before {\
+    margin-right: 5px;\
+    font-size: 16px;\
+    line-height: inherit;}\
+.user_toolbar > ul > li > ul li .iconize, .user_toolbar > ul > li > ul li .notifications-link:before, .user_toolbar > ul > li > ul li .mail-link:before, .user_toolbar > ul > li > ul li .feed-link:before {\
+    margin-right: 8px;\
+    text-align: center;\
+    color: #666;\
+    font-size: 14px;\
+    position: absolute;\
+    left: 0px;\
+    top: 0px;\
+    bottom: 0px;\
+    background: none repeat scroll 0% 0% #F8F8F8;\
+    line-height: 38px;\
+    width: 34px;\
+    border-right: 1px solid rgba(0, 0, 0, 0.15);}\
+.user_toolbar > ul > li > ul li:hover .notifications-link:before, .user_toolbar > ul > li > ul li:hover .mail-link:before, .user_toolbar > ul > li > ul li:hover .feed-link:before {\
+    background: #474543;\
+    color: #fff;}\
+.user_toolbar > ul > li > .mail-link, .user_toolbar > ul > li > .notifications-link, .user_toolbar > ul > li > .feed-link  {\
+    margin-top: -1px;}\
+.user_toolbar .notifications-link:before {\
+    content: "";}\
+.user_toolbar .mail-link:before {\
+    content: "";}\
+.user_toolbar .feed-link:before {\
+    content: "";}\
+.user_toolbar li > a > div[id^="num"], .user_toolbar li > .mail-link > div {\
+    display: none;}\
+@media all and (min-width: 700px) {\
+    .user_toolbar li > a.new > div[id^="num"], .user_toolbar li > .mail-link.new > div {\
+        display: inline;}\
+    .user_toolbar .notifications-link:not(.new):after {\
+        content: "Notes";}\
+    .user_toolbar .mail-link:not(.new):after {\
+        content: "Mail";}\
+    .user_toolbar .feed-link:not(.new):after {\
+        content: "Feed";}}\
+.user_toolbar .notifications-link.new,\
+.user_toolbar .mail-link.new,\
+.user_toolbar .feed-link.new {\
+    background-color: #C9593A;\
+    color: #FFF;\
+    text-shadow: -1px -1px #A0472E;\
+    border-bottom: 1px solid #8C3E28;\
+    margin-bottom: -1px;\
+    border-left: 1px solid #A0472E;\
+    margin-left: -1px;}\
+.user_toolbar .notifications-link.new:hover,\
+.user_toolbar .mail-link.new:hover,\
+.user_toolbar .feed-link.new:hover {\
+    background-color: #A0472E;\
+    color: #FFF;\
+    text-shadow: -1px -1px #803824;\
+    border-bottom: 1px solid #703120;\
+    margin-bottom: -1px;\
+    border-left: 1px solid #803824;}\
+.user_toolbar > ul > li ul .new, .user_toolbar > ul > li ul .new:hover {\
+  margin-top: 0px !important;\
+  margin-bottom: 0px !important;\
+  border: none !important;}\
+.user_toolbar > ul > li ul .new div:after {\
+  content: " )";}\
+.user_toolbar > ul > li ul .feed-link.new div:before {\
+  content: "Feed ( "}\
+.user_toolbar > ul > li ul .notifications-link.new div:before {\
+  content: "Notes ( "}\
+.user_toolbar > ul > li ul .mail-link.new div:before {\
+  content: "Mail ( "}\
+.user_toolbar > ul > li ul li.hover > .drop-down ul,\
+.user_toolbar > ul > li > .drop-down ul,\
+.user_toolbar > ul > li.hover > .drop-down {\
+    display: block !important;}\
+.user_toolbar > ul > li ul li > .drop-down,\
+.user_toolbar > ul > li > .drop-down {\
+    display: none;\
+    position: absolute;\
+    top: 39px;\
+    left: 0px;\
+    z-index: 15;\
+    width: 500px;\
+    background: none repeat scroll 0% 0% padding-box #FFF;\
+    border-right: 1px solid rgba(0, 0, 0, 0.2);\
+    border-width: medium 1px 1px;\
+    border-style: none solid solid;\
+    border-color: -moz-use-text-color rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2);\
+    -moz-border-top-colors: none;\
+    -moz-border-right-colors: none;\
+    -moz-border-bottom-colors: none;\
+    -moz-border-left-colors: none;\
+    border-image: none;\
+    color: #444;\
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);\
+    border-bottom-left-radius: 5px;\
+    border-bottom-right-radius: 5px;}\
+.user_toolbar > ul > li ul li.hover > .drop-down,\
+.user_toolbar > ul > li ul li.hover > ul {\
+    left: 100% !important;\
+    top: -1px;\
+    margin-left: 0px !important;\
+    display: block;}\
+.user_toolbar > ul > li ul li.hover > .drop-down:before {\
+    font-family: "FontAwesome";\
+    content: "";\
+    color: #474543;\
+    position: absolute;\
+    left: -20px;\
+    top: 0px;}\
+.user_toolbar ul.drop-down-private-messages,\
+.user_toolbar .drop-down.drop-down-private-messages,\
+.user_toolbar ul.drop-down-notifications,\
+.user_toolbar .drop-down.drop-down-notifications {\
+    width: 550px;\
+    left: -52px;}\
+.user_toolbar li ul.drop-down-private-messages ul,\
+.user_toolbar li ul.drop-down-notifications ul,\
+.user_toolbar li .drop-down ul {\
+    min-height: 50px;\
+    max-height: 420px;\
+    overflow: auto;\
+    position: relative;\
+    border: none;}\
+.user_toolbar li .drop-down.drop-down-notifications li * {\
+  line-height: 0px;}\
+.user_toolbar li > ul.drop-down-notifications li,\
+.user_toolbar li .drop-down.drop-down-notifications li {\
+    display: block;\
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);\
+    padding: 8px 80px 8px 10px;\
+    line-height: 1.2em;\
+    overflow: hidden;\
+    position: relative;\
+    font-weight: initial;}\
+.user_toolbar li > ul.drop-down-private-messages li,\
+.user_toolbar li .drop-down.drop-down-private-messages li {\
+    display: block;\
+    border-bottom: 1px solid #DDD;\
+    padding: 6px 80px 6px 8px;\
+    line-height: 1.4em;\
+    overflow: hidden;\
+    position: relative;\
+    font-weight: initial;}\
+.user_toolbar li > ul.drop-down-notifications li,\
+.user_toolbar li .drop-down.drop-down-notifications li {\
+    line-height: 1.2em;\
+    font-size: 12px;}\
+.user_toolbar li > ul.drop-down-notifications li i,\
+.user_toolbar li .drop-down.drop-down-notifications li i {\
+    margin-right: 4px;}\
+.user_toolbar li .drop-down.drop-down-notifications li p {\
+    display: inline !important;}\
+.user_toolbar li > ul.drop-down-private-messages li .date,\
+.user_toolbar li > ul.drop-down-notifications li .date,\
+.user_toolbar li .drop-down li .date {\
+    position: absolute;\
+    top: 50%;\
+    right: 10px;\
+    margin-top: -7px;\
+    font-size: 0.9em;}\
+.user_toolbar li ul.drop-down-notifications li a,\
+.user_toolbar li .drop-down.drop-down-notifications li a {\
+    font-weight: bold;\
+    padding: 0px;\
+    color: #507E2C;\
+    text-decoration: none;\
+    cursor: pointer;\
+    display: inline;}\
+.user_toolbar li ul.drop-down-private-messages li a,\
+.user_toolbar li .drop-down.drop-down-private-messages li a {\
+    background: none !important;\
+    color: #333;\
+    font-size: 1.1em;\
+    display: inline;\
+    padding: 0px;}\
+.user_toolbar li ul.drop-down-private-messages li .avatar,\
+.user_toolbar li .drop-down.drop-down-private-messages li .avatar {\
+    border-radius: 4px;\
+    width: 38px;\
+    height: 38px;\
+    margin-right: 8px;\
+    padding: 2px;\
+    vertical-align: middle;\
+    float: left;\
+    background: none repeat scroll 0% 0% #FFF;\
+    border-width: 1px;\
+    border-style: solid;\
+    border-right: 1px solid #BEBAB4;\
+    border-color: #D6D1CB #BEBAB4 #BEBAB4 #D6D1CB;\
+    -moz-border-top-colors: none;\
+    -moz-border-right-colors: none;\
+    -moz-border-bottom-colors: none;\
+    -moz-border-left-colors: none;\
+    border-image: none;}\
+.user_toolbar li ul.drop-down-notifications li i,\
+.user_toolbar li .drop-down.drop-down-notifications li i {\
+    position: relative;\
+    padding: 0px;\
+    border: none;\
+    background: none;\
+    display: inline;}\
+.user_toolbar .drop-down-header {\
+    border-bottom: 1px solid #CCC;}\
+.user_toolbar .drop-down-footer, .user_toolbar .drop-down-header {\
+    background: none repeat scroll 0% 0% #EEE;\
+    padding: 3px 8px;\
+    line-height: 1;\
+    text-align: left;}\
+.user_toolbar .drop-down-footer .styled_button,\
+.user_toolbar .drop-down-header .styled_button {\
+    padding: 6px;}\
+.user_toolbar .drop-down-footer .styled_button i,\
+.user_toolbar .drop-down-header .styled_button i {\
+    position: relative;\
+    padding: 0px;\
+    margin: 0px;\
+    color: inherit;\
+    background: none;\
+    border: none;\
+    display: inline-block;\
+    width: auto;\
+    line-height: inherit;}\
+.user_toolbar li > ul.drop-down-private-messages li .message-content,\
+.user_toolbar li .drop-down.drop-down-private-messages li .message-content {\
+    color: #AAA;}\
+.user_toolbar li > ul.drop-down-private-messages li .message-content:after,\
+.user_toolbar li .drop-down.drop-down-private-messages li .message-content:after {\
+    content: "...";}\
+.user_toolbar ul.loading:after,\
+.user_toolbar .drop-down ul.loading:after {\
+  animation: 2s linear 0s normal none infinite running fa-spin;\
+  line-height: 28px;\
+  position: absolute;\
+  content: "";\
+  font-family: FontAwesome;\
+  left: 50%;\
+  top: 50%;\
+  margin-left: -14px;\
+  margin-top: -14px;\
+  font-size: 28px;\
+  color: #333;}\
+.user_toolbar  ul.loading li {\
+    opacity: 0.5;}\
+.items .editing_button {\
+  position: relative;\
+  display: block;\
+  padding-left: 46px;\
+  text-align: left;\
+  background: #FFF;\
+  border: 1px solid rgba(0, 0, 0, 0.3);\
+  color: #444;\
+  text-shadow: none;}\
+.items .editing_button:hover {\
+  outline: 3px solid rgba(255,255,0,0.4);}\
+.items .editing_button i,\
+.items .editing_button .feed-link:before, .items .editing_button .notifications-link:before, .items .editing_button .mail-link:before {\
+  margin-right: 8px;\
+  text-align: center;\
+  color: #666;\
+  font-size: 14px;\
+  position: absolute;\
+  left: 0px;\
+  top: 0px;\
+  bottom: 0px;\
+  background: #F8F8F8;\
+  line-height: 38px;\
+  width: 35px;\
+  border-right: 1px solid rgba(0, 0, 0, 0.15);}\
+.user_toolbar > ul > li > label {\
+  vertical-align: initial;}\
+.items .editing_button .feed-link:before, .items .editing_button .notifications-link:before, .items .editing_button .mail-link:before {\
+  width: 34px;}\
+.user_toolbar > ul > li > label a {\
+  float: left;\
+  margin: 5px;}\
+.nav-bar-list .editing_button[data-type="spacer"]:before {\
+  font-size: 30px;\
+  line-height: 35px;}\
+.nav-bar-list .iconize {\
+  display: block;\
+  font-size: 14px;}\
+.nav-bar-list .editing_button[data-type="spacer"]:before, .nav-bar-list .iconize {\
+  color: #C8CCE0;\
+  padding: 0px 8px;\
+  font-weight: bold;}\
+.user_toolbar > ul > .editing_button[data-type="spacer"],\
+.user_toolbar > ul > .editing_button[data-type="divider"],\
+.user_toolbar > ul > .divider {\
+  display: inline-block;\
+  width: 2px;\
+  height: 39px !important;\
+  box-shadow: 0px 0px 8px transparent inset;\
+  border-right: 1px solid rgba(0, 0, 0, 0.2);\
+  border-top: 1px solid rgba(0, 0, 0, 0.2);\
+  margin: -1px 0px 0px;\
+  position: relative;\
+  z-index: 5;}\
+.user_toolbar > ul > li ul li.spacer {\
+  height: 1px;\
+  width: initial !important;\
+  background: #CCC;}\
+.nav-bar-list > .spacer:hover {\
+  background: none !important;}\
+.user_toolbar > ul > .spacer {\
+  border: none;}\
+.user_toolbar > ul > .spacer + li {\
+    border-left: 1px solid rgba(0, 0, 0, 0.2);}\
+.user_toolbar > ul > .divider {\
+  background-color: rgba(255, 255, 255, 0.1) !important;}\
+.nav-bar-list > .divider {\
+  background: none !important;\
+  width: 5px;}\
+.user_toolbar > ul > #form_search_sidebar {\
+  background-color: rgba(255, 255, 255, 0.1);}\
+.user_toolbar > ul > #form_search_sidebar .nav-bar-search {\
+  background-color: rgba(0,0,0,0.3);\
+  border: 1px solid rgba(0, 0, 0, 0.2);\
+  background-clip: padding-box;\
+  padding: 6px;\
+  margin-top: -4px;\
+  margin-bottom: -1px;\
+  outline: medium none;\
+  color: #C8CCE0;\
+  vertical-align: middle;\
+  line-height: 26px;\
+  width: 200px;}\
+.user_toolbar > ul > li ul .search_submit,\
+.user_toolbar > ul > #form_search_sidebar .search_submit {\
+  background: none;\
+  border: none;\
+  padding: 5px;\
+  outline: medium none;\
+  vertical-align: middle;\
+  font-family: "FontAwesome";\
+  line-height: 26px;\
+  margin-top: -4px;\
+  margin-bottom: -1px;}\
+.user_toolbar > ul > li ul #form_search_sidebar {\
+  position: relative;\
+  height: 40px;\
+  margin: 0px;\
+  padding: 0px;}\
+.user_toolbar > ul > #form_search_sidebar .search_submit:hover {\
+  background-color: rgba(0,0,0, 0.1);}\
+.user_toolbar > ul > li ul .search_submit,\
+.user_toolbar > ul > li ul #form_search_sidebar .nav-bar-search {\
+  position: absolute;\
+  border: 1px solid #CCC;}\
+.user_toolbar > ul > li ul #form_search_sidebar .nav-bar-search {\
+  line-height: 38px;\
+  top: 0px;\
+  bottom: 0px;\
+  left: 0px;\
+  padding-right: 18px;}\
+.user_toolbar > ul > li ul .search_submit {\
+  top: 0px;\
+  right: 0px;\
+  bottom: 0px;\
+  width: 35px;\
+  margin-top: 0px;\
+  margin-bottom: 0px;}\
 \
-@media all and (max-width: 700px) {\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new {\
-        margin-bottom: -1px;\
-        line-height: 1em;}\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"] {\
-        color: #fff !important;\
-        padding: 9px 8px 7px 8px;\
-        line-height: 1em;\
-        text-shadow: -1px -1px rgba(0, 0, 0, 0.3) !important;\
-        margin: -1px 0 0 0;}\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"].new div,\
-    .user_toolbar .inner > .user_drop_down_menu > div[class*="_link"]:after {\
-        display: none;}\
-    .user_toolbar .menu_list .button > span {\
-        display: initial !important;}}');
-
+.editor > li {\
+  vertical-align: top !important;}\
+.custom_button {\
+  cursor: pointer;\
+  -webkit-user-select: none;\
+  -moz-user-select: none;}\
+.button:not(.editing) .editBox {\
+  display: none;}\
+.button.editing + div.menu_list {\
+  display: block;\
+  visibility: visible;\
+  opacity: 1;}\
+body.editing .nav_bar,\
+body.editing .editor:not(.label) {\
+  min-height: 40px;\
+  height: auto !important;}\
+body.editing .user_toolbar ul:not(.editor),\
+body.editing .nav_bar ul:not(.editor),\
+body:not(.editing) .user_toolbar .editor,\
+body:not(.editing) .nav_bar .editor,\
+.user_toolbar .bin .items {\
+  display: none;}\
+.editor > .editing_button[data-type="spacer"]:hover,\
+.editor > .editing_button[data-type="divider"]:hover {\
+    background-color: rgba(0, 0, 0, 0.1);}\
+.editor > .editing_button[data-type="spacer"] {\
+  text-align: center;\
+  width: 30px !important;}\
+.editor > .editing_button[data-type="spacer"]:before {\
+  content: ":";}\
+.editor > .editing_button[data-type="divider"] {\
+  width: 5px !important;}\
+.items .editing_button[data-type="spacer"],\
+.items .editing_button[data-type="divider"] {\
+  height: 5px;\
+  background: none repeat scroll 0% 0% #CCC;}\
+.editing_button a {\
+  pointer-events: none !important;}\
+.editing_button {\
+  cursor: move;}\
+.editing_button i {\
+  float: none !important;}\
+.editing_button .items {\
+  cursor: default;\
+  min-height: 50px;\
+  min-width: 200px;\
+  background: rgba(255,255,255,0.3);\
+  padding: 5px;}\
+.editor .items .items {\
+  background: rgba(0,0,0,0.02);\
+  border-color: rgba(0,0,0,0.1);\
+  border-width: 1px;\
+  border-top-style: solid;\
+  margin-left: -11px;}\
+.editor .items .items:hover {\
+  background: rgba(0,0,0,0.03);}\
+.editor .items .arrow, .user_toolbar > ul > li ul .arrow {\
+  display: none;}\
+.editing_button:hover {\
+  z-index: 0;}\
+#button_moving {\
+  pointer-events: none;\
+  z-index: 100000;\
+  position: fixed !important;}\
+#button_moving:after {\
+  content: "Click to place, ESC to cancel";\
+  display: block;\
+  position: absolute;\
+  white-space: nowrap;\
+  top: -20px;\
+  background: rgba(255,255,255,0.4);\
+  border-radius: 5px;\
+  padding: 0 5px 0 5px;\
+  line-height: 20px;\
+  font-size: 12px;}\
+.editor.inner, .editor.label {\
+  border-radius: 0px;\
+  border-bottom: none;}\
+.bin {\
+  box-shadow: none !important;\
+  padding-top: 1px;\
+  border-top: none !important;}\
+.label, .bin {\
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);}\
+.label {\
+  position: relative;\
+  height: 25px;}\
+.label span {\
+  position: absolute;\
+  left: 0px;\
+  right: 0px;\
+  border-radius: 0 0 100% 100%;\
+  box-shadow: 0px -2px 2px rgba(0,0,0,0.1) inset;\
+  background-color: rgba(250, 240, 230, 0.6) !important;}');
+        
         var buttonRegistry = new register();
         var usedButtons = new register();
         var unusedButtons = new register();
 
         var customButtonData = [];
-
-        var toolbar = $($('.user_toolbar > .inner')[0]);
-        var navbar = $('.nav_bar > .light');
+        
+        var toolbar = $('nav.user_toolbar > ul').first();
+        var navbar = $('.nav-bar-list');
 
         var held = null;
 
@@ -413,7 +612,7 @@ $(document).ready(function () {
         var disabled = new ToolBar([]);
 
         makeCustomButtons(3);
-
+        
         var norm = [
             nav.getConfig(),
             def.getConfig()
@@ -427,19 +626,20 @@ $(document).ready(function () {
             def.fromConfig(conf[1]);
             nav.gen();
             def.gen(toolbar);
+            updateSpacers();
         }
-
+        
         loadUnusedButtons(disabled);
-
-        nav.getContainer(navbar, ['light'], function () {
+                
+        nav.getContainer(navbar, ['nav-bar-list'], function () {
             return this.isPinnable();
         });
-
-        $(toolbar).after('<div class="inner editor label"><i class="fa fa-trash-o" /> Disabled Items</div>');
-        disabled.getContainer(toolbar, ['inner', 'bin'], function () {
+        
+        disabled.getContainer(toolbar, ['bin'], function () {
             return this.type != 'pin' && this.children.length == 0;
         });
-
+        $(toolbar).after('<ul class="editor label"><span><i class="fa fa-trash-o" /> Disabled Items</span></ul>');
+        
         def.getContainer(toolbar, ['inner'], function () {
             return true;
         });
@@ -457,15 +657,20 @@ $(document).ready(function () {
                 }
             }
         });
-
+        $(window).resize(function() {
+            updateSpacers();
+        });
+        
         var control = $('<a href="javascript:void();" >Arrange Buttons</a>');
         $('.banner-buttons').append(control);
         control.click(function () {
+            $('.user_toolbar > ul').css('background-color', $('.user_toolbar > ul').first().css('background-color'));
             if ($('body').hasClass('editing')) {
                 $('body').removeClass('editing')
             } else {
                 $('body').addClass('editing')
             }
+            updateSpacers();
         });
 
         control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
@@ -475,16 +680,24 @@ $(document).ready(function () {
             clearUnusedButtons();
             usedButtons.flush(false);
             unusedButtons.flush(false, true);
+            nav.flush();
             nav.fromConfig(norm[0]);
             def.fromConfig(norm[1]);
             loadUnusedButtons(disabled);
-            def.gen(toolbar);
             nav.gen();
-            def.getEdit();
             nav.getEdit();
+            def.gen(toolbar);
+            def.getEdit();
             disabled.getEdit();
+            updateSpacers();
         });
     }
+    
+    function preInit() {
+        var but = $('.user_toolbar > ul > li > a[href^="/user/"]').children('span').first();
+        but.html(but.html().replace(' ▼',' <span class="arrow">▼</span>'));
+    }
+
     function getConfig() {
         return GM_getValue('config', norm);
     }
@@ -557,8 +770,8 @@ $(document).ready(function () {
             unusedButtons.set(i, i < 0);
             if (i < 0) {
                 var b = buttonRegistry.get(i);
-                b._parent = disabled;
                 b.children = [];
+                b._parent = disabled;
             }
         }
         for (var i = 0; i < disabled.children.length; i++) {
@@ -612,15 +825,16 @@ $(document).ready(function () {
         return null;
     }
 
-    //function Button(custom, el, handleChilds) {
+  //function Button(custom, el, handleChilds, typ) {
     function Button(p, index, el, handleChilds, typ) {
         if (p == true) {
             buttonRegistry.cust(this);
             usedButtons.cust(false);
             unusedButtons.cust(true);
             this.id = buttonRegistry.neglength();
-
+            
             p = disabled;
+            typ = handleChilds;
             handleChilds = el;
             el = index;
             index = disabled.children.length;
@@ -631,30 +845,33 @@ $(document).ready(function () {
             usedButtons.push(false);
             unusedButtons.push(false);
         }
-
-        this.type = typ == null ? 'button' : typ;
+        
+        
         this.originalElement = $(el);
+        if (this.originalElement.hasClass('divider')) typ = 'divider';
+        this.type = typ == null ? 'button' : typ;
         this._parent = p;
         this._index = index;
         var _removed = false;
-        this.timeout = 0;
+        this.timeout = true;
         this.listNode = null;
         this.children = [];
 
         this.originalParent = $($(el).parent());
         this.originalIndex = this.originalElement.index();
         
-        if (handleChilds && $(el).prop('tagName') == 'DIV' && !$(this.originalElement).find('.bookshelves').length) {
-            this.listNode = $(this.originalElement.find('.menu_list')[0]);
-            if (this.listNode.length == 0) {
-                this.listNode = $(this.originalElement.find('.container > .menu_list')[0]);
-            }
-            var childs = this.listNode.children();
-            for (var i = 0; i < childs.length; i++) {
-                if (childs[i].tagName == 'A' || childs[i].tagName == 'DIV' || childs[i].tagName == 'LABEL') {
-                    this.children.push(new Button(this, i, childs[i], false, this.type));
-                } else {
-                    this.children.push(new Baggage(childs[i]));
+        if (handleChilds && !$(this.originalElement).find('.bookshelves').length) {
+            this.listNode = $(this.originalElement.find('ul')[0]);
+            if (!this.listNode.length) {
+                this.listNode = null;
+            } else {
+                var childs = this.listNode.children();
+                for (var i = 0; i < childs.length; i++) {
+                    if (childs[i].tagName == 'LI') {
+                        this.children.push(new Button(this, i, childs[i], false, this.type));
+                    } else {
+                        this.children.push(new Baggage(childs[i]));
+                    }
                 }
             }
         }
@@ -736,26 +953,36 @@ $(document).ready(function () {
         this.genNode = function () {
             $(this.originalElement).removeClass('button-first');
 
-            if (this.children.length > 0 && this.listNode != null) {
-                $(this.listNode).children().detach();
-                for (var i = 0; i < this.children.length; i++) {
-                    $(this.listNode).append(this.children[i].genNode());
+            if (this.listNode != null) {
+                if (this.children.length > 0) {
+                    $(this.listNode).children().detach();
+                    for (var i = 0; i < this.children.length; i++) {
+                        $(this.listNode).append(this.children[i].genNode());
+                    }
+                    this.listNode.css('display', '');
+                } else {
+                    this.listNode.css('display', 'none');
                 }
             }
             return this.originalElement;
         }
         this.getEditNode = function () {
-            var result = $('<div class="button editing_button" />');
+            var result = $('<li class="button editing_button" data-type="' + this.type + '" />');
             var copy = this.originalElement.clone();
             var me = this;
 
-            copy.find('.menu_list').add(copy.find('.container')).remove();
-            copy.find('input').remove();
+            copy.find('.drop-down, ul, input').remove();
+            copy.find('.new').removeClass('new');
             var bs = copy.find('.button');
             if (bs.length > 0) {
-                result.html($(bs[0]).html());
+                result.html('<div class="button">' + bs.first().html() + '</div>');
             } else {
-                result.append(copy.html());
+                bs = copy.find('button');
+                if (bs.length > 0) {
+                    result.html('<div class="button iconize">' + bs.first().html() + '</div>');
+                } else {
+                    result.append(copy.html());
+                }
             }
 
             var subs = $('<div class="items" />');
@@ -780,8 +1007,8 @@ $(document).ready(function () {
                     e.stopPropagation();
                     if (held == null) {
                         me.pickup(this, e);
-                    } else if (held.timeout <= 0) {
-                        if (held.type == 'pin') {
+                    } else if (held.timeout) {
+                        if (held.isPinnable()) {
                             held._index = me._index;
                             held._parent = me._parent;
                             held.drop();
@@ -797,7 +1024,7 @@ $(document).ready(function () {
                     e.stopPropagation();
                     if (held == null) {
                         me.pickup(this, e);
-                    } else if (held.timeout <= 0) {
+                    } else if (held.timeout) {
                         if (me._parent != disabled) {
                             held._index = me._index;
                             held._parent = me._parent;
@@ -816,38 +1043,43 @@ $(document).ready(function () {
 
         this.pickup = function (node, e) {
             held = this;
-
             held.remove();
-            held.timeout = 50;
-            var interval = setInterval(function () {
-                if (--held.timeout == 0) {
-                    clearInterval(interval);
-                }
-            }, 10);
-
+            held.timeout = false;
+            setTimeout(function () {
+                held.timeout = true;
+            }, 50 * 5);
+            
             var offX = e.clientX - ($(node).offset().left - $(window).scrollLeft());
             var offY = e.clientY - ($(node).offset().top - $(window).scrollTop());
-
+            
+            var w = $(node).outerWidth();
+            var h = $(node).outerHeight();
+            var placer = $('<li style="transition:width 0.7s ease,height 0.7s ease;opacity:0;width:' + w + 'px;height:' + h + 'px" />');
+            $(node).before(placer);
+            setTimeout(function() {
+                placer.css('width','0px');
+                if (held._parent != def) {
+                    placer.css('height','0px');
+                }
+            },1);
+            $(node).css('width', w + 1);
+            $(node).css('height', h);
             $(node).attr('data_offset_X', offX);
             $(node).attr('data_offset_Y', offY);
-            $(node).css('left', (e.clientX) - offX + 'px');
-            $(node).css('top', (e.clientY) - offY + 'px');
-
+            $(node).css('left', (e.clientX - offX) + 'px');
+            $(node).css('top', (e.clientY - offY) + 'px');
             $(node).attr('id', 'button_moving');
-            $(node).css('position', 'fixed');
+            
             def.gen(toolbar);
         }
         this.drop = function () {
             held = null;
-
             this.add();
-
             def.gen(toolbar);
             def.getEdit();
             nav.gen();
             nav.getEdit();
             disabled.getEdit();
-
             setConfig([nav.getConfig(), def.getConfig()]);
             saveUnusedButtons();
         }
@@ -858,7 +1090,7 @@ $(document).ready(function () {
                 }
                 return true;
             }
-            return false;
+            return this.type == 'divider' || this.type == 'spacer';
         }
     }
 
@@ -872,6 +1104,9 @@ $(document).ready(function () {
         loadCustomButtons();
         for (var i = 0; i < customButtonData.length; i++) {
             customButton(i);
+        }
+        for (var i = 0; i < 3; i++) {
+            new Spacer();
         }
         saveCustomButtons();
     }
@@ -900,8 +1135,8 @@ $(document).ready(function () {
     }
 
     function customButton(index) {
-        var node = $('<div class="user_drop_down_menu"><div class="menu_list" /></div>');
-        var a = $('<div class="button custom_button" href="javascript:void();"><i class="bind_icon fa fa-' + customButtonData[index].icon + '" /><span class="bind_name">' + customButtonData[index].name + '</span></div>');
+        var node = $('<li><ul /></li>');
+        var a = $('<a class="button custom_button" href="javascript:void();"><i class="bind_icon fa fa-' + customButtonData[index].icon + '" /><span class="bind_name">' + customButtonData[index].name + '</span></a>');
         node.prepend(a);
 
         a.dblclick(function () {
@@ -919,7 +1154,29 @@ $(document).ready(function () {
             return null;
         };
     }
-
+    
+    function Spacer() {
+        new Button(true, $('<li class="spacer"></li>'), false, 'spacer');
+    }
+    
+    function updateSpacers() {
+        spaceOutBar(toolbar.width(), toolbar);
+        spaceOutBar($('.nav_bar > .light').width() - $('.nav_bar > .light > .right').width(), navbar);
+    }
+    
+    function spaceOutBar(total, bar) {
+        var spacers = bar.find('.spacer');
+        if (spacers.length > 0) {
+            var taken = 0;
+            bar.children('li').each(function() {
+                if (!$(this).hasClass('spacer')) {
+                    taken += $(this).width();
+                }
+            });
+            spacers.css('width', (total - (taken * 1.2)) / spacers.length);
+        }
+    }
+    
     function replaceAll(find, replace, me) {
         var escapeRegExp = function (str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
         return me.replace(new RegExp(escapeRegExp(find), 'g'), replace);
