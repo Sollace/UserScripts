@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3
+// @version     1.3.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -583,12 +583,12 @@ body:not(.editing) .nav_bar .editor,\
   box-shadow: none !important;\
   padding-top: 1px;\
   border-top: none !important;}\
-.label, .bin {\
+.editor.label, .editor.bin {\
   text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);}\
-.label {\
+.editor.label {\
   position: relative;\
   height: 25px;}\
-.label span {\
+.editor.label span {\
   position: absolute;\
   left: 0px;\
   right: 0px;\
