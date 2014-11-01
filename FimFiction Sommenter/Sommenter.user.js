@@ -96,8 +96,7 @@ body.pin_comment.hold_comment #add_comment_box .add_comment_toolbar {\
   padding-left: 5px;\
   padding-right: 5px;\
   height: 70px;}\
-body.pin_comment #add_comment_box .add_comment_toolbar:hover > *,\
-body.pin_comment.hold_comment #add_comment_box .add_comment_toolbar > * {\
+body.pin_comment #add_comment_box .add_comment_toolbar > * {\
   float: left;}\
 body.pin_comment #add_comment_box .comment_success {\
   margin: 3px;}\
