@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2.1
+// @version     2.2.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -56,66 +56,69 @@ function AddQuote(a, b) {
   }, 300)
 }
 
+$('#comment_preview').on('mouseenter', function() {
+    $('body').addClass('hold_comment');
+});
+$('#comment_preview').on('mouseleave', function() {
+    $('body').removeClass('hold_comment');
+});
 
-makeStyle(".comments_pinner:before {\
-        content: '';}\
+makeStyle("\
+.comments_pinner:before {\
+  content: '';}\
 body.pin_comment .comments_pinner:before {\
-        content: '';}\
+  content: '';}\
 body.pin_comment #add_comment_box {\
-        position: fixed;\
-        bottom: -30px;\
-        left: 0px;\
-        width: 100%;\
-        border-radius: 0px;\
-        z-index: 99999;}\
-body.pin_comment #comment_entry {\
-        height: 90px;}\
-body.pin_comment #comment_entry:hover,\
-body.pin_comment.hold_comment #comment_entry {\
-        transition: height 0.45s ease !important;\
-        height: 350px;}\
-body.pin_comment #comment_entry:hover .dark_toolbar,\
-body.pin_comment.hold_comment #comment_entry .dark_toolbar {\
-        transition: bottom 0.45s ease;}\
-body.pin_comment #comment_entry .dark_toolbar {\
-        position: absolute;\
-        bottom: 70px;\
-        background: none;\
-        border: none;}\
-body.pin_comment #comment_entry:hover .dark_toolbar,\
-body.pin_comment.hold_comment #comment_entry .dark_toolbar {\
-        bottom: 330px;}\
-body.pin_comment #comment_entry textarea {\
-        resize: none;}\
-body.pin_comment #comment_entry:hover textarea,\
-body.pin_comment.hold_comment #comment_entry textarea {\
-        margin-top: 5px;\
-        height: 285px !important;}\
-body.pin_comment:not(.hold_comment) #comment_entry:not(:hover) textarea {\
-        position: absolute;\
-        bottom: 0px;\
-        min-height: 85px !important;\
-        height: 85px !important;}\
-body.pin_comment #add_comment_box .emoticons_panel {\
-        max-height: 350px;\
-        transition: width 1s ease, opacity 2s ease 0.5s;}\
-body.pin_comment:not(.hold_comment) #comment_entry:not(:hover) .emoticons_panel {\
-        width: 0px;\
-        opacity: 0;\
-        transition: none;}\
-body.pin_comment #add_comment_box #comment_preview {\
-        position: absolute;\
-        bottom: 100%;\
-        width: 100%;\
-        padding: 0px;\
-        background: white;\
-        max-height: 500px;\
-        min-height: 200px;\
-        overflow-y: auto;\
-        transition: opacity 0.5s ease;\
-        pointer-events: none;}\
-body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) #comment_preview {\
-        opacity: 0.3;}");
+  position: fixed;\
+  margin: 0px;\
+  bottom: 0px;\
+  left: 0px;\
+  right: 0px;\
+  height: 90px;\
+  border-radius: 0px;\
+  z-index: 99999;}\
+body.pin_comment #add_comment_box:hover,\
+body.pin_comment.hold_comment #add_comment_box {\
+  height: 380px;}\
+body.pin_comment #add_comment_box textarea {\
+  resize: none;}\
+body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) .format-toolbar {\
+  display: none;}\
+body.pin_comment #add_comment_box,\
+body.pin_comment #add_comment_box textarea {\
+  transition: height 0.45s ease !important;}\
+body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) textarea {\
+  min-height: 85px !important;\
+  height: 85px !important;}\
+body.pin_comment #add_comment_box:hover .add_comment_toolbar,\
+body.pin_comment.hold_comment #add_comment_box .add_comment_toolbar {\
+  padding: 0px;\
+  padding-left: 5px;\
+  padding-right: 5px;\
+  height: 70px;}\
+body.pin_comment #add_comment_box .add_comment_toolbar:hover > *,\
+body.pin_comment.hold_comment #add_comment_box .add_comment_toolbar > * {\
+  float: left;}\
+body.pin_comment #add_comment_box .comment_success {\
+  margin: 3px;}\
+body.pin_comment #comment_preview {\
+  position: fixed !important;\
+  top: auto !important;\
+  bottom: 90px;\
+  left: 0px;\
+  right: 0px;\
+  max-height: 500px;\
+  background: white;\
+  overflow-y: auto;\
+  transition: opacity 0.5s ease, bottom 0.5s ease;\
+  z-index: 99998;}\
+body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) + #comment_preview:not(:hover) {\
+  opacity: 0;\
+  pointer-events: none;}\
+body.pin_comment #add_comment_box + #comment_preview:hover,\
+body.pin_comment.hold_comment #add_comment_box + #comment_preview,\
+body.pin_comment #add_comment_box:hover + #comment_preview {\
+  bottom: 380px;}");
 
 //--------------------------------------------------------------------------------------------------
 //----------------------------------------FUNCTIONS-------------------------------------------------

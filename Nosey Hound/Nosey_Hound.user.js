@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.3.1
+// @version     1.3.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -370,13 +370,11 @@ function makeGlobalPopup(title, fafaText, darken, img) {
     $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
     $(holder).addClass('global_popup');
 
-    var dark = $("<div style=\"position: fixed;left:0px;right:0px;top:0px;bottom:0px;background-color:rgba(0,0,0,0.4); z-index:100000;\" />");
-    if (typeof(darken) == 'number') {
-        dark.css('background-color', 'rgba(0,0,0,' + (darken/100) + ')');
-        $("body").append(dark);
-    } else if (darken == null || darken) {
-        $("body").append(dark);
+    var dark = $('<div class="dimmer" style="z-index:1001;" />');
+    if (typeof (darken) == 'number') {
+        dark.css('opacity', (darken / 100));
     }
+    $('#dimmers').append(dark);
 
     var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
     $(holder).append(pop);
