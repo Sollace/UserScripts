@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2
+// @version     1.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -62,29 +62,46 @@ var terms = {
     "pfp": [
         "Spy", "Farmer", "Doctor", "Teacher", "Dentist", "Detective",
         "Accountant", "Politition", "Lawyer", "Singer", "DJ", "Cook", "Baker",
-        "Mailmare", "Milkmare", "Librarian"
+        "Mailmare", "Milkmare", "Librarian","Medic"
     ],
     "pfn": [
-        "Killer", "Pimp", "Slaver", "Prostitute"
+        "Killer", "Pimp", "Slaver", "Prostitute","Pyromaniac"
     ],
     "pfnn": [
         "Serial Killing", "Pimping", "Horrible"
     ],
     "x": [
-        "merge","switch {x1}", "share {x1}"
+        "merge","switch {x1}", "share {x1}","have sex","plot"
     ],
     "x1": [
-        "places", "bodies", "families", "jobs"
+        "places", "bodies", "families", "jobs","brains","race"
     ],
     "c": [
-        "Celestia","Luna","Cadance","Twilight Sparkle","Nightmare Moon",
-        "Twilight","Applejack","Rarity","Fluttershy","Rainbow Dash",
-        "Sweetie Belle","Scootaloo","Applebloom","Babs Seed",
-        "Diamond Tiara","Silver Spoon",
-        "Trixie","Nyx",
-        "Big Mac",
-        "Lyra","Bon Bon","Carrot Top", "Derpy",
-        "Bill Gates","an Alien","The Doctor","The Master","The President","The Servant"
+        "{c2}","Nightmare {cn}",
+        "Princess Celestia","Princess Luna","Princess Cadance",
+        "Bon Bon","Carrot Top","Sunset Shimmer","Shining Armour","Vinyl Scratch",
+        "Sweetie Belle","Rainbow Dash","Diamond Tiara","Silver Spoon","Babs Seed",
+        "Twilight Sparkle","Pinkie Pie","Blinkie Pie","Inky Pie","Maud Pie","The Cake Twins",
+        "Dr. Hooves","MMMMM","Queen Crysalis","Button Mash","Sea Breeze","Angel Bunny",
+        "Cherry Jubilee","Photo Finish",
+        "Granny Smith","Mig Macintosh","Cheese Sandwich",
+        "Bill Gates","an Alien","The Doctor","The Master","The President","The Servant",
+        "Optimus Prime","Iron Man","The HULK","The HUNK"
+    ],
+    "cn": [
+        "{c2}","{c3}"
+    ],
+    "c2": [
+        "Nightlight","Cheerilee",
+        "Twilight","Applejack","Rarity","Fluttershy",
+        "Scootaloo","Applebloom",
+        "Trixie","Nyx","Fluffle Puff",
+        "Big Mac","Spitfire","sauren","Spike",
+        "Lyra", "Derpy","Octavia","Roseluck",
+        "Tirek","Discord","Maud"
+    ],
+    "c3": [
+        "Belle","Dash","Tiara","Spoon","Moon","Seed","Bon","Pie"
     ],
     "w": [
         "{wp} are", "{ws} is", "{ws} was",
@@ -105,7 +122,8 @@ var terms = {
         "The Moon",
         "Equestria",
         "Cloudsdale",
-        "Prance"
+        "Prance",
+        "Tartarus"
     ],
     "v": [
         "eaten",
@@ -122,7 +140,8 @@ var terms = {
         "bloated",
         "pregnant",
         "evil",
-        "undead"
+        "undead",
+        "gay"
     ],
     "v4": [
         "defeats",
@@ -139,12 +158,13 @@ var terms = {
     "v5": [
         "travels through space",
         "uses contraceptives",
+        "forgets to use contraceptives",
         "gets wasted",
         "{v6} drugs",
-        "accidentally {v6} drugs",
+        "accidentally {v6} drugs"
     ],
     "v6": [
-        "takes", "sells", "trips", "gives up", "buys"
+        "takes", "sells", "trips", "gives up", "buys","forgets"
     ],
     "o": [
         "peach",
@@ -155,7 +175,10 @@ var terms = {
         "rainbow",
         "baby",
         "cow",
-        "the Alicorn Amulet"
+        "the Alicorn Amulet",
+        "Kitchen Sink",
+        "MMMMM",
+        "Cheese Sandwich"
     ],
     "h": [
         "Aliens",
@@ -166,22 +189,24 @@ var terms = {
     ],
     "s": [
         "Vampony",
-        "Zombie",
+        "Zompony",
         "Alicorn",
         "Bat Pony",
         "Human",
         "Dragon",
-        "Changeling"
+        "Changeling",
+        "Clone",
+        "Pinkie Pie"
     ],
     "el": [
         "honesty", "love", "loyalty", "generosity", "kindness", "magic",
-        "deceit", "hate", "dishonor", "selfishness", "pride"
+        "deceit", "hate", "dishonor", "selfishness", "pride","murder"
     ]
 }
 function makePrompt() {
     var txt = "{f}";
     for (var i in terms) {
-            txt = fillTerm(txt, i);
+        txt = fillTerm(txt, i);
     }
     return txt;
 }
@@ -193,35 +218,37 @@ function fillTerm(txt, term) {
     return txt;
 }
 
-function pickOne(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-
-var but = $('<a class="button" href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a>');
+var but = $('<li><a href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a></li>');
 $(but).click(function() {
     var pop = makeGlobalPopup('Random Prompt', '');
     $(pop).append('<span>' + makePrompt() + '</span>');
     $(pop).css('padding', '15px');
     position(pop.parentNode.parentNode, 'center', 'center');
 });
-
-$('.inner:first > a:last').after(but);
+$('.user_toolbar audio').before(but);
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------API FUNCTIONS-----------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
 //==API FUNCTION==//
-function makeGlobalPopup(title, fafaText, img) {
+function pickOne(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+//==API FUNCTION==//
+function makeGlobalPopup(title, fafaText, darken, img) {
     var holder = document.createElement("div");
     $("body").append(holder);
     $(holder).addClass("drop-down-pop-up-container");
     $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
     $(holder).addClass('global_popup');
     
-    var dark = $("<div style=\"position: fixed;left:0px;right:0px;top:0px;bottom:0px;background-color:rgba(0,0,0,0.4); z-index:100000;\" />");
-    
-    $("body").append(dark);
+    var dark = $('<div class="dimmer" style="z-index:1001;" />');
+    if (typeof (darken) == 'number') {
+        dark.css('opacity', (darken / 100));
+    }
+    $('#dimmers').append(dark);
     
     var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
     $(holder).append(pop);
@@ -271,11 +298,19 @@ function position(obj, x, y, buff) {
     if (typeof y == "string" && y.toLowerCase() == "center") {
         y = ($(window).height() - $(obj).height()) / 2;
     }
-    
-    if (buff == null || buff == undefined) {
-        buff = 0;
-    }
+    if (typeof x == 'object') {
+        var parameters = x;
+        var positioner = x.object != null ? x.object : x;
+        buff = x.buffer != null ? x.buffer : y;
+        
+        y = $(positioner).offset().top - $(window).scrollTop();
+        x = $(positioner).offset().left - $(window).scrollLeft();
 
+        if (parameters.offX != null) x += parameters.offX;
+        if (parameters.offY != null) y += parameters.offY;
+    }
+    
+    if (buff == null) buff = 0;
     if (x < buff) x = buff;
     if (y < buff) y = buff;
     
