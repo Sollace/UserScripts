@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3
+// @version     1.3.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -27,8 +27,8 @@ var terms = {
         "{c} {i} a {ws}",
         "{c} {v5}",
         "{c} is the element of {el}",
-        "Try Again :P",
-        "Outta luck XD",
+        "Try Again <img src=\"https://fimfiction-static.net/images/emoticons/derpytongue2.png\" />",
+        "Outta luck <img src=\"https://fimfiction-static.net/images/emoticons/trollestia.png\" />",
         "{c}'s {cp}",
         "{c} gets a new {bp}",
         "{c}'s {bp} is fake",
