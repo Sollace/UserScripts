@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3.2
+// @version     1.3.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -255,7 +255,7 @@ function run() {
     $('.user_toolbar audio').before(but);
     $(but).click(function() {
         var pop = makeGlobalPopup('Random Prompt', '');
-        $(pop).append('<span>' + makePrompt('{pattern}', terms) + '</span>');
+        $(pop).append('<span>' + makePrompt('{f}', terms) + '</span>');
         $(pop).css('padding', '15px');
         position(pop.parentNode.parentNode, 'center', 'center');
     });
