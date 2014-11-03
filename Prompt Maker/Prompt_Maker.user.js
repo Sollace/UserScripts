@@ -3,273 +3,332 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3.3
+// @version     1.4
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
-var terms = {
-    "f": [
-        "{c} goes to {place}.",
-        "{place} is {v} by {c}.",
-        "{place} and [place] merge.",
-        "{c} and {c} {x}.",
-        "{c} {v2} a {o}.",
-        "{c} is taken to {pc}.",
-        "{c} tries to eat a {food}",
-        "{place} is invaded by {h}!",
-        "{c} {v4} {c}.",
-        "{c} {v2} {cs}.",
-        "{c} is {v3}.",
-        "{c} is a {vs}.",
-        "{w} {i2}.",
-        "{c} {i} {wp}",
-        "{c} {i} a {ws}",
-        "{c} {v5}",
-        "{c} is {element}",
-        "The {h} use {power} to {hc}",
-        "{c} discovers {power}",
-        "{c}'s {cp}",
-        "{c} gets a new {bodypart}",
-        "{c}'s {bodypart} is fake",
-        "{place} is {c}'s new home",
-        "Try Again <img src=\"https://fimfiction-static.net/images/emoticons/derpytongue2.png\" />",
-        "Outta luck <img src=\"https://fimfiction-static.net/images/emoticons/trollestia.png\" />"
+run({
+    pattern: [
+        '{pattern_1}!',
+        '{pattern_2}.',
+        '{pattern_3}.',
+        '{pattern_2} whilst [pattern_2].',
+        '{pattern_3} when it turns out that {pattern_2}.',
+        '{pattern_3} every time {pattern_2}.',
+        '{pattern_3} and {pattern_2}.'
     ],
-    "hc": [
-        "invade {place}",
-        "defeat {name}"
+    pattern_1: [
+        'Nanananananananaanananananananananananaanananananananananananananan BATMARE',
+        'Button\s Mom has got it goin\' on',
+        '{name} everywhere',
+        '{name_equestrian} meets {fandom}',
+        '{name_nonequestrian} is a {fandom_singular}',
+        '{race_plural} everywhere',
+        '{place} is invaded by {enemy}',
+        '{pattern_2} and {pattern_3}',
+        '{name} {i_present} a {weapon_singular}',
+        '{name} {i_past} {weapon_plural}',
+        '{place} is {name}\'s new home'
     ],
-    "cp": [
-        "{bodypart} {does}", "cute-ceneara is a {adv}"
+    pattern_2: [
+        '{place} {is_or_was} {verbed} by {enemy}',
+        '{name_nonequestrian} {place_phrase_non_eq}',
+        '{name_equestrian} {place_phrase_eq}',
+        '{place} and [place] merge',
+        '{place} is {verbed} by {name}',
+        'The {enemy_plural} use {power} to {verb_enemy}',
+        '{name} and [name] {action}',
+        '{name} {does_to} [name]',
+        '{name_pony_titled_evil} comes to {place_non_eq}'
     ],
-    "bodypart": [
-        "cutiemark", "hoof", "horn", "wing", "wings", "tail", "mane", "legs", "teeth", "tongue", "package"
+    pattern_3: [
+        '{name_equestrian}\'s cute-ceneara is {adv_phrase}',
+        '{name_equestrian}\'s {bodypart_phrase}',
+        '{name} is {done_by} by [name]',
+        '{name} {change} [name]',
+        '{name} {object_phrase}',
+        '{name} is {is}',
+        '{name} is a {profession}',
+        '{name} is a {race}',
+        '{name} is taken to {place_or_name}',
+        '{name} tries to {done_food} {food}',
+        '{name} {change} {name_or_race}',
+        '{name} {verbed_2} {power}',
+        '{name} gets a new {bodypart_singular}',
+        '{name}\'s {bodypart_singular} is fake',
+        '{name}\'s {bodypart_plural} are fake'
     ],
-    "does": [
-        "falls off",
-        "breaks",
-        "swells up"
+    verbed_2: ['discovers', 'is','breaks','{done_food}', '{i_present}'],
+    verbed: ['taken over','destroyed'],
+    is_or_was: ['is','was','gets'],
+    place_or_name: ['{name_equestrian}','{place}'],
+    name_or_race: ['{name_pony_titled_evil}', 'a {race}'],
+    enemy_or_race: ['{enemy}', '{race_plural}'],
+    verb_enemy: [
+        'invade {place}',
+        'defeat {name}'
     ],
-    "adv": [
-        "{adv2}",
-        "complete {adv2}"
+    weapon_phrase: [
+        '{weapon_plural} are', 'a {weapon_singular} is', 'a {weapon_singular} was',
+        '{weapon_plural} aren\'t', '{weapon_plural} weren\'t', '{weapon_singular} wasn\'t',
+        '{weapon_plural} must be', '{weapon_plural} must not be'
     ],
-    "adv2": [
-        "flop",
-        "disaster",
-        "success"
+    weapon: [
+        '{weapon_plural}',
+        'a {weapon_singular}'
     ],
-    "cs": [
-        "{c}", "a {race}"
+    weapon_plural: [
+        'guns', 'cars', 'politics', 'banks', 'space Travel', 'contraceptives'
     ],
-    "i": [
-        "{i2}",
-        "invents",
-        "discovers",
-        "used", "uses"
+    weapon_singular: [
+        'gun', 'car', 'bank', 'contraceptive'
     ],
-    "i2": [
-        "invented", "discovered"
+    bodypart_phrase: [
+        '{bodypart_singular} {does_object_singular}',
+        '{bodypart} {does_object}'
     ],
-    "pc": [
-        "{c}","{p}"
+    bodypart: ['{bodypart_plural}', '{bodypart_singular}'],
+    bodypart_plural: [
+        'cutiemark', 'hooves', 'horns', 'wings', 'legs', 'teeth', 'tongue', 'wings'
     ],
-    "vs": [
-        "{race}",
-        "{v3} {race}",
-        "{pf}"
+    bodypart_singular: [
+        'cutiemark', 'hoof', 'horn', 'wing', 'tail', 'mane', 'legs', 'teeth', 'tongue', 'package'
     ],
-    "pf": [
-        "{pfp}", "{pfp} {pfn}", "{pfn} {pfp}", "{pfnn} {pfp}"
+    place: ['{place_eq}', 'Equestria', 'The Moon', 'Earth', 'Tartarus'],
+    place_phrase_eq: [
+        '{conj_place} {place_eq}',
+        '{conj_place_to_0} Tartarus',
+        '{conj_place_to} {place_non_eq}'],
+    place_phrase_non_eq: [
+        '{conj_place_to} {place_eq}',
+        '{conj_place_to_0} Tartarus'],
+    place_eq: [
+        'Canterlot',
+        'Trottingham',
+        'Sweet Apple Acres',
+        'Manehatten',
+        'Cloudsdale',
+        'Prance'
     ],
-    "pfp": [
-        "Spy", "Farmer", "Doctor", "Teacher", "Dentist", "Detective",
-        "Accountant", "Politition", "Lawyer", "Singer", "DJ", "Cook", "Baker",
-        "Mailmare", "Milkmare", "Librarian","Medic"
+    place_non_eq: [
+        'Earth', 'New York', 'London', 'California', 'The Moon'
     ],
-    "pfn": [
-        "Killer", "Pimp", "Slaver", "Prostitute","Pyromaniac"
+    conj_place: [
+        '{conj_place_away}','{conj_place_to}'
     ],
-    "pfnn": [
-        "Serial Killing", "Pimping", "Horrible"
+    conj_place_to: [
+        'comes to',
+        '{conj_place_to_1}'
     ],
-    "x": [
-        "merge","switch {x1}", "share {x1}","have sex","plot"
+    conj_place_to_0: [
+        'comes from',
+        '{conj_place_to_1}'
     ],
-    "x1": [
-        "places", "bodies", "families", "jobs","brains","race"
+    conj_place_to_1: [
+        'visits',
+        'goes to'
     ],
-    "name": [
-        "Princess {c2}", "King {c2}", "Nightmare {cn}", "{c}"
+    conj_place_away: [
+        'leaves'
     ],
-    "c": [
-        "{c2}","{name}",
-        "Princess Celestia","Princess Luna","Princess Cadance",
-        "Bon Bon","Carrot Top","Sunset Shimmer","Shining Armour","Vinyl Scratch",
-        "Sweetie Belle","Rainbow Dash","Diamond Tiara","Silver Spoon","Babs Seed",
-        "Twilight Sparkle","Pinkie Pie","Blinkie Pie","Inky Pie","Maud Pie","The Cake Twins",
-        "Dr. Hooves","MMMMM","Queen Chrysalis","Button Mash","Sea Breeze","Angel Bunny",
-        "Cherry Jubilee","Photo Finish",
-        "Granny Smith","Mig Macintosh","Cheese Sandwich",
-        "Bill Gates","an Alien","The Doctor","The Master","The President","The Servant",
-        "Optimus Prime","Iron Man","The HULK","The HUNK"
+    enemy: ['{enemy_plural}', '{enemy_odd}', 'a horde of zombies'],
+    enemy_plural: [
+        'Changelings',
+        '{enemy_odd}'
     ],
-    "cn": [
-        "{c2}","{c3}"
+    enemy_odd: [
+        'Aliens',
+        'Humans',
+        'Timelords'
     ],
-    "c2": [
-        "Nightlight","Cheerilee",
-        "Twilight","Applejack","Rarity","Fluttershy",
-        "Scootaloo","Applebloom",
-        "Trixie","Nyx","Fluffle Puff",
-        "Big Mac","Spitfire","sauren","Spike",
-        "Lyra", "Derpy","Octavia","Roseluck",
-        "Tirek","Discord","Maud"
+    name: ['Filly {name_pony}', '{name_nonequestrian}', '{name_equestrian}'],
+    name_equestrian: ['{name_pony}', '{name_nonpony}'],
+    name_pony: [
+        '{name_pony_first}', 'Princess {name_pony_first}',
+        'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch',
+        'Sweetie Belle','Rainbow Dash','Diamond Tiara','Silver Spoon','Babs Seed',
+        'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie','The Cake Twins',
+        'Dr. Hooves','MMMMM','Queen Chrysalis','Button Mash',
+        'Cherry Jubilee','Photo Finish','Button\'s Mom',
+        'Granny Smith','Big Macintosh','Cheese Sandwich'
     ],
-    "c3": [
-        "Belle","Dash","Tiara","Spoon","Moon","Seed","Bon","Pie","Chrysalis"
+    name_nonpony: ['Sea Breeze','Angel Bunny','Tirek','Discord'],
+    name_nonequestrian: [
+        'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant',
+        'Optimus Prime','Starscream','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris'
     ],
-    "w": [
-        "{wp} are", "a {ws} is", "a {ws} was",
-        "{wp} aren't", "{ws} isn't", "{ws} wasn't",
-        "{wp} must be", "{wp} must not be"
+    name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
+    name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
+    name_pony_1: ['{name_pony_first}','{name_pony_last}'],
+    name_pony_first: [
+        'Celestia','Luna','Cadance',
+        'Nightlight','Cheerilee',
+        'Twilight','Applejack','Rarity','Fluttershy',
+        'Scootaloo','Applebloom',
+        'Trixie','Nyx','Fluffle Puff',
+        'Big Mac','Spitfire','sauren','Spike',
+        'Lyra', 'Derpy','Octavia','Roseluck',
+        'Maud'
     ],
-    "wp": [
-        "guns", "cars", "politics", "banks", "space Travel", "contraceptives"
+    name_pony_last: ['Belle','Dash','Tiara','Spoon','Moon','Seed','Bon','Pie','Chrysalis'],
+    race: ['Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Pinkie Pie'],
+    race_plural: ['Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones','Pinkie Pies'],
+    fandom: ['a {fandom_singular}','{fandom_plural}'],
+    fandom_singular: ['Brony','Furry','Anti-Brony'],
+    fandom_plural: ['Bronies','Furries','Anti-Bronies'],
+    power: [
+        'The Element of {element}', 'the magic of {element}'
     ],
-    "ws": [
-        "gun", "car", "bank", "contraceptive"
+    element: [
+        'Honesty', 'Love', 'Loyalty', 'Generosity', 'Kindness', 'Magic',
+        'Deceit', 'Hate', 'Dishonor', 'Selfishness', 'Pride','Murder'
     ],
-    "place": [
-        "Canterlot",
-        "Sweet Apple Acres",
-        "Manehatten",
-        "Earth",
-        "The Moon",
-        "Equestria",
-        "Cloudsdale",
-        "Prance",
-        "Tartarus"
+    object_phrase: [
+        '{does_with} a {descriptor} {object}',
+        '{does_with} a {object}',
+        '{done_food}s {food}'
     ],
-    "v": [
-        "eaten",
-        "taken"
+    descriptor: [
+        'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
     ],
-    "v2": [
-        "eats",
-        "has",
-        "dies"
+    object: [
+        'bottle',
+        'cloud',
+        'rainbow',
+        'baby',
+        'cow',
+        'the Alicorn Amulet',
+        'Kitchen Sink',
+        'MMMMM',
+        '{food_1} sandwich',
+        '{food_2} sandwich'
     ],
-    "v3": [
-        "dead",
-        "kidnapped",
-        "bloated",
-        "pregnant",
-        "evil",
-        "undead",
-        "gay"
+    food: ['a {food_2}','{food_1}'],
+    food_1: [
+        'chocolate',
+        'pie',
+        'apple pie',
+        'melon',
+        'water melon'
     ],
-    "v4": [
-        "defeats",
-        "kidnaps",
-        "is",
-        "loves",
-        "hates",
-        "marries",
-        "kills",
-        "is killed by",
-        "shrinks",
-        "cheats on"
+    food_2: [
+        'carrot',
+        'berry',
+        'cake',
+        'apple',
+        '{cheese} cheese'
     ],
-    "v5": [
-        "travels through space",
-        "uses contraceptives",
-        "forgets to use contraceptives",
-        "gets wasted",
-        "{v6} drugs",
-        "accidentally {v6} drugs"
+    cheese: [
+        'block of',
+        'slice of'
     ],
-    "v6": [
-        "takes", "sells", "trips", "gives up", "buys","forgets"
+    profession: ['{pfp}', '{pfp} {pfn}', '{pfn} {pfp}', '{pfnn} {pfp}'],
+    pfp: [
+        'Spy', 'Farmer', 'Doctor', 'Teacher', 'Dentist', 'Detective',
+        'Accountant', 'Politition', 'Lawyer', 'Singer', 'DJ', 'Cook', 'Baker',
+        'Mailmare', 'Milkmare', 'Librarian','Medic'
     ],
-    "o": [
-        "bottle",
-        "cloud",
-        "rainbow",
-        "baby",
-        "cow",
-        "the Alicorn Amulet",
-        "Kitchen Sink",
-        "MMMMM",
-        "{food} sandwich"
+    pfn: ['Killer', 'Pimp', 'Slaver', 'Prostitute','Pyromaniac'],
+    pfnn: ['Serial Killing', 'Pimping', 'Horrible'],
+    action: ['merge', 'switch {acted}', 'share {acted}', 'have sex', 'plot', '{name_does}'],
+    acted: ['places', 'bodies', 'families', 'jobs', 'brains', 'race'],
+    is: [
+        'dead',
+        'kidnapped',
+        'bloated',
+        'pregnant',
+        'evil',
+        'undead',
+        'gay',
+        'a filly'
     ],
-    "food": [
-        "cheese",
-        "carrot",
-        "berry",
-        "cake",
-        "chocolate",
-        "pie",
-        "apple",
-        "apple pie",
-        "melon",
-        "water melon",
+    i_present: [
+        'invents', 'discovers', 'uses'
     ],
-    "h": [
-        "Aliens",
-        "a horde of zombies",
-        "Humans",
-        "Changelings",
-        "Timelords"
+    i_past: [
+        'invented', 'discovered', 'used'
     ],
-    "race": [
-        "Vampony",
-        "Zompony",
-        "Alicorn",
-        "Bat Pony",
-        "Human",
-        "Dragon",
-        "Changeling",
-        "Clone",
-        "Pinkie Pie"
+    adv_phrase: [
+        'a {adv}', 'a complete {adv}', '{adv_2}'
     ],
-    "power": [
-        "The Element of {element}", "the magic of {element}"
+    adv: [
+        'disaster', 'success'
     ],
-    "element": [
-        "Honesty", "Love", "Loyalty", "Generosity", "Kindness", "Magic",
-        "Deceit", "Hate", "Dishonor", "Selfishness", "Pride","Murder"
-    ]
-}
-
-run();
+    adv_2: [
+        'ruined'
+    ],
+    done_by: ['eaten','taken','killed','murdered'],
+    change: ['takes', 'meets', '{does_to}', 'turns into'],
+    does_to: [
+        'defeats',
+        'kidnaps',
+        'makes sweet, sweet love to',
+        'loves',
+        'hates',
+        'marries',
+        'is',
+        'kills',
+        'is killed by',
+        'shrinks',
+        'cheats on'
+    ],
+    name_does: [
+        'travels through space',
+        'travels through space and time',
+        'uses contraceptives',
+        'forgets to use contraceptives',
+        '{is_done}',
+        '{does_2} drugs',
+        'accidentally {does_2} drugs'
+    ],
+    does_with: ['forgets','eats','has','cooks','{is_done} on'],
+    is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
+    does_object: ['fall off', 'break', 'swell up'],
+    does_object_singular: ['falls off', 'breaks', 'swells up'],
+    does_2: ['takes', 'sells', 'trips', 'buys', 'eats','gives up'],
+    done_food: ['eat','buy','sell','cook']
+});
 
 //--------------------------------------------------------------------------------------------------
 //----------------------------------------FUNCTIONS-------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
-function run() {
+function run(terms) {
     var but = $('<li><a href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a></li>');
     $('.user_toolbar audio').before(but);
-    $(but).click(function() {
-        var pop = makeGlobalPopup('Random Prompt', '');
-        $(pop).append('<span>' + makePrompt('{f}', terms) + '</span>');
-        $(pop).css('padding', '15px');
+    but.click(function() {
+        var pop = makeGlobalPopup('Random Prompt', 'fa fa-lightbulb-o', 0);
+        $(pop).append('<span class="prompt">' + makePrompt('{pattern}', terms) + '</span>');
+        $(pop).parent().append('<div class="drop-down-pop-up-footer" />');
+        var butt = $('<button class="styled_button"><i class="fa fa-lightbulb-o" />Try Again</button>');
+        butt.click(function() {
+            $('.prompt').html(makePrompt('{pattern}', terms));
+        });
+        $(pop).parent().find('.drop-down-pop-up-footer').append(butt);
+        $(pop).css({
+             'width': '600px',
+             'height': '300px'
+            });
         position(pop.parentNode.parentNode, 'center', 'center');
     });
 }
 
-function makePrompt(text, t) {
+function makePrompt(txt, t) {
     for (var i in t) {
         txt = fillTerm(txt, i, t);
     }
-    return txt;
+    if (txt.length > 0) {
+        txt = txt.split('');
+        txt[0] = txt[0].toUpperCase();
+        txt = txt.join('');
+    }
+    return '<textarea style="resize:none;padding:15px;width:100%;height:100%;border:none" >' + txt + '</textarea>';
 }
 
 function fillTerm(txt, term, t) {
-    while (txt.indexOf("{" + term + "}") != -1) {
+    while (txt.indexOf('{' + term + '}') != -1) {
         var item = pickOne(t[term]);
         var others = [];
         for (var i = 0; i < t[term].length;i++) {
@@ -277,8 +336,8 @@ function fillTerm(txt, term, t) {
                 others.push(t[term][i]);
             }
         }
-        txt = txt.replace("{" + term + "}", item);
-        txt = txt.replace("[" + term + "]", pickOne(others));
+        txt = txt.replace('{' + term + '}', item);
+        txt = txt.replace('[' + term + ']', pickOne(others));
     }
     return txt;
 }
@@ -293,11 +352,11 @@ function pickOne(arr) {
 }
 
 //==API FUNCTION==//
-function makeGlobalPopup(title, fafaText, darken, img) {
-    var holder = document.createElement("div");
-    $("body").append(holder);
-    $(holder).addClass("drop-down-pop-up-container");
-    $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
+function makeGlobalPopup(title, fafaText, darken) {
+    var holder = document.createElement('div');
+    $('body').append(holder);
+    $(holder).addClass('drop-down-pop-up-container');
+    $(holder).attr('style', 'position:fixed;z-index:2147483647;left:10px;top:10px');
     $(holder).addClass('global_popup');
     
     var dark = $('<div class="dimmer" style="z-index:1001;" />');
@@ -306,16 +365,14 @@ function makeGlobalPopup(title, fafaText, darken, img) {
     }
     $('#dimmers').append(dark);
     
-    var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
+    var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
     $(holder).append(pop);
     
-    var head = document.createElement("h1");
-    $(head).css("cursor","move");
+    var head = document.createElement('h1');
+    $(head).css('cursor','move');
     $(pop).append(head);
     if (fafaText != null) {
-        $(head).append("<i class=\"" + fafaText + "\" /i>");
-    } else if (img != null) {
-        $(head).append("<img src=\"" + img + "\" style=\"width:18px;height:18px;margin-right:5px;\" /img>");
+        $(head).append('<i class="' + fafaText + '" />');
     }
     $(head).append(title);
     
@@ -331,27 +388,27 @@ function makeGlobalPopup(title, fafaText, darken, img) {
         document.onmousemove = function(e) {};
     };
     
-    var close = document.createElement("a");
-    $(close).addClass("close_button");
-    $(close).attr("id", "message_close_button");
+    var close = document.createElement('a');
+    $(close).addClass('close_button');
+    $(close).attr('id', 'message_close_button');
     $(close).click(function(e) {
         $(dark).remove();
         $(holder).remove();
     });
     $(head).append(close);
     
-    var content = document.createElement("div");
-    $(content).addClass("drop-down-pop-up-content");
+    var content = document.createElement('div');
+    $(content).addClass('drop-down-pop-up-content');
     $(pop).append(content);
     return content;
 }
 
 //==API FUNCTION==//
 function position(obj, x, y, buff) {
-    if (typeof x == "string" && x.toLowerCase() == "center") {
+    if (typeof x == 'string' && x.toLowerCase() == 'center') {
         x = ($(window).width() - $(obj).width()) / 2;
     }
-    if (typeof y == "string" && y.toLowerCase() == "center") {
+    if (typeof y == 'string' && y.toLowerCase() == 'center') {
         y = ($(window).height() - $(obj).height()) / 2;
     }
     if (typeof x == 'object') {
@@ -376,6 +433,6 @@ function position(obj, x, y, buff) {
     var maxY = $(window).height() - ($(obj).height() + buff);
     if (y > maxY) y = maxY;
     
-    $(obj).css('top', y + "px");
-    $(obj).css('left', x + "px");
+    $(obj).css('top', y + 'px');
+    $(obj).css('left', x + 'px');
 }
