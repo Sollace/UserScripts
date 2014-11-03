@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3.1
+// @version     1.3.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -11,49 +11,74 @@
 
 var terms = {
     "f": [
-        "{c} goes to {p}",
-        "{p} is {v} by {c}",
-        "{p} and {p} merge",
-        "{c} and {c} {x}",
-        "{c} {v2} a {o}",
-        "{c} is taken to {pc}",
-        "{p} is invaded by {h}",
-        "{c} {v4} {c}",
-        "{c} {v2} {cs}",
-        "{c} is {v3}",
-        "{c} is a {vs}",
-        "{w} invented",
+        "{c} goes to {place}.",
+        "{place} is {v} by {c}.",
+        "{place} and [place] merge.",
+        "{c} and {c} {x}.",
+        "{c} {v2} a {o}.",
+        "{c} is taken to {pc}.",
+        "{c} tries to eat a {food}",
+        "{place} is invaded by {h}!",
+        "{c} {v4} {c}.",
+        "{c} {v2} {cs}.",
+        "{c} is {v3}.",
+        "{c} is a {vs}.",
+        "{w} {i2}.",
         "{c} {i} {wp}",
         "{c} {i} a {ws}",
         "{c} {v5}",
-        "{c} is the element of {el}",
-        "Try Again <img src=\"https://fimfiction-static.net/images/emoticons/derpytongue2.png\" />",
-        "Outta luck <img src=\"https://fimfiction-static.net/images/emoticons/trollestia.png\" />",
+        "{c} is {element}",
+        "The {h} use {power} to {hc}",
+        "{c} discovers {power}",
         "{c}'s {cp}",
-        "{c} gets a new {bp}",
-        "{c}'s {bp} is fake",
+        "{c} gets a new {bodypart}",
+        "{c}'s {bodypart} is fake",
+        "{place} is {c}'s new home",
+        "Try Again <img src=\"https://fimfiction-static.net/images/emoticons/derpytongue2.png\" />",
+        "Outta luck <img src=\"https://fimfiction-static.net/images/emoticons/trollestia.png\" />"
+    ],
+    "hc": [
+        "invade {place}",
+        "defeat {name}"
     ],
     "cp": [
-        "{bp}", "cute-ceneara"
+        "{bodypart} {does}", "cute-ceneara is a {adv}"
     ],
-    "bp": [
+    "bodypart": [
         "cutiemark", "hoof", "horn", "wing", "wings", "tail", "mane", "legs", "teeth", "tongue", "package"
     ],
+    "does": [
+        "falls off",
+        "breaks",
+        "swells up"
+    ],
+    "adv": [
+        "{adv2}",
+        "complete {adv2}"
+    ],
+    "adv2": [
+        "flop",
+        "disaster",
+        "success"
+    ],
     "cs": [
-        "{c}", "a {s}"
+        "{c}", "a {race}"
     ],
     "i": [
-        "invented", "invents",
-        "discovered", "discovers",
+        "{i2}",
+        "invents",
+        "discovers",
         "used", "uses"
     ],
+    "i2": [
+        "invented", "discovered"
+    ],
     "pc": [
-        "{c}",
-        "{p}"
+        "{c}","{p}"
     ],
     "vs": [
-        "{s}",
-        "{v3} {s}",
+        "{race}",
+        "{v3} {race}",
         "{pf}"
     ],
     "pf": [
@@ -76,13 +101,16 @@ var terms = {
     "x1": [
         "places", "bodies", "families", "jobs","brains","race"
     ],
+    "name": [
+        "Princess {c2}", "King {c2}", "Nightmare {cn}", "{c}"
+    ],
     "c": [
-        "{c2}","Nightmare {cn}",
+        "{c2}","{name}",
         "Princess Celestia","Princess Luna","Princess Cadance",
         "Bon Bon","Carrot Top","Sunset Shimmer","Shining Armour","Vinyl Scratch",
         "Sweetie Belle","Rainbow Dash","Diamond Tiara","Silver Spoon","Babs Seed",
         "Twilight Sparkle","Pinkie Pie","Blinkie Pie","Inky Pie","Maud Pie","The Cake Twins",
-        "Dr. Hooves","MMMMM","Queen Crysalis","Button Mash","Sea Breeze","Angel Bunny",
+        "Dr. Hooves","MMMMM","Queen Chrysalis","Button Mash","Sea Breeze","Angel Bunny",
         "Cherry Jubilee","Photo Finish",
         "Granny Smith","Mig Macintosh","Cheese Sandwich",
         "Bill Gates","an Alien","The Doctor","The Master","The President","The Servant",
@@ -101,10 +129,10 @@ var terms = {
         "Tirek","Discord","Maud"
     ],
     "c3": [
-        "Belle","Dash","Tiara","Spoon","Moon","Seed","Bon","Pie"
+        "Belle","Dash","Tiara","Spoon","Moon","Seed","Bon","Pie","Chrysalis"
     ],
     "w": [
-        "{wp} are", "{ws} is", "{ws} was",
+        "{wp} are", "a {ws} is", "a {ws} was",
         "{wp} aren't", "{ws} isn't", "{ws} wasn't",
         "{wp} must be", "{wp} must not be"
     ],
@@ -114,7 +142,7 @@ var terms = {
     "ws": [
         "gun", "car", "bank", "contraceptive"
     ],
-    "p": [
+    "place": [
         "Canterlot",
         "Sweet Apple Acres",
         "Manehatten",
@@ -167,9 +195,6 @@ var terms = {
         "takes", "sells", "trips", "gives up", "buys","forgets"
     ],
     "o": [
-        "peach",
-        "water mellon",
-        "apple",
         "bottle",
         "cloud",
         "rainbow",
@@ -178,7 +203,19 @@ var terms = {
         "the Alicorn Amulet",
         "Kitchen Sink",
         "MMMMM",
-        "Cheese Sandwich"
+        "{food} sandwich"
+    ],
+    "food": [
+        "cheese",
+        "carrot",
+        "berry",
+        "cake",
+        "chocolate",
+        "pie",
+        "apple",
+        "apple pie",
+        "melon",
+        "water melon",
     ],
     "h": [
         "Aliens",
@@ -187,7 +224,7 @@ var terms = {
         "Changelings",
         "Timelords"
     ],
-    "s": [
+    "race": [
         "Vampony",
         "Zompony",
         "Alicorn",
@@ -198,34 +235,53 @@ var terms = {
         "Clone",
         "Pinkie Pie"
     ],
-    "el": [
-        "honesty", "love", "loyalty", "generosity", "kindness", "magic",
-        "deceit", "hate", "dishonor", "selfishness", "pride","murder"
+    "power": [
+        "The Element of {element}", "the magic of {element}"
+    ],
+    "element": [
+        "Honesty", "Love", "Loyalty", "Generosity", "Kindness", "Magic",
+        "Deceit", "Hate", "Dishonor", "Selfishness", "Pride","Murder"
     ]
 }
-function makePrompt() {
-    var txt = "{f}";
-    for (var i in terms) {
-        txt = fillTerm(txt, i);
+
+run();
+
+//--------------------------------------------------------------------------------------------------
+//----------------------------------------FUNCTIONS-------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+function run() {
+    var but = $('<li><a href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a></li>');
+    $('.user_toolbar audio').before(but);
+    $(but).click(function() {
+        var pop = makeGlobalPopup('Random Prompt', '');
+        $(pop).append('<span>' + makePrompt('{pattern}', terms) + '</span>');
+        $(pop).css('padding', '15px');
+        position(pop.parentNode.parentNode, 'center', 'center');
+    });
+}
+
+function makePrompt(text, t) {
+    for (var i in t) {
+        txt = fillTerm(txt, i, t);
     }
     return txt;
 }
 
-function fillTerm(txt, term) {
+function fillTerm(txt, term, t) {
     while (txt.indexOf("{" + term + "}") != -1) {
-        txt = txt.replace("{" + term + "}", pickOne(terms[term]));
+        var item = pickOne(t[term]);
+        var others = [];
+        for (var i = 0; i < t[term].length;i++) {
+            if (t[term][i] != item) {
+                others.push(t[term][i]);
+            }
+        }
+        txt = txt.replace("{" + term + "}", item);
+        txt = txt.replace("[" + term + "]", pickOne(others));
     }
     return txt;
 }
-
-var but = $('<li><a href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a></li>');
-$(but).click(function() {
-    var pop = makeGlobalPopup('Random Prompt', '');
-    $(pop).append('<span>' + makePrompt() + '</span>');
-    $(pop).css('padding', '15px');
-    position(pop.parentNode.parentNode, 'center', 'center');
-});
-$('.user_toolbar audio').before(but);
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------API FUNCTIONS-----------------------------------------------
