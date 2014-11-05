@@ -5,17 +5,11 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2.2
+// @version     2.2.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // ==/UserScript==
-
-function contains(me, it) { return me != null ? me.indexOf(it) != -1 : false; }
-function replaceAll(find, replace, me) {
-    var escapeRegExp = function (str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
-    return me.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-}
 
 var interactiveP = $('input[name="show_interactive_pony"]');
 if (interactiveP.length > 0) {
@@ -98,7 +92,8 @@ body.pin_comment.hold_comment #add_comment_box .add_comment_toolbar {\
   height: 70px;}\
 body.pin_comment #add_comment_box .add_comment_toolbar > * {\
   float: left;}\
-body.pin_comment #add_comment_box .comment_success {\
+body.pin_comment #add_comment_box .comment_success,\
+body.pin_comment #add_comment_box .comment_processing {\
   margin: 3px;}\
 body.pin_comment #comment_preview {\
   position: fixed !important;\
@@ -169,9 +164,7 @@ function makeButton(a, text, img) {
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    while (contains(input, '  ')) {
-        input = replaceAll('  ', ' ', input);
-    }
+    while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
     var style = document.createElement('style');
     $(style).attr('type', 'text/css');
     $(style).append(input);

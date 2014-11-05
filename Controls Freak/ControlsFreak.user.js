@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.2
+// @version     1.3.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -1300,24 +1300,27 @@ body:not(.editing) .nav_bar .editor,\
     }
 
     //==API FUNCTION==//
-    function makeGlobalPopup(title, fafaText, darken, img) {
+    function makeGlobalPopup(title, fafaText, darken, close) {
+        if (typeof (close) == 'undefined') close = true;
         var holder = document.createElement("div");
         $("body").append(holder);
         $(holder).addClass("drop-down-pop-up-container");
         $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
         $(holder).addClass('global_popup');
 
-        var dark = $('<div class="dimmer" style="z-index:1001;" />');
-        if (typeof (darken) == 'number') {
-            dark.css('opacity', (darken / 100));
+        if (darken) {
+            var dark = $('<div class="dimmer" style="z-index:1001;" />');
+            if (typeof (darken) == 'number') {
+                dark.css('opacity', (darken / 100));
+            }
+            $('#dimmers').append(dark);
         }
-        $('#dimmers').append(dark);
 
         var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
         $(holder).append(pop);
 
         var head = document.createElement("h1");
-        $(head).css("cursor", "move");
+        $(head).css("cursor","move");
         $(pop).append(head);
         if (fafaText != null) {
             $(head).append("<i class=\"" + fafaText + "\" /i>");
@@ -1326,26 +1329,28 @@ body:not(.editing) .nav_bar .editor,\
         }
         $(head).append(title);
 
-        head.onmousedown = function (event) {
+        head.onmousedown = function(event) {
             var x = event.clientX - parseInt(holder.style.left.split('px')[0]);
             var y = event.clientY - parseInt(holder.style.top.split('px')[0]);
-            document.onmousemove = function (event) {
+            document.onmousemove = function(event) {
                 position(holder, event.clientX - x, event.clientY - y, 30);
             };
             event.preventDefault();
         };
-        head.onmouseup = function (e) {
-            document.onmousemove = function (e) { };
+        head.onmouseup = function(e) {
+            document.onmousemove = function(e) {};
         };
 
-        var close = document.createElement("a");
-        $(close).addClass("close_button");
-        $(close).attr("id", "message_close_button");
-        $(close).click(function (e) {
-            $(dark).remove();
-            $(holder).remove();
+        var c = $('<a id="message_close_button" class="close_button" />');
+        $(head).append(c);
+        $(c).click(function(e) {
+            if (close) {
+                $(dark).remove();
+                $(holder).remove();
+            } else {
+                $(holder).css('display','none');
+            }
         });
-        $(head).append(close);
 
         var content = document.createElement("div");
         $(content).addClass("drop-down-pop-up-content");

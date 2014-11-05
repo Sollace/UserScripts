@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4.1
+// @version     1.4.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -418,27 +418,32 @@ function pickOne(arr) {
 }
 
 //==API FUNCTION==//
-function makeGlobalPopup(title, fafaText, darken) {
-    var holder = document.createElement('div');
-    $('body').append(holder);
-    $(holder).addClass('drop-down-pop-up-container');
-    $(holder).attr('style', 'position:fixed;z-index:2147483647;left:10px;top:10px');
+function makeGlobalPopup(title, fafaText, darken, close) {
+    if (typeof (close) == 'undefined') close = true;
+    var holder = document.createElement("div");
+    $("body").append(holder);
+    $(holder).addClass("drop-down-pop-up-container");
+    $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
     $(holder).addClass('global_popup');
     
-    var dark = $('<div class="dimmer" style="z-index:1001;" />');
-    if (typeof (darken) == 'number') {
-        dark.css('opacity', (darken / 100));
+    if (darken) {
+        var dark = $('<div class="dimmer" style="z-index:1001;" />');
+        if (typeof (darken) == 'number') {
+            dark.css('opacity', (darken / 100));
+        }
+        $('#dimmers').append(dark);
     }
-    $('#dimmers').append(dark);
     
-    var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
+    var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
     $(holder).append(pop);
     
-    var head = document.createElement('h1');
-    $(head).css('cursor','move');
+    var head = document.createElement("h1");
+    $(head).css("cursor","move");
     $(pop).append(head);
     if (fafaText != null) {
-        $(head).append('<i class="' + fafaText + '" />');
+        $(head).append("<i class=\"" + fafaText + "\" /i>");
+    } else if (img != null) {
+        $(head).append("<img src=\"" + img + "\" style=\"width:18px;height:18px;margin-right:5px;\" /img>");
     }
     $(head).append(title);
     
@@ -454,17 +459,19 @@ function makeGlobalPopup(title, fafaText, darken) {
         document.onmousemove = function(e) {};
     };
     
-    var close = document.createElement('a');
-    $(close).addClass('close_button');
-    $(close).attr('id', 'message_close_button');
-    $(close).click(function(e) {
-        $(dark).remove();
-        $(holder).remove();
+    var c = $('<a id="message_close_button" class="close_button" />');
+    $(head).append(c);
+    $(c).click(function(e) {
+        if (close) {
+            $(dark).remove();
+            $(holder).remove();
+        } else {
+           $(holder).css('display','none');
+        }
     });
-    $(head).append(close);
     
-    var content = document.createElement('div');
-    $(content).addClass('drop-down-pop-up-content');
+    var content = document.createElement("div");
+    $(content).addClass("drop-down-pop-up-content");
     $(pop).append(content);
     return content;
 }
@@ -505,106 +512,109 @@ function position(obj, x, y, buff) {
 
 //==API FUNCTION==//
 function Logger(name, l) {
-    var test = null;
-    var minLevel = 0;
-    var paused = false;
-    if (typeof (l) == 'number') minLevel = l;
-    this.Start = function (level) {
-        if (typeof (level) == 'number') minLevel = level;
-        test = $('#debug-console');
-        paused = false;
-        if (!test.length) {
-            test = $('<div id="debug-console" style="overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
-            $('body').append(test);
-            test.click(function () {
-                $(this).empty();
-                this.style.bottom = this.style.left = line = 0;
-            });
+  var test = null;
+  var minLevel = 0;
+  var paused = false;
+  if (typeof (l) == 'number') minLevel = l;
+  this.Start = function (level) {
+    if (typeof (level) == 'number') minLevel = level;
+    if (test == null) {
+      Output('===Logging Started===', minLevel + 1);
+    }
+    test = $('#debug-console');
+    paused = false;
+    if (!test.length) {
+      test = $('<div id="debug-console" style="overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
+      $('body').append(test);
+      test.click(function () {
+        $(this).empty();
+      });
+    }
+  }
+  this.Stop = function () {
+    if (test != null) {
+      test.remove();
+      test = null;
+      Output('===Logging Stopped===', minLevel + 1);
+    }
+  }
+  this.Pause = function () {
+    if (!paused) Output('===Logging Paused===', minLevel + 1);
+    paused = true;
+  }
+  this.Continue = function () {
+    if (paused) {
+      paused = false;
+      Output('===Logging Continued===', minLevel + 1);
+    }
+  }
+  this.Log = function (txt, level, params) {
+    if (arguments.length > 1) {
+      if (typeof arguments[1] == 'string') {
+        [].splice.apply(arguments, [1, 0, 0]);
+        level = 0;
+      }
+      for (var i = 2; i < arguments.length; i++) {
+        txt = txt.replace(new RegExp('\\{' + (i-2) + '\\}', 'g'), arguments[i]);
+      }
+    } else {
+      level = 0;
+    }
+    Output(txt, level);
+  }
+  this.Error = function (txt, params) {
+    arguments.splice(1,0,1000);
+    this.Log.apply(this,arguments);
+  }
+  this.SevereException = function (txt, excep) {
+    if (excep != 'handled') {
+      try {
+        var stopped = false;
+        if (test == null) {
+          stopped = true;
+          this.Start();
         }
-        Output('===Logging Enabled===', minLevel + 1);
-    }
-    this.Stop = function () {
-        if (test != null) {
-            test.remove();
-            test = null;
-        }
-        line = 0;
-        Output('===Logging Disabled===', minLevel + 1);
-    }
-    this.Pause = function () {
-        Output('===Logging Paused===', minLevel + 1);
-        paused = true;
-    }
-    this.Continue = function () {
-        paused = false;
-        Output('===Logging Continued===', minLevel + 1);
-    }
-    this.Log = function (txt, level, params) {
-        if (arguments.length > 1) {
-            if (typeof arguments[1] == 'string') {
-                [].splice.apply(arguments, [1, 0, 0]);
-                level = 0;
-            }
-            for (var i = 2; i < arguments.length; i++) {
-                txt = txt.replace(new RegExp('\\{' + (i-2) + '\\}', 'g'), arguments[i]);
-            }
+        if (txt.indexOf('{0}') != -1) {
+          SOut(txt.replace('{0}', excep), 2000);
         } else {
-            level = 0;
+          SOut(txt + '<br/>' + except, 2000);
         }
-        Output(txt, level);
+        if (excep.stack != null) SOut(excep.stack, 2000);
+        if (stopped) this.Pause();
+      } catch (e) {
+        alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
+      }
+      throw 'handled';
     }
-    this.Error = function (txt, params) { Output(txt, 1000); }
-    this.SevereException = function (txt, excep) {
-        if (excep != 'handled') {
-            try {
-                var stopped = false;
-                if (test == null) {
-                    stopped = true;
-                    this.Start();
-                }
-                if (txt.indexOf('{0}') != -1) {
-                    SOut(txt.replace('{0}', excep), 2000);
-                } else {
-                    SOut(txt + '<br/>' + except, 2000);
-                }
-                if (excep.stack != null) SOut(excep.stack, 2000);
-                if (stopped) this.Pause();
-            } catch (e) {
-                alert('Error in displaying Severe: ' + e);
-                alert('Severe: ' + txt);
-            }
-            throw 'handled';
-        }
+  }
+  this.Severe = function (txt) {
+    try {
+      var stopped = false;
+      if (test == null) {
+        stopped = true;
+        this.Start();
+      }
+      SOut(txt, 2);
+      if (stopped) this.Pause();
+    } catch (e) {
+      alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + excep);
     }
-    this.Severe = function (txt) {
-        try {
-            var stopped = false;
-            if (test == null) {
-                stopped = true;
-                this.Start();
-            }
-            SOut(txt, 2);
-            if (stopped) this.Pause();
-        } catch (e) {
-            alert('Error in displaying Severe: ' + e);
-            alert('Severe: ' + txt);
-        }
+  }
+  function Output(txt, level) {
+    if (!paused) SOut(txt, level);
+  }
+  function SOut(txt, level) {
+    if (level == null || level == undefined) level = 0;
+    if (test != null && level >= minLevel) {
+      var line = test.children().length;
+      if (line > 150) {
+        line = 0;
+        test.empty();
+      }
+      test.append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
+      test.stop().animate({
+        scrollTop: test[0].scrollHeight
+      },800);
     }
-    function Output(txt, level) {
-        if (!paused) SOut(txt, level);
-    }
-    function SOut(txt, level) {
-        if (level == null || level == undefined) level = 0;
-        if (test != null && level >= minLevel) {
-            var line = test.children().length;
-            if (line > 150) {
-                line = 0;
-                test.empty();
-            }
-            test.append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
-            test.stop().animate({
-                scrollTop: test[0].scrollHeight
-            },800);
-        }
-    }
+  }
 }
