@@ -3,26 +3,28 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4
+// @version     1.4.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
-
-run({
+var logger = new Logger('Prompt Maker',5)
+try {
+    run({
     pattern: [
         '{pattern_1}!',
         '{pattern_2}.',
         '{pattern_3}.',
         '{pattern_2} whilst [pattern_2].',
-        '{pattern_3} when it turns out that {pattern_2}.',
-        '{pattern_3} every time {pattern_2}.',
         '{pattern_3} and {pattern_2}.'
     ],
     pattern_1: [
         'Nanananananananaanananananananananananaanananananananananananananan BATMARE',
         'Button\s Mom has got it goin\' on',
         '{name} everywhere',
+        '{creature}s everywhere',
+        'a horde of {creature_plural} attack {place_or_name}',
+        'a horde of {creature_plural} attack {name_nonequestrian}',
         '{name_equestrian} meets {fandom}',
         '{name_nonequestrian} is a {fandom_singular}',
         '{race_plural} everywhere',
@@ -36,10 +38,11 @@ run({
         '{place} {is_or_was} {verbed} by {enemy}',
         '{name_nonequestrian} {place_phrase_non_eq}',
         '{name_equestrian} {place_phrase_eq}',
-        '{place} and [place] merge',
+        '{place} and [place] {action_object}',
         '{place} is {verbed} by {name}',
         'The {enemy_plural} use {power} to {verb_enemy}',
         '{name} and [name] {action}',
+        '{name} {name_does}',
         '{name} {does_to} [name]',
         '{name_pony_titled_evil} comes to {place_non_eq}'
     ],
@@ -55,12 +58,12 @@ run({
         '{name} is taken to {place_or_name}',
         '{name} tries to {done_food} {food}',
         '{name} {change} {name_or_race}',
-        '{name} {verbed_2} {power}',
+        '{name} {verbed_2} The Element of {element}',
         '{name} gets a new {bodypart_singular}',
         '{name}\'s {bodypart_singular} is fake',
         '{name}\'s {bodypart_plural} are fake'
     ],
-    verbed_2: ['discovers', 'is','breaks','{done_food}', '{i_present}'],
+    verbed_2: ['discovers', 'is','breaks','steals','{done_food}','{i_present}'],
     verbed: ['taken over','destroyed'],
     is_or_was: ['is','was','gets'],
     place_or_name: ['{name_equestrian}','{place}'],
@@ -87,14 +90,15 @@ run({
     ],
     bodypart_phrase: [
         '{bodypart_singular} {does_object_singular}',
+        'eyebrow {does_object_singular}',
         '{bodypart} {does_object}'
     ],
     bodypart: ['{bodypart_plural}', '{bodypart_singular}'],
     bodypart_plural: [
-        'cutiemark', 'hooves', 'horns', 'wings', 'legs', 'teeth', 'tongue', 'wings'
+        'hooves','horns','wings','legs','teeth','wings','eyebrows'
     ],
     bodypart_singular: [
-        'cutiemark', 'hoof', 'horn', 'wing', 'tail', 'mane', 'legs', 'teeth', 'tongue', 'package'
+        'cutiemark','hoof','horn','wing','tail','mane','legs','tooth','tongue','dick'
     ],
     place: ['{place_eq}', 'Equestria', 'The Moon', 'Earth', 'Tartarus'],
     place_phrase_eq: [
@@ -105,15 +109,30 @@ run({
         '{conj_place_to} {place_eq}',
         '{conj_place_to_0} Tartarus'],
     place_eq: [
+        'Appleloosa',
+        'Carousel Boutique',
+        'Castle of the Two Sisters',
+        'Dodge Junction',
+        'Everfree Forest',
+        'Golden Oak Library',
+        'the School House',
+        'Sugarcube Corner',
+        'Wonderbolt Academy',
+        '{name_pony}\'s house',
         'Canterlot',
         'Trottingham',
         'Sweet Apple Acres',
         'Manehatten',
         'Cloudsdale',
-        'Prance'
+        'Prance',
+        'Ponyville',
+        'Twilight\'s Castle',
+        'The Crystal Empire',
+        'Frostdale',
+        'Canterlot High'
     ],
     place_non_eq: [
-        'Earth', 'New York', 'London', 'California', 'The Moon'
+        'Earth', 'New York', 'London', 'California', 'The Moon','Africa','Britain','China','Japan','Australia'
     ],
     conj_place: [
         '{conj_place_away}','{conj_place_to}'
@@ -143,38 +162,76 @@ run({
         'Humans',
         'Timelords'
     ],
-    name: ['Filly {name_pony}', '{name_nonequestrian}', '{name_equestrian}'],
-    name_equestrian: ['{name_pony}', '{name_nonpony}'],
+    name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
+    name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
     name_pony: [
         '{name_pony_first}', 'Princess {name_pony_first}',
-        'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch',
-        'Sweetie Belle','Rainbow Dash','Diamond Tiara','Silver Spoon','Babs Seed',
-        'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie','The Cake Twins',
-        'Dr. Hooves','MMMMM','Queen Chrysalis','Button Mash',
-        'Cherry Jubilee','Photo Finish','Button\'s Mom',
-        'Granny Smith','Big Macintosh','Cheese Sandwich'
+        'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch','Suri Polomare',
+        'Sweetie Belle','Rainbow Dash',
+        'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie',
+        'Dr. Hooves','Hayseed Turnip Truck','Aunt Orange','Uncle Orange','Goldie Delicious',
+        'Cherry Jubilee','Photo Finish','Button\'s Mom','Prince Blue Blood','Sunny Daze','Peachy Pie',
+        'Granny Smith','Big Macintosh','Cheese Sandwich','Berry Punch','Night Light','Twilight Velvet',
+        'Hoity Toity','Sapphire Shores','Fancy Pants','Daring Do','Prim Hemline','Mayor Mare','Hondo Flanks','Cookie Crumbles',
+        'Jet Set','Upper Crust','Fleur Dis Lee','Filthy Rich','Cloud Chaser','Bulk Biceps','Lightning Dust','Ms. Peachbottom','Ms. Harshwhinny','Flash Sentry',
+        'Coco Pommel','Silver Shill','Teddie Safari','Nurse Redheart','Doctor Horse','Dr. Hooves','Nurse Ponies',
+        'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Clover the Clever'
     ],
-    name_nonpony: ['Sea Breeze','Angel Bunny','Tirek','Discord'],
+    name_pony_young: [
+        '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','The Cake Twins','Button Mash','Berry Pinch'
+    ],
+    name_inanimate: [
+        'Bloomberg','Pinkie\'s imaginary friends','Tom','Mr. Smarty Pants'
+    ],
+    name_pet: [
+        'Angel Bunny','Winona','Opalescence','Gummy','Philomena','Owlowicious','Tank','Peewee','Tiberius','Cerberus'
+    ],
+    name_nonpony: [
+        'Steven Magnet','Steve Magnum',
+        'Zecora','Cranky Doodle Donkey','Cranky Doodle Dandy','Matilda','Mulia Mild','Little Strongheart','Chief Thunderhooves','Iron Will','Gustave le Grand',
+        'Spike','Sea Breeze','Tirek','Scorpan','Discord','MMMMM','Queen Chrysalis','Spa Ponies','Star Swirl the Bearded','The Ponytones','The Power Ponies','Hum Drum',
+        'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
+    ],
     name_nonequestrian: [
-        'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant',
+        'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto',
         'Optimus Prime','Starscream','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris'
     ],
     name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
     name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
-    name_pony_1: ['{name_pony_first}','{name_pony_last}'],
+    name_pony_1: ['{name_pony_first}','{name_pony_last}', '{name_pony_first_young}'],
     name_pony_first: [
-        'Celestia','Luna','Cadance',
-        'Nightlight','Cheerilee',
-        'Twilight','Applejack','Rarity','Fluttershy',
-        'Scootaloo','Applebloom',
-        'Trixie','Nyx','Fluffle Puff',
-        'Big Mac','Spitfire','sauren','Spike',
-        'Lyra', 'Derpy','Octavia','Roseluck',
-        'Maud'
+        'Celestia','Luna','Cadance','Flim','Flam','Cheerilee','Gizmo',
+        'Twilight','Applejack','Rarity','Fluttershy','Sombra','Joe',
+        'Trixie','Fluffle Puff','Alo','Lotus',
+        'Big Mac','Spitfire','sauren','Fleetfoot',
+        'Lyra', 'Derpy','Octavia','Roseluck','Thunderlane',
+        'Maud','Tenderhoof','Junebug','Flitter','Blossomforth'
+    ],
+    name_pony_first_young: [
+        'Featherweight','Pipsqueak','Snips','Snails','Runble','Dinky','Twist','Nyx','Scootaloo','Applebloom'
     ],
     name_pony_last: ['Belle','Dash','Tiara','Spoon','Moon','Seed','Bon','Pie','Chrysalis'],
-    race: ['Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Pinkie Pie'],
-    race_plural: ['Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones','Pinkie Pies'],
+    race: [
+        'Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Breezie',
+        'Parasprite','Pheonix','Timberwolf','Fruit Bat','Windigos'
+    ],
+    race_plural: [
+        'Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones',
+        'Parasprites','Pheonixes','Timberwolves','Fruit Bats','Windigo'
+    ],
+    creature_plural: [
+        '{creature_0}s','{creature_0}es'
+    ],
+    creature_singular: [
+        '{creature_0}','{creature_0}'
+    ],
+    creature_0: [
+        'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm',
+        'Diamond Dog'
+    ],
+    creature_1: [
+        'Orthros'
+    ],
     fandom: ['a {fandom_singular}','{fandom_plural}'],
     fandom_singular: ['Brony','Furry','Anti-Brony'],
     fandom_plural: ['Bronies','Furries','Anti-Bronies'],
@@ -194,12 +251,13 @@ run({
         'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
     ],
     object: [
+        'Tree of Harmony',
         'bottle',
         'cloud',
         'rainbow',
         'baby',
         'cow',
-        'the Alicorn Amulet',
+        'Alicorn Amulet',
         'Kitchen Sink',
         'MMMMM',
         '{food_1} sandwich',
@@ -232,7 +290,10 @@ run({
     ],
     pfn: ['Killer', 'Pimp', 'Slaver', 'Prostitute','Pyromaniac'],
     pfnn: ['Serial Killing', 'Pimping', 'Horrible'],
-    action: ['merge', 'switch {acted}', 'share {acted}', 'have sex', 'plot', '{name_does}'],
+    action: ['merge', 'switch {acted}', 'share {acted}', 'have sex', 'plot','become separated','meet','meet {repeated}','team up'],
+    action_object: ['merge','switch','collide','meet','meet {repeated}','become separated','smash together'],
+    repeated: ['again','for the {nth} time'],
+    nth: ['first','last','(n)'],
     acted: ['places', 'bodies', 'families', 'jobs', 'brains', 'race'],
     is: [
         'dead',
@@ -290,6 +351,7 @@ run({
     does_2: ['takes', 'sells', 'trips', 'buys', 'eats','gives up'],
     done_food: ['eat','buy','sell','cook']
 });
+} catch (e) {logger.SeverException('UnhadledException: {0}', e);}
 
 //--------------------------------------------------------------------------------------------------
 //----------------------------------------FUNCTIONS-------------------------------------------------
@@ -297,7 +359,7 @@ run({
 
 function run(terms) {
     var but = $('<li><a href="javascript:void();"><i class="fa fa-lightbulb-o" /><span>Prompt</span></a></li>');
-    $('.user_toolbar audio').before(but);
+    $('.user_toolbar ul').first().children('li').last().after(but);
     but.click(function() {
         var pop = makeGlobalPopup('Random Prompt', 'fa fa-lightbulb-o', 0);
         $(pop).append('<span class="prompt">' + makePrompt('{pattern}', terms) + '</span>');
@@ -338,6 +400,10 @@ function fillTerm(txt, term, t) {
         }
         txt = txt.replace('{' + term + '}', item);
         txt = txt.replace('[' + term + ']', pickOne(others));
+    }
+    while (txt.indexOf('(n)') != -1) {
+        var r = (2 + Math.floor(Math.random() * 20)) + '';
+        txt = txt.replace('(n)', r + (r[r.length-1] == '1' ? 'st' : r[r.length-1] == '2' ? 'nd' : r[r.length-1] == '3' ? 'rd' : 'th'));
     }
     return txt;
 }
@@ -435,4 +501,110 @@ function position(obj, x, y, buff) {
     
     $(obj).css('top', y + 'px');
     $(obj).css('left', x + 'px');
+}
+
+//==API FUNCTION==//
+function Logger(name, l) {
+    var test = null;
+    var minLevel = 0;
+    var paused = false;
+    if (typeof (l) == 'number') minLevel = l;
+    this.Start = function (level) {
+        if (typeof (level) == 'number') minLevel = level;
+        test = $('#debug-console');
+        paused = false;
+        if (!test.length) {
+            test = $('<div id="debug-console" style="overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
+            $('body').append(test);
+            test.click(function () {
+                $(this).empty();
+                this.style.bottom = this.style.left = line = 0;
+            });
+        }
+        Output('===Logging Enabled===', minLevel + 1);
+    }
+    this.Stop = function () {
+        if (test != null) {
+            test.remove();
+            test = null;
+        }
+        line = 0;
+        Output('===Logging Disabled===', minLevel + 1);
+    }
+    this.Pause = function () {
+        Output('===Logging Paused===', minLevel + 1);
+        paused = true;
+    }
+    this.Continue = function () {
+        paused = false;
+        Output('===Logging Continued===', minLevel + 1);
+    }
+    this.Log = function (txt, level, params) {
+        if (arguments.length > 1) {
+            if (typeof arguments[1] == 'string') {
+                [].splice.apply(arguments, [1, 0, 0]);
+                level = 0;
+            }
+            for (var i = 2; i < arguments.length; i++) {
+                txt = txt.replace(new RegExp('\\{' + (i-2) + '\\}', 'g'), arguments[i]);
+            }
+        } else {
+            level = 0;
+        }
+        Output(txt, level);
+    }
+    this.Error = function (txt, params) { Output(txt, 1000); }
+    this.SevereException = function (txt, excep) {
+        if (excep != 'handled') {
+            try {
+                var stopped = false;
+                if (test == null) {
+                    stopped = true;
+                    this.Start();
+                }
+                if (txt.indexOf('{0}') != -1) {
+                    SOut(txt.replace('{0}', excep), 2000);
+                } else {
+                    SOut(txt + '<br/>' + except, 2000);
+                }
+                if (excep.stack != null) SOut(excep.stack, 2000);
+                if (stopped) this.Pause();
+            } catch (e) {
+                alert('Error in displaying Severe: ' + e);
+                alert('Severe: ' + txt);
+            }
+            throw 'handled';
+        }
+    }
+    this.Severe = function (txt) {
+        try {
+            var stopped = false;
+            if (test == null) {
+                stopped = true;
+                this.Start();
+            }
+            SOut(txt, 2);
+            if (stopped) this.Pause();
+        } catch (e) {
+            alert('Error in displaying Severe: ' + e);
+            alert('Severe: ' + txt);
+        }
+    }
+    function Output(txt, level) {
+        if (!paused) SOut(txt, level);
+    }
+    function SOut(txt, level) {
+        if (level == null || level == undefined) level = 0;
+        if (test != null && level >= minLevel) {
+            var line = test.children().length;
+            if (line > 150) {
+                line = 0;
+                test.empty();
+            }
+            test.append('<p style="background: rgba(' + (line % 2 == 0 ? '155,0' : '0,155') + ',0,0.3);">' + (line + 1) + '):' + name + ') ' + txt + '</p>');
+            test.stop().animate({
+                scrollTop: test[0].scrollHeight
+            },800);
+        }
+    }
 }
