@@ -15,7 +15,6 @@ var interactiveP = $('input[name="show_interactive_pony"]');
 if (interactiveP.length > 0) {
     interactiveP = interactiveP.parent().parent().parent().parent();
     var Option = $('<input type="checkbox" name="pin_comments">');
-
     var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
     row.find('.toggleable-switch').prepend(Option);
     interactiveP.before(row);
@@ -55,6 +54,21 @@ $('#comment_preview').on('mouseenter', function() {
 });
 $('#comment_preview').on('mouseleave', function() {
     $('body').removeClass('hold_comment');
+});
+$(document).off('click','.jump-to').on('click','.jump-to', function(b) {
+  b.preventDefault();
+  if (!$('body').hasClass('pin_comment')) {
+    $("html, body").animate({
+      scrollTop: $($(this).data("jump")).offset().top
+    }, 500);
+  } else {
+    $('body').addClass('hold_comment');
+    setTimeout(function() {
+      if (!$('#comment_preview').is(':hover')) {
+        $('body').removeClass('hold_comment');
+      }
+    },2000);
+  }
 });
 
 makeStyle("\
