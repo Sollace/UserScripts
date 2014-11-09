@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.3
+// @version     1.3.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -248,6 +248,9 @@ $(document).ready(function () {
     position: absolute;\
     left: -20px;\
     top: 0px;}\
+.user_toolbar .drop-down.drop-down-private-messages,\
+.user_toolbar .drop-down.drop-down-notifications {\
+  overflow: hidden;}\
 .user_toolbar ul.drop-down-private-messages,\
 .user_toolbar .drop-down.drop-down-private-messages,\
 .user_toolbar ul.drop-down-notifications,\
@@ -650,14 +653,16 @@ body:not(.editing) .nav_bar .editor,\
                 $('#button_moving').css('left', (e.clientX - $('#button_moving').attr('data_offset_X')) + 'px');
             }
         });
-        $(document).keypress(function (e) {
+        $(document).on('keypress', function (e) {
             if (e.keyCode == 27) {
-                if (held != null) {
-                    held.drop();
-                }
+                if (held != null) held.drop();
             }
         });
-        $(window).resize(function() {
+        $(document).on('click','.user_toolbar .button-close', function(a) {
+            var b = $(this).closest("li");
+            b.hasClass("hover") && (a.preventDefault(), b.removeClass("hover"))
+        });
+        $(window).on('resize', function() {
             updateSpacers();
         });
         
