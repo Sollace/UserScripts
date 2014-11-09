@@ -6,7 +6,7 @@
 // @include     https://plus.googleapis.com/*
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/_/up/widget*
-// @version     2.0.2
+// @version     2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -265,15 +265,17 @@ var mainCss = '\
     #channel-search .show-search img, #channel-search .yt-uix-button-icon-search {\
         background: no-repeat url(http://i.imgur.com/VirN1wE.png) -170px -201px !important;}\
     #player, .yt-ui-ellipsis, .yt-uix-expander-ellipsis {\
-        background: transparent !important;}\
+        background: none !important;}\
 .yt-ui-menu-content, #yt-uix-videoactionmenu-menu, .add-to-widget .playlists {\
     background: #222 !important;\
     border-color: #444343 !important;}\
 .yt-ui-menu-content h3, .yt-uix-button-menu-item, .yt-ui-menu-item {\
     color: #888 !important;}\
 #yt-uix-videoactionmenu-menu .addto-playlist-item:hover, #yt-uix-videoactionmenu-menu .create-playlist-item:hover,\
-.yt-uix-menu-trigger-selected .yt-ui-menu-item, .yt-ui-menu-item:hover {\
+.yt-uix-menu-trigger-selected .yt-ui-menu-item, .yt-ui-menu-item:hover, .yt-ui-menu-item:hover:focus, .yt-ui-menu-content:hover > .selected:hover, .selected {\
     background-color: #333232 !important;}\
+.yt-ui-menu-item:focus {\
+    background: none !important;}\
     .player-unavailable {\
         float: inherit !important;}\
     .watch-branded-banner .player-branded-banner {\
@@ -1277,6 +1279,23 @@ var largePlayerCss = '\
         height: 100% !important;}';
 
 var commentsCss = '\
+div[role=menu] {\
+  border-color: #444343 !important;\
+  background: #1B1B1B;}\
+div[role=menuitem] * {\
+  color: #aaa !important;}\
+div[role=menuitem]:hover {\
+  background: #333 !important;}\
+.b-c-R, button[name="cancel"] {\
+  color: #aaa!important;\
+  border-color: #303030 !important;\
+  box-shadow: none !important;\
+  outline-color: black;\
+  background: #242323 !important;}\
+.b-c-R:hover, button[name="cancel"]:hover {\
+  border-color: #444343 !important;}\
+.b-c-R:focus, button[name="cancel"]:focus {\
+  outline-color: #00A1AA !important;}\
 .G-q, .G-q > div {\
   background: #333 !important;\
   color: #aaa !important;}\
@@ -1399,6 +1418,25 @@ var subEmbedCss = '\
     border-color: #303030 !important;\
     background: #222 !important;}';
 
+var buttonStyle = '\
+.dark-theme-button {\
+    position: fixed;\
+    z-index: 999999999;\
+    bottom: -30px;\
+    right: -30px;\
+    border-radius: 500px 0 0 0 !important;\
+    transition: all 0.125s linear;\
+    box-shadow: 0 0 0 rgba(255,255,255,1.3) inset;\
+    height: 60px !important;\
+    width: 60px !important;\
+    opacity: 0.5;\
+    padding-top: 10px;\
+    padding-left: 10px;}\
+.dark-theme-button:hover {\
+    right: 0px !important;\
+    bottom: 0px !important;\
+    opacity: 1;}';
+
 var theme = GM_getValue("theme", "Switch");
 run();
 
@@ -1406,14 +1444,13 @@ function run() {
     if (window.top == window && document.location.href.indexOf('youtube.com/embed') == -1) {
         var ls = document.createElement("style");
         ls.setAttribute("type", "text/css");
-        ls.innerHTML = largePlayerCss;
+        ls.innerHTML = largePlayerCss + buttonStyle;
         document.head.appendChild(ls);
 
         var but = createButton();
         document.ready = function() {
             document.body.appendChild(but);
         }
-        but.setAttribute("style", "position:fixed;bottom:11px;right:11px;width:59px;z-index:999999999;");
         but.name = "themeButton";
         but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
 
@@ -1425,7 +1462,7 @@ function run() {
             }
             this.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
         }
-
+        
         if (theme == "Dark") {
             switchToDark();
         } else if (theme == "Light") {
@@ -1505,7 +1542,7 @@ function createButton() {
     var result = document.createElement("button");
     result.setAttribute("role", "button");
     result.setAttribute("type", "button");
-    result.setAttribute("class", " yt-uix-button yt-uix-button-primary yt-uix-button-size-default");
+    result.setAttribute("class", "dark-theme-button yt-uix-button yt-uix-button-primary yt-uix-button-size-default");
     return result;
 }
 
