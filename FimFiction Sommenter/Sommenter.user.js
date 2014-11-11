@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2.3
+// @version     2.2.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -50,17 +50,23 @@ function AddQuote(a, b) {
 }
 
 $('#comment_preview').on('mouseenter', function() {
-    $('body').addClass('hold_comment');
+  $('body').addClass('hold_comment');
 });
 $('#comment_preview').on('mouseleave', function() {
-    $('body').removeClass('hold_comment');
+  $('body').removeClass('hold_comment');
 });
-$(document).off('click','.jump-to').on('click','.jump-to', function(b) {
+$('.jump-to').on('click', function(b) {
   b.preventDefault();
+  b.stopPropagation();
   if (!$('body').hasClass('pin_comment')) {
-    $("html, body").animate({
-      scrollTop: $($(this).data("jump")).offset().top
-    }, 500);
+    var a;
+    if ('bottom' == $(this).data('align')) {
+      a = $($(this).data('jump'));
+      a = a.offset().top - $(window).height() + a.height();
+    } else {
+      a = $($(this).data('jump')).offset().top;
+    }
+    $("html, body").animate({scrollTop: a}, 500);
   } else {
     $('body').addClass('hold_comment');
     setTimeout(function() {
@@ -70,6 +76,7 @@ $(document).off('click','.jump-to').on('click','.jump-to', function(b) {
     },2000);
   }
 });
+
 
 makeStyle("\
 .comments_pinner:before {\

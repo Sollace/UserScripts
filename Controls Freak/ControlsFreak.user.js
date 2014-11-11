@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.4
+// @version     1.3.5
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -161,6 +161,49 @@ $(document).ready(function () {
     color: #fff;}\
 .user_toolbar > ul > li > .mail-link, .user_toolbar > ul > li > .notifications-link, .user_toolbar > ul > li > .feed-link  {\
     margin-top: -1px;}\
+@media all and (max-width: 700px) {\
+  .user_toolbar .notifications-link:before,\
+  .user_toolbar .mail-link:before,\
+  .user_toolbar .feed-link:before {\
+    font-size: 16px;\
+    vertical-align: middle;\
+    width: 30px;\
+    text-align: center;}\
+  .user_toolbar > ul li ul .notifications-link:before,\
+  .user_toolbar > ul li ul .mail-link:before,\
+  .user_toolbar > ul li ul .feed-link:before {\
+    background: none !important;\
+    color: #9699A8 !important;\
+    border: none !important;\
+    width: 24px !important;}\
+  .user_toolbar .notifications-link:after,\
+  .user_toolbar .mail-link:after,\
+  .user_toolbar .feed-link:after {\
+    margin-left: 5px;}\
+  .user_toolbar .drop-down.drop-down-notifications,\
+  .user_toolbar .drop-down.drop-down-private-messages {\
+    left: 0px !important;}\
+  .user_toolbar > ul ul li div.drop-down.drop-down-notifications,\
+  .user_toolbar > ul ul li div.drop-down.drop-down-private-messages {\
+    position: initial;\
+    width: 100%;\
+    border-radius: 5px;}\
+  .user_toolbar .drop-down.drop-down-notifications ul,\
+  .user_toolbar .drop-down.drop-down-private-messages ul {\
+    background: #fff !important;\
+    box-shadow: none !important;\
+    padding: 0px !important;\
+    margin: 0px !important;\
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;\
+    border-radius: 0px !important;}\
+  .user_toolbar .drop-down.drop-down-notifications li,\
+  .user_toolbar .drop-down.drop-down-private-messages li {\
+    color: rgba(0, 0, 0, 0.85) !important;}\
+  .user_toolbar.show > ul {\
+    overflow: visible !important;}\
+  .user_toolbar > ul > #private-message-drop-down.hover ~ li,\
+  .user_toolbar > ul > #notifications-drop-down.hover ~ li {\
+    display: none;}}\
 .user_toolbar .notifications-link:before {\
     content: "";}\
 .user_toolbar .mail-link:before {\
@@ -169,15 +212,14 @@ $(document).ready(function () {
     content: "";}\
 .user_toolbar li > a > div[id^="num"], .user_toolbar li > .mail-link > div {\
     display: none;}\
-@media all and (min-width: 700px) {\
-    .user_toolbar li > a.new > div[id^="num"], .user_toolbar li > .mail-link.new > div {\
-        display: inline;}\
-    .user_toolbar .notifications-link:not(.new):after {\
-        content: "Notes";}\
-    .user_toolbar .mail-link:not(.new):after {\
-        content: "Mail";}\
-    .user_toolbar .feed-link:not(.new):after {\
-        content: "Feed";}}\
+.user_toolbar li > a.new > div[id^="num"], .user_toolbar li > .mail-link.new > div {\
+  display: inline;}\
+.user_toolbar .notifications-link:not(.new):after {\
+  content: "Notes";}\
+.user_toolbar .mail-link:not(.new):after {\
+  content: "Mail";}\
+.user_toolbar .feed-link:not(.new):after {\
+  content: "Feed";}\
 .user_toolbar .notifications-link.new,\
 .user_toolbar .mail-link.new,\
 .user_toolbar .feed-link.new {\
@@ -344,7 +386,7 @@ $(document).ready(function () {
     background: none;\
     display: inline;}\
 .user_toolbar .drop-down-header {\
-    border-bottom: 1px solid #CCC;}\
+    border-bottom: 1px solid #CCC;\}\
 .user_toolbar .drop-down-footer, .user_toolbar .drop-down-header {\
     background: none repeat scroll 0% 0% #EEE;\
     padding: 3px 8px;\
