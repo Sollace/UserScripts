@@ -1,4 +1,4 @@
-// ==UserScript==
+ // ==UserScript==
 // @name        Dark Tube
 // @namespace   youtube
 // @include     http://www.youtube.com/*
@@ -76,7 +76,7 @@ var mainCss = '\
 .yt-uix-button-icon-footer-language,\
 .yt-uix-button-icon-questionmark,\
 .yt-uix-button-icon-sprite_send_message,\
-.yt-uix-button-icon-watch-like, .yt-uix-button-icon-watch-dislike {\
+.yt-uix-button-icon-watch-like, .yt-uix-button-icon-watch-dislike, .ad-info-icon {\
     background-image: url(' + resources.highjacker + ') !important;}\
 \
 .dashboard-widget-handle {\
@@ -155,13 +155,20 @@ var mainCss = '\
     background-image: url(' + resources.editor + ') !important;}\
 \
 /*Highjacker positions*/\
+.ad-info-icon {\
+  background-position: -177px -4px !important;\
+  opacity: 0.6;}\
 .actionable .yt-uix-button:active .yt-uix-button-icon-watch-like,\
+.actionable .yt-uix-button[title="Unlike"] .yt-uix-button-icon-watch-like,\
 .actionable .yt-uix-button.yt-uix-button-toggled .yt-uix-button-icon-watch-like {\
-  background-position: -24px -39px !important;}\
+    opacity: 1;\
+    background-position: -24px -39px !important;}\
 .yt-uix-button-icon-watch-like {\
-  background-position: -2px -39px !important;}\
+    background-position: -2px -39px !important;}\
 .yt-uix-button-icon-watch-dislike {\
-  background-position: -46px -40px !important;}\
+    background-position: -46px -40px !important;}\
+.yt-uix-button-icon-watch-like, .yt-uix-button-icon-watch-dislike {\
+    opacity: 0.6;}\
 .yt-uix-button-icon-sprite_send_message {\
     opacity: 0.6;\
     background-position: -44px -22px !important;}\
@@ -341,10 +348,9 @@ var mainCss = '\
         background-color: #1d1d1d !important;}\
     .branded-page-v2-secondary-col .branded-page-related-channels-see-more a:hover {\
         color: #2793e6 !important;}\
+    .branded-page-v2-masthead-ad-header.masthead-ad-expanded .branded-page-v2-primary-col,\
     .branded-page-v2-has-solid-bg .branded-page-v2-secondary-col {\
         border-color: #303030 !important;}\
-    .branded-page-v2-masthead-ad-header.masthead-ad-expanded .branded-page-v2-primary-col {\
-        border-top: none !important;}\
     .branded-page-v2-subnav-container, #c4-header-bg-container, #channel-subheader, .welcome.c4-spotlight-module-component, .c4-box {\
         border-bottom-color: #303030 !important;}\
     .c4-welcome-primary-col {\
@@ -532,7 +538,7 @@ var mainCss = '\
     .subscriptions-filter .filter-field-container {\
         border-color: #303030 !important;\
         background: #000 !important;}\
-    .pl-header-inlineedit .c4-module-is-editable:hover,\
+    .pl-header-inlineedit .c4-module-is-editable:hover, .pl-message-panel .panel-content,\
     #subscription-manager-container .even td, .pl-video-list-editable .pl-video:hover .pl-video-handle, .yt-uix-dragdrop-cursor-follower, .yt-uix-dragdrop-cursor-follower tr, .yt-uix-dragdrop-cursor-follower .pl-video-handle,\
     #collections-container, #subscriptions-container {\
         background: #222 !important;\
@@ -1043,7 +1049,7 @@ var mainCss = '\
         border-bottom-color: #303030 !important;}\
     #watch7-user-header .yt-user-name {\
         color: #2793e6 !important;}\
-    #eow-title,\
+    #eow-title, #watch7-user-header .yt-user-info a,\
     .yt-uix-button img, .yt-uix-button-icon-wrapper+.yt-uix-button-content,\
     .yt-default h1, .yt-default h2, .yt-default h3, .yt-default h4, .yt-default h5, .yt-default h6, h1.yt, h2.yt, h3.yt, h4.yt, h5.yt, h6.yt {\
         color: #888 !important;}\
@@ -1081,9 +1087,10 @@ var mainCss = '\
     .yt-uix-form-input-checkbox, .yt-uix-form-input-checkbox-element {\
         background: #2a2a2a !important;\
         border-color: #555 !important;}\
-    .yt-badge {\
+    .yt-badge-ad, .yt-badge {\
         border-color: #303030 !important;\
-        color: #aaa !important;}\
+        color: #555 !important;\
+        border-radius: 3px;}\
     .no-adsense-text .yt-uix-button {\
         color: #fff !important;}\
     #google-cookie-alert {\
@@ -1292,7 +1299,7 @@ div[role=menuitem] * {\
 div[role=menuitem]:hover {\
   background: #333 !important;}\
 button[name="cancel"] {\
-  color: #aaa!important;\
+  color: #aaa !important;\
   border-color: #303030 !important;\
   box-shadow: none !important;\
   outline-color: black;\
@@ -1344,7 +1351,7 @@ button[name="cancel"]:hover {\
     background-color: rgba(0,0,0,0.2) !important;}\
 .proflink, .proflinkPrefix, .Ct {\
     color: #aaa;}\
-.Ct > a {\
+.M7Fqc, .Ct > a {\
     color: #bbb !important;}\
 .r0, .d-y-r-c, div[class="tvb yDa"], .xN {\
     border-color: #303030 !important;\
