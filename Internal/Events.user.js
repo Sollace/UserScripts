@@ -121,4 +121,3 @@
     })();
   }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
-alert('yay');
