@@ -2,14 +2,14 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2
+// @version     1.2.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
 (function (win) {
-  var ver = 1.2;
+  var ver = 1.21;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -63,7 +63,7 @@
     
   if (startup) {
     (function() {
-      var originalprototype = win.AjaxRequest.prototype;
+      var original = win.AjaxRequest;
       win.AjaxRequest = function(a) {
         var event = win.FimFicEvents.getEventName(a.url);
         if (event != null) {
@@ -84,9 +84,11 @@
             win.FimFicEvents.trigger('after' + event.eventName, event);
           };
         }
-        originalprototype.constructor.apply(this, [a]);
+        return original.prototype.constructor.apply(this, [a]);
       }
-      AjaxRequest.prototype = originalprototype;
+      for (var i in original) {
+        win.AjaxRequest[i] = original[i];
+      }
     })();
     win.$.ajax = (function() {
       win.$.__ajax = win.$.ajax;
@@ -119,3 +121,4 @@
     })();
   }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
+alert('yay');
