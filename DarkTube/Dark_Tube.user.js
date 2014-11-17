@@ -1496,8 +1496,7 @@ var buttonStyle = '\
     bottom: 0px !important;\
     opacity: 1;}';
 
-var theme = GM_getValue("theme", "Switch");;
-theme = "Dark";
+var theme = getTheme();
 run();
 
 function run() {
@@ -1513,53 +1512,35 @@ function run() {
         }
         but.name = "themeButton";
         but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
-
         but.onclick = function () {
             if (theme == "Dark") {
                 switchToLight();
             } else {
                 switchToDark();
             }
+            reloadComments();
             this.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
         }
         
         if (theme == "Dark") {
             switchToDark();
-        } else if (theme == "Light") {
-            switchToLight();
-        }
-    } else if (document.location.href.indexOf('https://plus.google.com') == 0 && document.location.href.indexOf('/notifications/frame') != -1) {
-        if (theme == "Dark") {
-            createStyleTag(noticesCss);
-        } else if (theme == "Light") {
-            removeCss();
-        }
-    } else if (document.getElementById('player') == null) {
-        if (document.location.href.indexOf('https://plus.google.com/_/up/widget') == 0) {
-            if (document.location.href.indexOf('parent=https%3A%2F%2Fwww.youtube.com') != -1) {
-                if (theme == "Dark") {
-                    createStyleTag(googlePlusCss);
-                } else if (theme == "Light") {
-                    removeCss();
-                }
-            }
-        } else if (document.location.href.indexOf('https://apis.google.com') == 0 && document.location.href.indexOf('hovercard/internalcard') != -1) {
-            if (theme == "Dark") {
-                createStyleTag(hoverCardCss);
-            } else if (theme == "Light") {
-                removeCss();
-            }
-        } else if (document.location.href.indexOf('subscribe_embed') != -1) {
-            if (theme == "Dark") {
-                createStyleTag(subEmbedCss);
-            } else if (theme == "Light") {
-                removeCss();
-            }
         } else {
-            if (theme == "Dark") {
-                createStyleTag(commentsCss);
-            } else if (theme == "Light") {
-                removeCss();
+            setTheme("Light");
+        }
+    } else {
+        if (theme == "Dark") {
+            if (document.location.href.indexOf('https://plus.google.com') == 0 && document.location.href.indexOf('/notifications/frame') != -1) {
+                addCss(noticesCss);
+            } else if (document.getElementById('player') == null) {
+                if (document.location.href.indexOf('https://plus.google.com/_/up/widget') == 0 && document.location.href.indexOf('parent=https%3A%2F%2Fwww.youtube.com') != -1) {
+                    addCss(googlePlusCss);
+                } else if (document.location.href.indexOf('https://apis.google.com') == 0 && document.location.href.indexOf('hovercard/internalcard') != -1) {
+                    addCss(hoverCardCss);
+                } else if (document.location.href.indexOf('subscribe_embed') != -1) {
+                    addCss(subEmbedCss);
+                } else {
+                    addCss(commentsCss);
+                }
             }
         }
     }
@@ -1569,29 +1550,14 @@ function removeCss() {
     $('style[name="darkYouTubeTheme"]').remove();
 }
 
-function updatePlayer() {
-    $('.watch-medium').addClass('watch-large');
-    $('.watch-medium').removeClass('watch-medium');
-}
-
-function insertCss(css) {
-    if (theme == "Dark") {
-        createStyleTag(css);
-    } else if (theme == "Light") {
-        removeCss();
-    }
-}
-
 function switchToDark() {
-    createStyleTag(mainCss + subEmbedCss);
+    addCss(mainCss + subEmbedCss);
     setTheme("Dark");
-    reloadComments();
 }
 
 function switchToLight() {
     removeCss();
     setTheme("Light");
-    reloadComments();
 }
 
 function reloadComments() {
@@ -1602,12 +1568,15 @@ function reloadComments() {
             var oldsrc = split[0] + "?r=2&" + split[1];
             this.src = oldsrc;
         });
-    } catch (e) {
-    }
+    } catch (e) {}
+}
+
+function getTheme() {
+    return GM_getValue("theme", "Switch")
 }
 
 function setTheme(val) {
-    theme = val;
+    GM_setValue("theme", theme = val);
 }
 
 function createButton() {
@@ -1618,7 +1587,7 @@ function createButton() {
     return result;
 }
 
-function createStyleTag(sheet) {
+function addCss(sheet) {
     var result = document.createElement("style");
     result.setAttribute("type", "text/css");
     result.setAttribute("name", "darkYouTubeTheme");
