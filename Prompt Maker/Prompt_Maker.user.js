@@ -230,7 +230,7 @@ try {
         profession: ['{pfp}', '{pfp} {pfn}', '{pfn} {pfp}', '{pfnn} {pfp}'],
         pfp: [
             'Spy', 'Farmer', 'Doctor', 'Teacher', 'Dentist', 'Detective',
-            'Accountant', 'Politition', 'Lawyer', 'Singer', 'DJ', 'Cook', 'Baker',
+            'Accountant', 'Politicion', 'Lawyer', 'Singer', 'DJ', 'Cook', 'Baker',
             'Mailmare', 'Milkmare', 'Librarian','Medic'
         ],
         pfn: ['Killer', 'Pimp', 'Slaver', 'Prostitute','Pyromaniac'],
