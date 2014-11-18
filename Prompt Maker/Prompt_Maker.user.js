@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4.2
+// @version     1.4.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -11,347 +11,350 @@
 var logger = new Logger('Prompt Maker',5)
 try {
     run({
-    pattern: [
-        '{pattern_1}!',
-        '{pattern_2}.',
-        '{pattern_3}.',
-        '{pattern_2} whilst [pattern_2].',
-        '{pattern_3} and {pattern_2}.'
-    ],
-    pattern_1: [
-        'Nanananananananaanananananananananananaanananananananananananananan BATMARE',
-        'Button\s Mom has got it goin\' on',
-        '{name} everywhere',
-        '{creature}s everywhere',
-        'a horde of {creature_plural} attack {place_or_name}',
-        'a horde of {creature_plural} attack {name_nonequestrian}',
-        '{name_equestrian} meets {fandom}',
-        '{name_nonequestrian} is a {fandom_singular}',
-        '{race_plural} everywhere',
-        '{place} is invaded by {enemy}',
-        '{pattern_2} and {pattern_3}',
-        '{name} {i_present} a {weapon_singular}',
-        '{name} {i_past} {weapon_plural}',
-        '{place} is {name}\'s new home'
-    ],
-    pattern_2: [
-        '{place} {is_or_was} {verbed} by {enemy}',
-        '{name_nonequestrian} {place_phrase_non_eq}',
-        '{name_equestrian} {place_phrase_eq}',
-        '{place} and [place] {action_object}',
-        '{place} is {verbed} by {name}',
-        'The {enemy_plural} use {power} to {verb_enemy}',
-        '{name} and [name] {action}',
-        '{name} {name_does}',
-        '{name} {does_to} [name]',
-        '{name_pony_titled_evil} comes to {place_non_eq}'
-    ],
-    pattern_3: [
-        '{name_equestrian}\'s cute-ceneara is {adv_phrase}',
-        '{name_equestrian}\'s {bodypart_phrase}',
-        '{name} is {done_by} by [name]',
-        '{name} {change} [name]',
-        '{name} {object_phrase}',
-        '{name} is {is}',
-        '{name} is a {profession}',
-        '{name} is a {race}',
-        '{name} is taken to {place_or_name}',
-        '{name} tries to {done_food} {food}',
-        '{name} {change} {name_or_race}',
-        '{name} {verbed_2} The Element of {element}',
-        '{name} gets a new {bodypart_singular}',
-        '{name}\'s {bodypart_singular} is fake',
-        '{name}\'s {bodypart_plural} are fake'
-    ],
-    verbed_2: ['discovers', 'is','breaks','steals','{done_food}','{i_present}'],
-    verbed: ['taken over','destroyed'],
-    is_or_was: ['is','was','gets'],
-    place_or_name: ['{name_equestrian}','{place}'],
-    name_or_race: ['{name_pony_titled_evil}', 'a {race}'],
-    enemy_or_race: ['{enemy}', '{race_plural}'],
-    verb_enemy: [
-        'invade {place}',
-        'defeat {name}'
-    ],
-    weapon_phrase: [
-        '{weapon_plural} are', 'a {weapon_singular} is', 'a {weapon_singular} was',
-        '{weapon_plural} aren\'t', '{weapon_plural} weren\'t', '{weapon_singular} wasn\'t',
-        '{weapon_plural} must be', '{weapon_plural} must not be'
-    ],
-    weapon: [
-        '{weapon_plural}',
-        'a {weapon_singular}'
-    ],
-    weapon_plural: [
-        'guns', 'cars', 'politics', 'banks', 'space Travel', 'contraceptives'
-    ],
-    weapon_singular: [
-        'gun', 'car', 'bank', 'contraceptive'
-    ],
-    bodypart_phrase: [
-        '{bodypart_singular} {does_object_singular}',
-        'eyebrow {does_object_singular}',
-        '{bodypart} {does_object}'
-    ],
-    bodypart: ['{bodypart_plural}', '{bodypart_singular}'],
-    bodypart_plural: [
-        'hooves','horns','wings','legs','teeth','wings','eyebrows'
-    ],
-    bodypart_singular: [
-        'cutiemark','hoof','horn','wing','tail','mane','legs','tooth','tongue','dick'
-    ],
-    place: ['{place_eq}', 'Equestria', 'The Moon', 'Earth', 'Tartarus'],
-    place_phrase_eq: [
-        '{conj_place} {place_eq}',
-        '{conj_place_to_0} Tartarus',
-        '{conj_place_to} {place_non_eq}'],
-    place_phrase_non_eq: [
-        '{conj_place_to} {place_eq}',
-        '{conj_place_to_0} Tartarus'],
-    place_eq: [
-        'Appleloosa',
-        'Carousel Boutique',
-        'Castle of the Two Sisters',
-        'Dodge Junction',
-        'Everfree Forest',
-        'Golden Oak Library',
-        'the School House',
-        'Sugarcube Corner',
-        'Wonderbolt Academy',
-        '{name_pony}\'s house',
-        'Canterlot',
-        'Trottingham',
-        'Sweet Apple Acres',
-        'Manehatten',
-        'Cloudsdale',
-        'Prance',
-        'Ponyville',
-        'Twilight\'s Castle',
-        'The Crystal Empire',
-        'Frostdale',
-        'Canterlot High'
-    ],
-    place_non_eq: [
-        'Earth', 'New York', 'London', 'California', 'The Moon','Africa','Britain','China','Japan','Australia'
-    ],
-    conj_place: [
-        '{conj_place_away}','{conj_place_to}'
-    ],
-    conj_place_to: [
-        'comes to',
-        '{conj_place_to_1}'
-    ],
-    conj_place_to_0: [
-        'comes from',
-        '{conj_place_to_1}'
-    ],
-    conj_place_to_1: [
-        'visits',
-        'goes to'
-    ],
-    conj_place_away: [
-        'leaves'
-    ],
-    enemy: ['{enemy_plural}', '{enemy_odd}', 'a horde of zombies'],
-    enemy_plural: [
-        'Changelings',
-        '{enemy_odd}'
-    ],
-    enemy_odd: [
-        'Aliens',
-        'Humans',
-        'Timelords'
-    ],
-    name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
-    name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
-    name_pony: [
-        '{name_pony_first}', 'Princess {name_pony_first}',
-        'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch','Suri Polomare',
-        'Sweetie Belle','Rainbow Dash',
-        'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie',
-        'Dr. Hooves','Hayseed Turnip Truck','Aunt Orange','Uncle Orange','Goldie Delicious',
-        'Cherry Jubilee','Photo Finish','Button\'s Mom','Prince Blue Blood','Sunny Daze','Peachy Pie',
-        'Granny Smith','Big Macintosh','Cheese Sandwich','Berry Punch','Night Light','Twilight Velvet',
-        'Hoity Toity','Sapphire Shores','Fancy Pants','Daring Do','Prim Hemline','Mayor Mare','Hondo Flanks','Cookie Crumbles',
-        'Jet Set','Upper Crust','Fleur Dis Lee','Filthy Rich','Cloud Chaser','Bulk Biceps','Lightning Dust','Ms. Peachbottom','Ms. Harshwhinny','Flash Sentry',
-        'Coco Pommel','Silver Shill','Teddie Safari','Nurse Redheart','Doctor Horse','Dr. Hooves','Nurse Ponies',
-        'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Clover the Clever'
-    ],
-    name_pony_young: [
-        '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','The Cake Twins','Button Mash','Berry Pinch'
-    ],
-    name_inanimate: [
-        'Bloomberg','Pinkie\'s imaginary friends','Tom','Mr. Smarty Pants'
-    ],
-    name_pet: [
-        'Angel Bunny','Winona','Opalescence','Gummy','Philomena','Owlowicious','Tank','Peewee','Tiberius','Cerberus'
-    ],
-    name_nonpony: [
-        'Steven Magnet','Steve Magnum',
-        'Zecora','Cranky Doodle Donkey','Cranky Doodle Dandy','Matilda','Mulia Mild','Little Strongheart','Chief Thunderhooves','Iron Will','Gustave le Grand',
-        'Spike','Sea Breeze','Tirek','Scorpan','Discord','MMMMM','Queen Chrysalis','Spa Ponies','Star Swirl the Bearded','The Ponytones','The Power Ponies','Hum Drum',
-        'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
-    ],
-    name_nonequestrian: [
-        'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto',
-        'Optimus Prime','Starscream','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris'
-    ],
-    name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
-    name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
-    name_pony_1: ['{name_pony_first}','{name_pony_last}', '{name_pony_first_young}'],
-    name_pony_first: [
-        'Celestia','Luna','Cadance','Flim','Flam','Cheerilee','Gizmo',
-        'Twilight','Applejack','Rarity','Fluttershy','Sombra','Joe',
-        'Trixie','Fluffle Puff','Alo','Lotus',
-        'Big Mac','Spitfire','sauren','Fleetfoot',
-        'Lyra', 'Derpy','Octavia','Roseluck','Thunderlane',
-        'Maud','Tenderhoof','Junebug','Flitter','Blossomforth'
-    ],
-    name_pony_first_young: [
-        'Featherweight','Pipsqueak','Snips','Snails','Runble','Dinky','Twist','Nyx','Scootaloo','Applebloom'
-    ],
-    name_pony_last: ['Belle','Dash','Tiara','Spoon','Moon','Seed','Bon','Pie','Chrysalis'],
-    race: [
-        'Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Breezie',
-        'Parasprite','Pheonix','Timberwolf','Fruit Bat','Windigos'
-    ],
-    race_plural: [
-        'Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones',
-        'Parasprites','Pheonixes','Timberwolves','Fruit Bats','Windigo'
-    ],
-    creature_plural: [
-        '{creature_0}s','{creature_0}es'
-    ],
-    creature_singular: [
-        '{creature_0}','{creature_0}'
-    ],
-    creature_0: [
-        'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm',
-        'Diamond Dog'
-    ],
-    creature_1: [
-        'Orthros'
-    ],
-    fandom: ['a {fandom_singular}','{fandom_plural}'],
-    fandom_singular: ['Brony','Furry','Anti-Brony'],
-    fandom_plural: ['Bronies','Furries','Anti-Bronies'],
-    power: [
-        'The Element of {element}', 'the magic of {element}'
-    ],
-    element: [
-        'Honesty', 'Love', 'Loyalty', 'Generosity', 'Kindness', 'Magic',
-        'Deceit', 'Hate', 'Dishonor', 'Selfishness', 'Pride','Murder'
-    ],
-    object_phrase: [
-        '{does_with} a {descriptor} {object}',
-        '{does_with} a {object}',
-        '{done_food}s {food}'
-    ],
-    descriptor: [
-        'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
-    ],
-    object: [
-        'Tree of Harmony',
-        'bottle',
-        'cloud',
-        'rainbow',
-        'baby',
-        'cow',
-        'Alicorn Amulet',
-        'Kitchen Sink',
-        'MMMMM',
-        '{food_1} sandwich',
-        '{food_2} sandwich'
-    ],
-    food: ['a {food_2}','{food_1}'],
-    food_1: [
-        'chocolate',
-        'pie',
-        'apple pie',
-        'melon',
-        'water melon'
-    ],
-    food_2: [
-        'carrot',
-        'berry',
-        'cake',
-        'apple',
-        '{cheese} cheese'
-    ],
-    cheese: [
-        'block of',
-        'slice of'
-    ],
-    profession: ['{pfp}', '{pfp} {pfn}', '{pfn} {pfp}', '{pfnn} {pfp}'],
-    pfp: [
-        'Spy', 'Farmer', 'Doctor', 'Teacher', 'Dentist', 'Detective',
-        'Accountant', 'Politition', 'Lawyer', 'Singer', 'DJ', 'Cook', 'Baker',
-        'Mailmare', 'Milkmare', 'Librarian','Medic'
-    ],
-    pfn: ['Killer', 'Pimp', 'Slaver', 'Prostitute','Pyromaniac'],
-    pfnn: ['Serial Killing', 'Pimping', 'Horrible'],
-    action: ['merge', 'switch {acted}', 'share {acted}', 'have sex', 'plot','become separated','meet','meet {repeated}','team up'],
-    action_object: ['merge','switch','collide','meet','meet {repeated}','become separated','smash together'],
-    repeated: ['again','for the {nth} time'],
-    nth: ['first','last','(n)'],
-    acted: ['places', 'bodies', 'families', 'jobs', 'brains', 'race'],
-    is: [
-        'dead',
-        'kidnapped',
-        'bloated',
-        'pregnant',
-        'evil',
-        'undead',
-        'gay',
-        'a filly'
-    ],
-    i_present: [
-        'invents', 'discovers', 'uses'
-    ],
-    i_past: [
-        'invented', 'discovered', 'used'
-    ],
-    adv_phrase: [
-        'a {adv}', 'a complete {adv}', '{adv_2}'
-    ],
-    adv: [
-        'disaster', 'success'
-    ],
-    adv_2: [
-        'ruined'
-    ],
-    done_by: ['eaten','taken','killed','murdered'],
-    change: ['takes', 'meets', '{does_to}', 'turns into'],
-    does_to: [
-        'defeats',
-        'kidnaps',
-        'makes sweet, sweet love to',
-        'loves',
-        'hates',
-        'marries',
-        'is',
-        'kills',
-        'is killed by',
-        'shrinks',
-        'cheats on'
-    ],
-    name_does: [
-        'travels through space',
-        'travels through space and time',
-        'uses contraceptives',
-        'forgets to use contraceptives',
-        '{is_done}',
-        '{does_2} drugs',
-        'accidentally {does_2} drugs'
-    ],
-    does_with: ['forgets','eats','has','cooks','{is_done} on'],
-    is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
-    does_object: ['fall off', 'break', 'swell up'],
-    does_object_singular: ['falls off', 'breaks', 'swells up'],
-    does_2: ['takes', 'sells', 'trips', 'buys', 'eats','gives up'],
-    done_food: ['eat','buy','sell','cook']
-});
-} catch (e) {logger.SeverException('UnhadledException: {0}', e);}
+        pattern: [
+            '{pattern_0}.',
+            '{pattern_1}!',
+            '{pattern_2}.',
+            '{pattern_3}.'
+        ],
+        pattern_0: [
+            '{pattern_2} whilst [pattern_2]',
+            '{pattern_2} and {pattern_3}'
+        ],
+        pattern_1: [
+            'Nanananananananaanananananananananananaanananananananananananananan BATMARE',
+            'Button\s Mom has got it goin\' on',
+            '{name} everywhere',
+            '{creature_plural} everywhere',
+            'a horde of {creature_plural} attack {place_or_name}',
+            'a horde of {creature_plural} attack {name_nonequestrian}',
+            '{name_equestrian} meets {fandom}',
+            '{name_nonequestrian} is a {fandom_singular}',
+            '{race_plural} everywhere',
+            '{place} is invaded by {enemy}',
+            '{name} {i_present} a {weapon_singular}',
+            '{name} {i_past} {weapon_plural}',
+            '{place} is {name}\'s new home'
+        ],
+        pattern_2: [
+            '{place} {is_or_was} {verbed} by {enemy}',
+            '{name_nonequestrian} {place_phrase_non_eq}',
+            '{name_equestrian} {place_phrase_eq}',
+            '{place} and [place] {action_object}',
+            '{place} is {verbed} by {name}',
+            'The {enemy_plural} use {power} to {verb_enemy}',
+            '{name} and [name] {action}',
+            '{name} {name_does}',
+            '{name} {does_to} [name]',
+            '{name_pony_titled_evil} comes to {place_non_eq}'
+        ],
+        pattern_3: [
+            '{name_equestrian}\'s cute-ceneara is {adv_phrase}',
+            '{name_equestrian}\'s {bodypart_phrase}',
+            '{name} is {done_by} by [name]',
+            '{name} {change} [name]',
+            '{name} {object_phrase}',
+            '{name} is {is}',
+            '{name} is a {profession}',
+            '{name} is a {race}',
+            '{name} is taken to {place_or_name}',
+            '{name} tries to {done_food} {food}',
+            '{name} {change} {name_or_race}',
+            '{name} {verbed_2} The Element of {element}',
+            '{name} gets a new {bodypart_singular}',
+            '{name}\'s {bodypart_singular} is fake',
+            '{name}\'s {bodypart_plural} are fake'
+        ],
+        verbed_2: ['discovers', 'is','breaks','steals','{done_food}','{i_present}'],
+        verbed: ['taken over','destroyed'],
+        is_or_was: ['is','was','gets'],
+        place_or_name: ['{name_equestrian}','{place}'],
+        name_or_race: ['{name_pony_titled_evil}', 'a {race}'],
+        enemy_or_race: ['{enemy}', '{race_plural}'],
+        verb_enemy: [
+            'invade {place}',
+            'defeat {name}'
+        ],
+        weapon_phrase: [
+            '{weapon_plural} are', 'a {weapon_singular} is', 'a {weapon_singular} was',
+            '{weapon_plural} aren\'t', '{weapon_plural} weren\'t', '{weapon_singular} wasn\'t',
+            '{weapon_plural} must be', '{weapon_plural} must not be'
+        ],
+        weapon: [
+            '{weapon_plural}',
+            'a {weapon_singular}'
+        ],
+        weapon_plural: [
+            'guns', 'cars', 'politics', 'banks', 'space Travel', 'contraceptives'
+        ],
+        weapon_singular: [
+            'gun', 'car', 'bank', 'contraceptive'
+        ],
+        bodypart_phrase: [
+            '{bodypart_singular} {does_object_singular}',
+            'eyebrow {does_object_singular}',
+            '{bodypart} {does_object}'
+        ],
+        bodypart: ['{bodypart_plural}', '{bodypart_singular}'],
+        bodypart_plural: [
+            'hooves','horns','wings','legs','teeth','wings','eyebrows'
+        ],
+        bodypart_singular: [
+            'cutiemark','hoof','horn','wing','tail','mane','legs','tooth','tongue','dick'
+        ],
+        place: ['{place_eq}', 'Equestria', 'The Moon', 'Earth', 'Tartarus'],
+        place_phrase_eq: [
+            '{conj_place} {place_eq}',
+            '{conj_place_to_0} Tartarus',
+            '{conj_place_to} {place_non_eq}'],
+        place_phrase_non_eq: [
+            '{conj_place_to} {place_eq}',
+            '{conj_place_to_0} Tartarus'],
+        place_eq: [
+            'Appleloosa',
+            'Carousel Boutique',
+            'Castle of the Two Sisters',
+            'Dodge Junction',
+            'Everfree Forest',
+            'Golden Oak Library',
+            'the School House',
+            'Sugarcube Corner',
+            'Wonderbolt Academy',
+            '{name_pony}\'s house',
+            'Canterlot',
+            'Trottingham',
+            'Sweet Apple Acres',
+            'Manehatten',
+            'Cloudsdale',
+            'Prance',
+            'Ponyville',
+            'Twilight\'s Castle',
+            'The Crystal Empire',
+            'Frostdale',
+            'Canterlot High'
+        ],
+        place_non_eq: [
+            'Earth', 'New York', 'London', 'California', 'The Moon','Africa','Britain','China','Japan','Australia'
+        ],
+        conj_place: [
+            '{conj_place_away}','{conj_place_to}'
+        ],
+        conj_place_to: [
+            'comes to',
+            '{conj_place_to_1}'
+        ],
+        conj_place_to_0: [
+            'comes from',
+            '{conj_place_to_1}'
+        ],
+        conj_place_to_1: [
+            'visits',
+            'goes to'
+        ],
+        conj_place_away: [
+            'leaves'
+        ],
+        enemy: ['{enemy_plural}', '{enemy_odd}', 'a horde of zombies'],
+        enemy_plural: [
+            'Changelings',
+            '{enemy_odd}'
+        ],
+        enemy_odd: [
+            'Aliens',
+            'Humans',
+            'Timelords'
+        ],
+        creature_plural: [
+            '{creature_0}s','{creature_0}es'
+        ],
+        creature_singular: [
+            '{creature_0}','{creature_0}'
+        ],
+        creature_0: [
+            'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm',
+            'Diamond Dog'
+        ],
+        creature_1: [
+            'Orthros'
+        ],
+        fandom: ['a {fandom_singular}','{fandom_plural}'],
+        fandom_singular: ['Brony','Furry','Anti-Brony'],
+        fandom_plural: ['Bronies','Furries','Anti-Bronies'],
+        power: [
+            'The Element of {element}', 'the magic of {element}'
+        ],
+        element: [
+            'Honesty', 'Love', 'Loyalty', 'Generosity', 'Kindness', 'Magic',
+            'Deceit', 'Hate', 'Dishonor', 'Selfishness', 'Pride','Murder'
+        ],
+        object_phrase: [
+            '{does_with} a {descriptor} {object}',
+            '{does_with} a {object}',
+            '{done_food}s {food}'
+        ],
+        descriptor: [
+            'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
+        ],
+        object: [
+            'Tree of Harmony',
+            'bottle',
+            'cloud',
+            'rainbow',
+            'baby',
+            'cow',
+            'Alicorn Amulet',
+            'Kitchen Sink',
+            'MMMMM',
+            '{food_1} sandwich',
+            '{food_2} sandwich'
+        ],
+        food: ['a {food_2}','{food_1}'],
+        food_1: [
+            'chocolate',
+            'pie',
+            'apple pie',
+            'melon',
+            'water melon'
+        ],
+        food_2: [
+            'carrot',
+            'berry',
+            'cake',
+            'apple',
+            '{cheese} cheese'
+        ],
+        cheese: [
+            'block of',
+            'slice of'
+        ],
+        profession: ['{pfp}', '{pfp} {pfn}', '{pfn} {pfp}', '{pfnn} {pfp}'],
+        pfp: [
+            'Spy', 'Farmer', 'Doctor', 'Teacher', 'Dentist', 'Detective',
+            'Accountant', 'Politition', 'Lawyer', 'Singer', 'DJ', 'Cook', 'Baker',
+            'Mailmare', 'Milkmare', 'Librarian','Medic'
+        ],
+        pfn: ['Killer', 'Pimp', 'Slaver', 'Prostitute','Pyromaniac'],
+        pfnn: ['Serial Killing', 'Pimping', 'Horrible'],
+        action: ['merge', 'switch {acted}', 'share {acted}', 'have sex', 'plot','become separated','meet','meet {repeated}','team up'],
+        action_object: ['merge','switch','collide','meet','meet {repeated}','become separated','smash together'],
+        repeated: ['again','for the {nth} time'],
+        nth: ['first','last','(n)'],
+        acted: ['places', 'bodies', 'families', 'jobs', 'brains', 'race'],
+        is: [
+            'dead',
+            'kidnapped',
+            'bloated',
+            'pregnant',
+            'evil',
+            'undead',
+            'gay',
+            'a filly'
+        ],
+        i_present: [
+            'invents', 'discovers', 'uses'
+        ],
+        i_past: [
+            'invented', 'discovered', 'used'
+        ],
+        adv_phrase: [
+            'a {adv}', 'a complete {adv}', '{adv_2}'
+        ],
+        adv: [
+            'disaster', 'success'
+        ],
+        adv_2: [
+            'ruined'
+        ],
+        done_by: ['eaten','taken','killed','murdered'],
+        change: ['takes', 'meets', '{does_to}', 'turns into'],
+        does_to: [
+            'defeats',
+            'kidnaps',
+            'makes sweet, sweet love to',
+            'loves',
+            'hates',
+            'marries',
+            'is',
+            'kills',
+            'is killed by',
+            'shrinks',
+            'cheats on'
+        ],
+        name_does: [
+            'travels through space',
+            'travels through space and time',
+            'uses contraceptives',
+            'forgets to use contraceptives',
+            '{is_done}',
+            '{does_2} drugs',
+            'accidentally {does_3} drugs'
+        ],
+        does_with: ['forgets','eats','has','cooks','{is_done} on'],
+        is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
+        does_object: ['fall off', 'break', 'swell up'],
+        does_object_singular: ['falls off', 'breaks', 'swells up'],
+        does_2: ['gives up', 'cooks', '{does_3}'],
+        does_3: ['takes', 'sells', 'buys', 'invents', 'gives {name}'],
+        done_food: ['eat','buy','sell','cook'],
+        name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
+        name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
+        name_pony: [
+            '{name_pony_first}', 'Princess {name_pony_first}',
+            'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch','Suri Polomare',
+            'Sweetie Belle','Rainbow Dash',
+            'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie',
+            'Dr. Hooves','Hayseed Turnip Truck','Aunt Orange','Uncle Orange','Goldie Delicious',
+            'Cherry Jubilee','Photo Finish','Button\'s Mom','Prince Blue Blood','Sunny Daze','Peachy Pie',
+            'Granny Smith','Big Macintosh','Cheese Sandwich','Berry Punch','Night Light','Twilight Velvet',
+            'Hoity Toity','Sapphire Shores','Fancy Pants','Daring Do','Prim Hemline','Mayor Mare','Hondo Flanks','Cookie Crumbles',
+            'Jet Set','Upper Crust','Fleur Dis Lee','Filthy Rich','Cloud Chaser','Bulk Biceps','Lightning Dust','Ms. Peachbottom','Ms. Harshwhinny','Flash Sentry',
+            'Coco Pommel','Silver Shill','Teddie Safari','Nurse Redheart','Doctor Horse','Dr. Hooves','Nurse Ponies',
+            'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Clover the Clever'
+        ],
+        name_pony_young: [
+            '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','Cake Twins','Button Mash','Berry Pinch'
+        ],
+        name_inanimate: [
+            'Bloomberg','Pinkie\'s imaginary friends','Tom','Mr. Smarty Pants'
+        ],
+        name_pet: [
+            'Angel Bunny','Winona','Opalescence','Gummy','Philomena','Owlowicious','Tank','Peewee','Tiberius','Cerberus'
+        ],
+        name_nonpony: [
+            'Steven Magnet','Steve Magnum',
+            'Zecora','Cranky Doodle Donkey','Cranky Doodle Dandy','Matilda','Mulia Mild','Little Strongheart','Chief Thunderhooves','Iron Will','Gustave le Grand',
+            'Spike','Sea Breeze','Tirek','Scorpan','Discord','MMMMM','Queen Chrysalis','Spa Ponies','Star Swirl the Bearded','The Ponytones','The Power Ponies','Hum Drum',
+            'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
+        ],
+        name_nonequestrian: [
+            'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto',
+            'Optimus Prime','Starscream','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris'
+        ],
+        name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
+        name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
+        name_pony_1: ['{name_pony_first}','{name_pony_last}', '{name_pony_first_young}'],
+        name_pony_first: [
+            'Celestia','Luna','Cadance','Flim','Flam','Cheerilee','Gizmo',
+            'Twilight','Applejack','Rarity','Fluttershy','Sombra','Joe',
+            'Trixie','Fluffle Puff','Alo','Lotus',
+            'Big Mac','Spitfire','sauren','Fleetfoot',
+            'Lyra', 'Derpy','Octavia','Roseluck','Thunderlane',
+            'Maud','Tenderhoof','Junebug','Flitter','Blossomforth'
+        ],
+        name_pony_first_young: [
+            'Featherweight','Pipsqueak','Snips','Snails','Rumble','Dinky','Twist','Nyx','Scootaloo','Applebloom'
+        ],
+        name_pony_last: ['Belle','Dash','Tiara','Spoon','Moon','Seed','Bon','Pie','Chrysalis'],
+        race: [
+            'Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Breezie',
+            'Parasprite','Pheonix','Timberwolf','Fruit Bat','Windigos'
+        ],
+        race_plural: [
+            'Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones',
+            'Parasprites','Pheonixes','Timberwolves','Fruit Bats','Windigo'
+        ]
+    });
+} catch (e) {logger.SeverException('UnhandledException: {0}', e);}
 
 //--------------------------------------------------------------------------------------------------
 //----------------------------------------FUNCTIONS-------------------------------------------------
