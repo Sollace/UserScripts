@@ -66,17 +66,16 @@ var mainCss = '\
 .yt-search-field-search-button .yt-uix-button-content {\
     background: no-repeat url(' + resources.hitchhiker + ') 0px 0px !important;}\
 \
-.yt-uix-button-icon-action-panel-addto,\
-.yt-uix-button-icon-action-panel-none-addto,\
-.yt-uix-button-icon-action-panel-share,\
-.yt-uix-button-icon-action-panel-overflow,\
+.action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before,\
+.action-panel-trigger-share:before,\
+#action-panel-overflow-button:before, .action-panel-trigger-overflow:before,\
 .playlist-status,\
 #pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like,\
 .yt-uix-button-icon-play-all,\
 .yt-uix-button-icon-footer-language,\
 .yt-uix-button-icon-questionmark,\
 .yt-uix-button-icon-sprite_send_message,\
-.yt-uix-button-icon-watch-like, .yt-uix-button-icon-watch-dislike, .ad-info-icon {\
+#watch-like:before, #watch-dislike:before, .ad-info-icon {\
     background-image: url(' + resources.highjacker + ') !important;}\
 \
 .dashboard-widget-handle {\
@@ -158,16 +157,16 @@ var mainCss = '\
 .ad-info-icon {\
   background-position: -65px -26px !important;\
   opacity: 0.6;}\
-.actionable .yt-uix-button:active .yt-uix-button-icon-watch-like,\
-.actionable .yt-uix-button[title="Unlike"] .yt-uix-button-icon-watch-like,\
-.actionable .yt-uix-button.yt-uix-button-toggled .yt-uix-button-icon-watch-like {\
+.actionable #watch-like:active:before,\
+.actionable #watch-like[title="Unlike"]:before,\
+.actionable #watch-like.yt-uix-button-toggled:before {\
     opacity: 1;\
     background-position: -24px -39px !important;}\
-.yt-uix-button-icon-watch-like {\
+#watch-like:before {\
     background-position: -2px -39px !important;}\
-.yt-uix-button-icon-watch-dislike {\
+#watch-dislike:before {\
     background-position: -46px -40px !important;}\
-.yt-uix-button-icon-watch-like, .yt-uix-button-icon-watch-dislike {\
+#watch-like:before, #watch-dislike:before {\
     opacity: 0.6;}\
 .yt-uix-button-icon-sprite_send_message {\
     opacity: 0.6;\
@@ -184,11 +183,11 @@ var mainCss = '\
 #pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like {\
     opacity: 0.3;\
     background-position: -4px -25px !important;}\
-.yt-uix-button-icon-action-panel-addto, .yt-uix-button-icon-action-panel-none-addto {\
+.action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before {\
     background-position: 0px -4px !important;}\
-.yt-uix-button-icon-action-panel-share {\
+.action-panel-trigger-share:before {\
     background-position: -60px -4px !important;}\
-.yt-uix-button-icon-action-panel-overflow {\
+#action-panel-overflow-button:before, .action-panel-trigger-overflow:before {\
     background-position: -35px -4px !important;}\
 .playlist-status {\
     background-position: -79px -4px !important;}\
@@ -311,7 +310,7 @@ var mainCss = '\
         box-shadow: 0 0px 0px #ddd !important;}\
     .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title, .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title:visited, .feed-item-grouplet-muted .channels-content-item .content-item-detail a.content-item-title:hover {\
         color: #2793e6 !important;}\
-    #watch8-action-buttons .yt-uix-button, #watch8-action-buttons .yt-uix-button:hover, #action-panel-dismiss, #action-panel-dismiss:hover {\
+    .watch-action-buttons .yt-uix-button, .watch-action-buttons .yt-uix-button:hover, #action-panel-dismiss, #action-panel-dismiss:hover {\
         box-shadow: none !important;\
         background: none repeat scroll 0% 0% transparent !important;}\
     .yt-uix-expander-head .yt-uix-button, .yt-uix-button-default, .yt-uix-button-default[disabled], .yt-uix-button-default[disabled]:hover, .yt-uix-button-default[disabled]:active, .yt-uix-button-default[disabled]:focus {\
@@ -333,8 +332,11 @@ var mainCss = '\
         border-left-color: #303030 !important;}\
     .branded-page-related-channels {\
         background-color: #1b1b1b !important;}\
-    .branded-page-v2-primary-col > .yt-card {\
+    .branded-page-v2-primary-col > .yt-card, .pl-suggestions-section {\
         background: #1b1b1b !important;}\
+    .pl-suggestions-section .section-description,\
+    .pl-suggestions-section .pl-suggestions-video-title {\
+        color: #aaa;}\
     .branded-page-v2-primary-col .branded-page-box {\
         border-bottom-color: #303030 !important;}\
     .branded-page-v2-has-solid-bg .branded-page-v2-col-container {\
@@ -524,7 +526,7 @@ var mainCss = '\
         color: #aaa !important;}\
     .collection-promo {\
         border-bottom-color: #303030 !important;}\
-    .create-collection-button.yt-uix-button.yt-uix-button-primary.yt-uix-button-size-default .yt-uix-button-content {\
+    .create-collection-button.yt-uix-button.yt-uix-button-primary.yt-uix-button-size-default .yt-uix-button-content, #watch8-action-buttons .yt-uix-button-content {\
         color: #fff !important;}\
     .subscriptions-filter .filter-button {\
         -moz-border-radius-topleft: 0 !important;\
@@ -1294,7 +1296,20 @@ var noticesCss = '\
 .b-c-R.b-c-da-ja:focus, .xD:focus {\
   outline-color: #00A1AA !important;}\
 .b-c-R.b-c-da-ja:active, .xD:active {\
-  box-shadow: inset 0 0px 0 #ddd !important;}';
+  box-shadow: inset 0 0px 0 #ddd !important;}\
+\
+/*Lazy fix for loading sprite*/\
+.RWdWXd, .Pu5TY, .ISc.Tzc {\
+  position: relative !important;}\
+.RWdWXd:before, .Pu5TY:before, .ISc.Tzc:before {\
+  content: "";\
+  position: absolute;\
+  top: -2px;\
+  left: -2px;\
+  bottom: -2px;\
+  right: -2px;\
+  border: solid 3px #242323;\
+  border-radius: 500px;}';
 
 var largePlayerCss = '\
 @media all and (min-width: 1066px) {\
@@ -1397,14 +1412,16 @@ button[name="cancel"]:hover {\
     color: #aaa;}\
 .M7Fqc, .Ct > a {\
     color: #bbb !important;}\
-.r0, .d-y-r-c, div[class="tvb yDa"], .xN {\
+.r3 .r0, .r3 .PA, .d-y-r-c, div[class="tvb yDa"], .xN {\
     border-color: #303030 !important;\
     background-color: #242323 !important;\
     background-image: none !important;}\
-.r0, .d-y-r-c, *[role="button"] > *, .xN > *, .zDa {\
+.r3 .r0:hover, .r3 .PA:hover {\
+    background-color: #343333 !important;\}\
+.r3 .r0, .r3 .PA, .d-y-r-c, *[role="button"] > *, .xN > *, .zDa {\
     color: #aaa!important;}\
 .g8b, .ve .if, .Ik .e1b {\
-    background-color: transparent!important;}\
+    background-color: transparent !important;}\
 .Kgb, .Y8b .TD {\
     background-color: rgba(219,228,235,0.3);}\
 .MJa {\
@@ -1420,7 +1437,21 @@ button[name="cancel"]:hover {\
 .IGPVEc {\
     background-position: 0px -250px !important;}\
 .IGPVEc, .MJa, .LJa, .if, .b-P-M .b-P-Tb {\
-    background-image: url(' + resources.comment + ')!important;}';
+    background-image: url(' + resources.comment + ')!important;}\
+/*Lazy fix for comment loading sprite*/\
+.PA .Uv {\
+  position: relative !important;}\
+.PA .Uv:before {\
+  content: "";\
+  position: absolute;\
+  top: -2px;\
+  left: -2px;\
+  width: 14px;\
+  height: 14px;\
+  border: solid 3px #242323;\
+  border-radius: 500px;}\
+.PA:hover .Uv:before {\
+  border-color: #343333 !important;}';
 
 var googlePlusCss = '\
     .Bga {\
