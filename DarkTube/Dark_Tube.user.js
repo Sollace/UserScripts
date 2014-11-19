@@ -93,6 +93,8 @@ var mainCss = '\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -209px -399px !important;}\
 .yt-uix-button-icon-action-panel-transcript {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -172px -159px !important;}\
+.addto-watch-later-button:before, .addto-watch-later-button-sign-in:before {\
+  background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -169px -339px !important;}\
 .yt-uix-button-icon-comment-actions-menu,\
 .yt-uix-button-icon-action-panel-report {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -81px -62px !important;}\
@@ -1052,7 +1054,7 @@ var mainCss = '\
     #watch7-user-header .yt-user-name {\
         color: #2793e6 !important;}\
     #eow-title, #watch7-user-header .yt-user-info a,\
-    .yt-uix-button img, .yt-uix-button-icon-wrapper+.yt-uix-button-content,\
+    .yt-uix-button img, .yt-uix-button-icon-wrapper + .yt-uix-button-content,\
     .yt-default h1, .yt-default h2, .yt-default h3, .yt-default h4, .yt-default h5, .yt-default h6, h1.yt, h2.yt, h3.yt, h4.yt, h5.yt, h6.yt {\
         color: #888 !important;}\
     #comments-view .comment-text a {\
