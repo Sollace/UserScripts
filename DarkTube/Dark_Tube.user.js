@@ -448,6 +448,10 @@ var mainCss = '\
         color: #555 !important;}\
     .live-comments-setting, #comments-scroller {\
         border-color: #303030 !important;}\
+    .yt-uix-button-subscribe-branded, .yt-uix-button-subscribe-branded[disabled], .yt-uix-button-subscribe-branded[disabled]:hover, .yt-uix-button-subscribe-branded[disabled]:active, .yt-uix-button-subscribe-branded[disabled]:focus {\
+        color: #FEFEFE !important;\
+        border-color: #E62117 !important;\
+        background-color: #E62117 !important;}\
     .subscribe-label {\
         color: #fff !important;}\
     .yt-uix-form-input-textarea.comments-textarea.link-gplus-lightbox {\
