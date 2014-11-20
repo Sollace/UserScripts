@@ -71,7 +71,7 @@ var mainCss = '\
 #action-panel-overflow-button:before, .action-panel-trigger-overflow:before,\
 .playlist-status,\
 #pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like,\
-.yt-uix-button-icon-play-all,\
+.play-all-icon-btn:before,\
 .yt-uix-button-icon-footer-language,\
 .yt-uix-button-icon-questionmark,\
 .yt-uix-button-icon-sprite_send_message,\
@@ -179,7 +179,7 @@ var mainCss = '\
 .yt-uix-button-icon-questionmark {\
   opacity: 0.3;\
   background-position: -125px -5px !important;}\
-.yt-uix-button-icon-play-all {\
+.play-all-icon-btn:before {\
     opacity: 0.3;\
     background-position: -20px -22px !important;}\
 #pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like {\
