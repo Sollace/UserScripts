@@ -448,10 +448,23 @@ var mainCss = '\
         color: #555 !important;}\
     .live-comments-setting, #comments-scroller {\
         border-color: #303030 !important;}\
-    .yt-uix-button-subscribe-branded, .yt-uix-button-subscribe-branded[disabled], .yt-uix-button-subscribe-branded[disabled]:hover, .yt-uix-button-subscribe-branded[disabled]:active, .yt-uix-button-subscribe-branded[disabled]:focus {\
+    .yt-uix-button-subscribe-branded:before {\
+        opacity: 1 !important;}\
+    .yt-uix-button-subscribe-branded:focus,\
+    .yt-uix-button-subscribe-branded,\
+    .yt-uix-button-subscribe-branded[disabled],\
+    .yt-uix-button-subscribe-branded[disabled]:hover,\
+    .yt-uix-button-subscribe-branded[disabled]:active,\
+    .yt-uix-button-subscribe-branded[disabled]:focus {\
         color: #FEFEFE !important;\
         border-color: #E62117 !important;\
-        background-color: #E62117 !important;}\
+        background: #E62117 !important;}\
+    .yt-uix-button-subscribe-branded:hover {\
+        border-color: #E62117 !important;\
+        background: #CC181E !important;}\
+    .yt-uix-button-subscribe-branded:active {\
+        border-color: #E62117 !important;\
+        background: #B31217 !important;}\
     .subscribe-label {\
         color: #fff !important;}\
     .yt-uix-form-input-textarea.comments-textarea.link-gplus-lightbox {\
@@ -1318,6 +1331,8 @@ var noticesCss = '\
   border-radius: 500px;}';
 
 var largePlayerCss = '\
+.playlist-videos-list {\
+    max-height: 410px !important;}\
 @media all and (min-width: 1066px) {\
     .custom-medium, .custom-medium #player-api,\
     .watch-medium, .watch-medium #player-api  {\
