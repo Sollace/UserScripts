@@ -1317,6 +1317,16 @@ var noticesCss = '\
 .b-c-R.b-c-da-ja:active, .xD:active {\
   box-shadow: inset 0 0px 0 #ddd !important;}\
 \
+div.t-Pa-mb-c.b-c-R , .wp > .Id > .Ae {\
+  background-color: #333 !important;\
+  border-color: #444 !important;\
+  color: #ccc !important;}\
+.xa {\
+  background: #222 !important;\
+  color: #ccc !important;}\
+.rj {\
+  color: #ccc !important;}\
+\
 /*Lazy fix for loading sprite*/\
 .RWdWXd, .Pu5TY, .ISc.Tzc {\
   position: relative !important;}\
@@ -1472,7 +1482,20 @@ button[name="cancel"]:hover {\
   border: solid 3px #242323;\
   border-radius: 500px;}\
 .PA:hover .Uv:before {\
-  border-color: #343333 !important;}';
+  border-color: #343333 !important;}\
+\
+/*Lazy fix for loading sprite*/\
+.B1 {\
+  position: relative !important;}\
+.B1:before {\
+  content: "";\
+  position: absolute;\
+  top: -2px;\
+  left: -2px;\
+  bottom: -2px;\
+  right: -2px;\
+  border: solid 3px #1B1B1B;\
+  border-radius: 500px;}';
 
 var googlePlusCss = '\
     .Bga {\

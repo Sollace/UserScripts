@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.2
+// @version     1.3
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -37,52 +37,42 @@ move().style('.navbar-menu-inner * {\
 #collectlink:hover, #collectlink.active {\
     color: yellow !important;}\
 div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
-    .dp-ad-chrome,\
-    .blt-ad-container,\
-    .sleekadbubble,\
-    .ad-blocking-makes-fella-confused,\
-    .partial-ad,\
-    .da-custom-ad-box,\
-    .dac-ad-frontpage-banner,\
-    .tower-ad-header,\
-    .sleekadfooter,\
-    #gmi-MessageCenterDockAd,\
-    #fake-col-left {\
-display: none;}\
+.mczone-you-know-what,\
+.dp-ad-chrome,\
+.blt-ad-container,\
+.sleekadbubble,\
+.ad-blocking-makes-fella-confused,\
+.partial-ad,\
+.da-custom-ad-box,\
+.dac-ad-frontpage-banner,\
+.tower-ad-header,\
+.sleekadfooter,\
+#gmi-MessageCenterDockAd,\
+#fake-col-left {\
+    display: none;}\
 #oh-menu-submit:not(.mmhover) > a > span {\
     background: none repeat scroll 0% 0% rgba(0,0,0,0.1) !important;}');
 
 
 function run() {
-    $('.external').each(reref);
     deAd();
     ready = true;
-}
-
-function reref() {
-    $(this).removeClass('external');
-    var locs = $(this).attr('href').split('?');
-    locs.splice(0,1);
-    locs = locs.join('?').split(':');
-    if (locs[0].indexOf('http') == 0) {
-        locs.splice(0,1);
-    }
-    $(this).attr('href', 'http://' + locs.join(':'));
 }
 
 function deAd() {
     $('#gmi-MessageCenterDockAd').parent().remove();
     $('\
 div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
-    .dp-ad-chrome,\
-    .blt-ad-container,\
-    .sleekadbubble,\
-    .ad-blocking-makes-fella-confused,\
-    .partial-ad,\
-    .da-custom-ad-box,\
-    .dac-ad-frontpage-banner,\
-    .tower-ad-header,\
-    .sleekadfooter').remove();
+.dp-ad-chrome,\
+.blt-ad-container,\
+.sleekadbubble,\
+.ad-blocking-makes-fella-confused,\
+.partial-ad,\
+.da-custom-ad-box,\
+.dac-ad-frontpage-banner,\
+.tower-ad-header,\
+.mczone-you-know-what,\
+.sleekadfooter').remove();
     if ($('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child iframe').length) {
         $('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child, #fake-col-left').remove();
     }
