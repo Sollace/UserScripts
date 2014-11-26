@@ -149,11 +149,13 @@ try {
             this.followersRaw = [];
             var me = this;
             $('.user-avatar', xml).each(function() {
+                var name = $(this).parent().find('.name').clone();
+                name.find('*').remove();
                 followers.push({
                     id: $(this).css('background-image').split('avatars/').reverse()[0].split('_')[0],
-                    name: $(this).parent().attr('href').split('/').reverse()[0]
+                    name: name.text()
                 });
-                me.followersRaw.push($(this).parent().attr('href').split('/').reverse()[0]);
+                me.followersRaw.push(name.text());
             });
             var gained = [];
             var lost = [];
