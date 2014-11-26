@@ -196,6 +196,8 @@ try {
             'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
         ],
         object: [
+            'The Internet',
+            'The 4th Wall',
             'Tree of Harmony',
             'bottle',
             'cloud',
@@ -287,7 +289,11 @@ try {
             'forgets to use contraceptives',
             '{is_done}',
             '{does_2} drugs',
-            'accidentally {does_3} drugs'
+            'accidentally {does_3} drugs',
+            'reads {fanfic}',
+            'discovers {fanfic}',
+            'reacts to {fanfic}',
+            'reacts to {subject}'
         ],
         does_with: ['forgets','eats','has','cooks','{is_done} on'],
         is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
@@ -296,6 +302,17 @@ try {
         does_2: ['gives up', 'cooks', '{does_3}'],
         does_3: ['takes', 'sells', 'buys', 'invents', 'gives {name}'],
         done_food: ['eat','buy','sell','cook'],
+        fanfic: [
+            'Cupcakes','My Little Dashie','Five Score Divided By Four','{name_pony}\'s expansive clop collection',
+            'a fanfic by {author}'
+        ],
+        author: [
+            'Kaidan','knighty','The Parasprite','RainbowBob','Vegie','Vengful Spirit','TwistedSpectrum','L'
+        ],
+        subject: [
+            'Politics','an unexpected power outage','an expected power outage','Equestrai Daily','Equestria After Dark',
+            'Bronies','{name_pony_young}\'s new cutiemark}'
+        ],
         name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
         name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
         name_pony: [
@@ -327,8 +344,9 @@ try {
             'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
         ],
         name_nonequestrian: [
-            'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto',
-            'Optimus Prime','Starscream','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris'
+            'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto','Autobots','Decepticons',
+            'Optimus Prime','Starscream','Soundwave','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris','Scarlet Johanson',
+            'Luke Skywalker','Darth Vader','Yoda','Lance Armstrong','Bruce Willace','Batman','Britney Spears'
         ],
         name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
         name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
