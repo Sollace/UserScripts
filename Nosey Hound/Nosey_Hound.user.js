@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.4
+// @version     1.4.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
