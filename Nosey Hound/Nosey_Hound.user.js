@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.4.1
+// @version     1.4.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -31,7 +31,7 @@ var followerMapping = (function() {
                 if (result.opened()) t += 'class="opened" ';
                 t += 'target="_blank" href="/user/' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
                 if (result.children.length > 0) {
-                    t += '<span class="open-pin" /><div class="dog"><div class="list"><ol>';
+                    t += '<span class="open-pin" /><div class="dog"><div class="list content"><ol>';
                     var s = '';
                     for (var i = 0; i < result.children.length; i++) {
                         s += result.children[i].html(filter);
@@ -119,6 +119,7 @@ try {
             var pop = $(makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table'));
             pop.css({ width: '300px', height: '300px'});
             position(pop.parent().parent(), 'center', 'center');
+            $('body').append($('#info-cards'));
             this.Sniff(true,pop);
         }
         Dog.prototype.snubFollowers = function(link) {
@@ -186,7 +187,6 @@ try {
             });
             pop.empty();
             followerMapping.registerChild(pop.parent().attr('data-item'), followers);
-            //pop.append(list(followers));
             $('#nosey_follower_searcher').trigger('input');
         }
         Dog.prototype.printFollowers = function(firstTime, pop, gained, lost, named) {
@@ -356,30 +356,17 @@ try {
         $(document).on('mouseleave','button.forget', function() {
             $(this).attr('data-check','0').text('Forget this User');
         });
-        $(document).on('mouseenter', '.dog a', function() {
-            null != unsafeWindow.infocard_timeout && (clearTimeout(unsafeWindow.infocard_timeout), unsafeWindow.infocard_timeout = null);
-            var c = $(this),
-                b = $(this).attr('href');
-            b && ($(this).attr('data-no-user-popup') && 'true' == $(this).data('no-user-popup') || (unsafeWindow.infocard_timeout = setTimeout(function () {
-                var a = !1,
-                    d = /^\/user\/([^\/]*)$/.exec(b);
-                d && ('undefined' !== typeof d[1] && ($('#infocard .infocard').html('<img src=\'http://www.fimfiction-static.net/images/loading_white.gif\' style=\'margin:10px;\' />'), $('#infocard .infocard').load('/ajax/infocard_user.php?name=' +
-                d[1].replace(/ /g, '%20'), function() {
-                    snuffButton.call(this, c);
-                }),a = !0), a && ($('#infocard').addClass('infocard_visible'), $('#infocard').css('left', c.offset().left + c.width() - 5), $('#infocard').css('top', c.offset().top - 30)))
-            }, 1000)))
-        });
-        $(document).on('mouseleave', '.dog a', function() {
-            unsafeWindow.infocard_hover_off.apply(this);
+        $(document).on('mouseenter', '.dog .list a', function() {
+            $('.dog .list a.hover').removeClass('hover');
+            $(this).addClass('hover');
         });
         
-        function snuffButton(link) {
-            var l = $(this).find('.info > a').last();
-            var snif = $('<a href="javascript:void()">Sniff</a>');
-            l.after(snif);
-            l.after(' <b>·</b> ');
+        function snuffButton(context) {
+            var l = $(context).find('.top-info .button-group').first();
+            var snif = $('<a class="snuff styled_button button-icon-only dark styled_button_dark_grey" href="javascript:void()">Sniff</a>');
+            l.prepend(snif);
             snif.click(function() {
-                (new Dog($(this).parents('.infocard'))).snubFollowers(link);
+                (new Dog($(this).parents('.info-card').find('.user-links a').first().attr('href').split('&user=')[1])).snubFollowers($('.dog a.hover').first());
             });
         }
         
@@ -405,7 +392,7 @@ try {
         function listing(name, followers, node) {
             followerMapping.registerList(followers);
             node = $(node);
-            var list = $('<div class="list">');
+            var list = $('<div class="list content">');
             var search = $('<input id="nosey_follower_searcher" type="text" placeholder="search followers" />');
             $(search).on('input', function () {
                 list.empty();
@@ -566,7 +553,19 @@ a:hover + .open-pin:after, .open-pin:hover:after {\
   border-color: transparent transparent #609734 transparent;}\
 .opened + .open-pin:after {\
   margin-top: 5px;\
-  border-color: transparent transparent #507E2C transparent;}');
+  border-color: transparent transparent #507E2C transparent;}\
+#info-cards > * {\
+  z-index: 99999999999999999 !important;}\
+.global_popup input[type="text"], .global_popup input[type="url"] {\
+    padding: 8px;\
+    width: 100%;\
+    border: 1px solid #CCC;\
+    background: none repeat scroll 0% 0% #F8F8F8;\
+    outline: medium none;\
+    color: #333;\
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;\
+    border-radius: 3px;\
+    margin: 5px 0px;}');
     })();
 } catch (e) {alert('Nosey Hound: ' + e);}
 
@@ -705,4 +704,3 @@ function makeStyle(input, id) {
     }
     $('head').append(style);
 }
-
