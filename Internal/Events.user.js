@@ -2,14 +2,14 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2.2
+// @version     1.2.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
 
 (function (win) {
-  var ver = 1.22;
+  var ver = 1.23;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -38,6 +38,9 @@
           }
           if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
             return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
+          }
+          if (url.indexOf('/ajax/infocard_user.php') == 0) {
+            return {'eventName': 'infocard', 'user':url.split('&')[0].split('?name=')[1]};
           }
           return null;
         }

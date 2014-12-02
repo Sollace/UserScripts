@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.5
+// @version     1.3.6
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -161,6 +161,8 @@ $(document).ready(function () {
     color: #fff;}\
 .user_toolbar > ul > li > .mail-link, .user_toolbar > ul > li > .notifications-link, .user_toolbar > ul > li > .feed-link  {\
     margin-top: -1px;}\
+.drop-down-notifications .drop-down-header .styled_button, .drop-down-private-messages .drop-down-header .styled_button {\
+    display: inline-block !important;}\
 @media all and (max-width: 700px) {\
   .user_toolbar .notifications-link:before,\
   .user_toolbar .mail-link:before,\
