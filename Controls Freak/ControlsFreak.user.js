@@ -182,24 +182,24 @@ $(document).ready(function () {
   .user_toolbar .mail-link:after,\
   .user_toolbar .feed-link:after {\
     margin-left: 5px;}\
-  .user_toolbar .drop-down.drop-down-notifications,\
-  .user_toolbar .drop-down.drop-down-private-messages {\
+  .user_toolbar div.drop-down-notifications,\
+  .user_toolbar div.drop-down-private-messages {\
     left: 0px !important;}\
-  .user_toolbar > ul ul li div.drop-down.drop-down-notifications,\
-  .user_toolbar > ul ul li div.drop-down.drop-down-private-messages {\
+  .user_toolbar > ul ul li div.drop-down-notifications,\
+  .user_toolbar > ul ul li div.drop-down-private-messages {\
     position: initial;\
     width: 100%;\
     border-radius: 5px;}\
-  .user_toolbar .drop-down.drop-down-notifications ul,\
-  .user_toolbar .drop-down.drop-down-private-messages ul {\
+  .user_toolbar .drop-down-notifications ul,\
+  .user_toolbar .drop-down-private-messages ul {\
     background: #fff !important;\
     box-shadow: none !important;\
     padding: 0px !important;\
     margin: 0px !important;\
     border: 1px solid rgba(0, 0, 0, 0.3) !important;\
     border-radius: 0px !important;}\
-  .user_toolbar .drop-down.drop-down-notifications li,\
-  .user_toolbar .drop-down.drop-down-private-messages li {\
+  .user_toolbar .drop-down-notifications li,\
+  .user_toolbar .drop-down-private-messages li {\
     color: rgba(0, 0, 0, 0.85) !important;}\
   .user_toolbar.show > ul {\
     overflow: visible !important;}\
@@ -292,15 +292,15 @@ $(document).ready(function () {
     position: absolute;\
     left: -20px;\
     top: 0px;}\
-.user_toolbar .drop-down.drop-down-private-messages,\
-.user_toolbar .drop-down.drop-down-notifications {\
+.user_toolbar .drop-down-private-messages,\
+.user_toolbar .drop-down-notifications {\
   overflow: hidden;}\
 .user_toolbar ul.drop-down-private-messages,\
-.user_toolbar .drop-down.drop-down-private-messages,\
+.user_toolbar .drop-down-private-messages,\
 .user_toolbar ul.drop-down-notifications,\
-.user_toolbar .drop-down.drop-down-notifications {\
+.user_toolbar .drop-down-notifications {\
     width: 550px;\
-    left: -52px;}\
+    left: -52px !important;}\
 .user_toolbar li ul.drop-down-private-messages ul,\
 .user_toolbar li ul.drop-down-notifications ul,\
 .user_toolbar li .drop-down ul {\
@@ -309,10 +309,10 @@ $(document).ready(function () {
     overflow: auto;\
     position: relative;\
     border: none;}\
-.user_toolbar li .drop-down.drop-down-notifications li * {\
+.user_toolbar li .drop-down-notifications li * {\
   line-height: 0px;}\
 .user_toolbar li > ul.drop-down-notifications li,\
-.user_toolbar li .drop-down.drop-down-notifications li {\
+.user_toolbar li .drop-down-notifications li {\
     display: block;\
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);\
     padding: 8px 80px 8px 10px;\
@@ -321,7 +321,7 @@ $(document).ready(function () {
     position: relative;\
     font-weight: initial;}\
 .user_toolbar li > ul.drop-down-private-messages li,\
-.user_toolbar li .drop-down.drop-down-private-messages li {\
+.user_toolbar li .drop-down-private-messages li {\
     display: block;\
     border-bottom: 1px solid #DDD;\
     padding: 6px 80px 6px 8px;\
@@ -330,13 +330,13 @@ $(document).ready(function () {
     position: relative;\
     font-weight: initial;}\
 .user_toolbar li > ul.drop-down-notifications li,\
-.user_toolbar li .drop-down.drop-down-notifications li {\
+.user_toolbar li .drop-down-notifications li {\
     line-height: 1.2em;\
     font-size: 12px;}\
 .user_toolbar li > ul.drop-down-notifications li i,\
-.user_toolbar li .drop-down.drop-down-notifications li i {\
+.user_toolbar li .drop-down-notifications li i {\
     margin-right: 4px;}\
-.user_toolbar li .drop-down.drop-down-notifications li p {\
+.user_toolbar li .drop-down-notifications li p {\
     display: inline !important;}\
 .user_toolbar li > ul.drop-down-private-messages li .date,\
 .user_toolbar li > ul.drop-down-notifications li .date,\
@@ -347,7 +347,7 @@ $(document).ready(function () {
     margin-top: -7px;\
     font-size: 0.9em;}\
 .user_toolbar li ul.drop-down-notifications li a,\
-.user_toolbar li .drop-down.drop-down-notifications li a {\
+.user_toolbar li .drop-down-notifications li a {\
     font-weight: bold;\
     padding: 0px;\
     color: #507E2C;\
@@ -355,14 +355,14 @@ $(document).ready(function () {
     cursor: pointer;\
     display: inline;}\
 .user_toolbar li ul.drop-down-private-messages li a,\
-.user_toolbar li .drop-down.drop-down-private-messages li a {\
+.user_toolbar li .drop-down-private-messages li a {\
     background: none !important;\
     color: #333;\
     font-size: 1.1em;\
     display: inline;\
     padding: 0px;}\
 .user_toolbar li ul.drop-down-private-messages li .avatar,\
-.user_toolbar li .drop-down.drop-down-private-messages li .avatar {\
+.user_toolbar li .drop-down-private-messages li .avatar {\
     border-radius: 4px;\
     width: 38px;\
     height: 38px;\
@@ -381,7 +381,7 @@ $(document).ready(function () {
     -moz-border-left-colors: none;\
     border-image: none;}\
 .user_toolbar li ul.drop-down-notifications li i,\
-.user_toolbar li .drop-down.drop-down-notifications li i {\
+.user_toolbar li .drop-down-notifications li i {\
     position: relative;\
     padding: 0px;\
     border: none;\
@@ -409,10 +409,10 @@ $(document).ready(function () {
     width: auto;\
     line-height: inherit;}\
 .user_toolbar li > ul.drop-down-private-messages li .message-content,\
-.user_toolbar li .drop-down.drop-down-private-messages li .message-content {\
+.user_toolbar li .drop-down-private-messages li .message-content {\
     color: #AAA;}\
 .user_toolbar li > ul.drop-down-private-messages li .message-content:after,\
-.user_toolbar li .drop-down.drop-down-private-messages li .message-content:after {\
+.user_toolbar li .drop-down-private-messages li .message-content:after {\
     content: "...";}\
 .user_toolbar ul.loading:after,\
 .user_toolbar .drop-down ul.loading:after {\
@@ -897,6 +897,9 @@ body:not(.editing) .nav_bar .editor,\
         
         
         this.originalElement = $(el);
+        
+        $(this.originalElement).find('.nav-bar-drop-down, .drop-down').addClass('nav-bar-drop-down').addClass('drop-down');
+        
         if (this.originalElement.hasClass('divider')) typ = 'divider';
         this.type = typ == null ? 'button' : typ;
         this._parent = p;
@@ -1001,7 +1004,7 @@ body:not(.editing) .nav_bar .editor,\
         }
         this.genNode = function () {
             $(this.originalElement).removeClass('button-first');
-
+            
             if (this.listNode != null) {
                 if (this.children.length > 0) {
                     $(this.listNode).children().detach();
@@ -1020,7 +1023,7 @@ body:not(.editing) .nav_bar .editor,\
             var copy = this.originalElement.clone();
             var me = this;
 
-            copy.find('.drop-down, ul, input').remove();
+            copy.find('.drop-down, .nav-bar-drop-down, ul, input').remove();
             copy.find('.new').removeClass('new');
             var bs = copy.find('.button');
             if (bs.length > 0) {
