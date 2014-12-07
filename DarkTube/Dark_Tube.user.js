@@ -53,7 +53,7 @@ var mainCss = '\
 .yt-uix-subscription-preferences-button:hover .yt-uix-button-icon-subscription-preferences,\
 .yt-uix-button-icon-c4-grid-flow, .yt-uix-button-icon-c4-list-flow, .yt-uix-button-icon-gear, .yt-uix-button-icon-gear-active,\
 .yt-uix-button-icon-icon-account-settings, .yt-uix-button-icon-playlist-share,\
-.yt-uix-button-icon-c4-editor-plus, .yt-uix-button-icon-plus-button,\
+.c4-editor-plus:before, .yt-uix-button-icon-plus-button,\
 #storyboard .timeline-zoomslider .slider-icon,\
 .yt-uix-button-icon-footer-history, .yt-uix-button-icon-action-panel-dismiss {\
     background-image: url(' + resources.hitchhiker + ') !important;}\
@@ -104,7 +104,7 @@ var mainCss = '\
     background: no-repeat #2a2a2a url(http://i.imgur.com/DDNZc3U.png) -155px -62px !important;\
     border: 1px solid #36649c !important;}\
 \
-#channel-header-view-as-link img {\
+#channel-header-view-as-link .header-action-icon {\
     background: no-repeat url(http://i.imgur.com/TLZeIKB.png) 0 -93px !important;}\
 .yt-uix-button-icon-c4-editor-move-up {\
     background: no-repeat url(http://i.imgur.com/TLZeIKB.png) -6px -160px !important;}\
@@ -141,7 +141,7 @@ var mainCss = '\
 .yt-uix-button-icon-c4-editor-trash {\
     background: no-repeat url(http://i.imgur.com/FwVdCu1.png) 0 -111px !important;}\
 \
-.watch-pencil-icon .yt-uix-button-icon-pencil {\
+.watch-pencil-icon .yt-uix-button-icon-pencil, .c4-editor-edit:before {\
     background: no-repeat url(http://i.imgur.com/P8b3ZSs.png) 0 -140px !important;}\
 \
 .yt-uix-button-icon-upload-add,\
@@ -222,7 +222,7 @@ var mainCss = '\
 .yt-uix-button-icon-playlist-share {\
     opacity: 0.3;\
     background-position: 0px -336px !important;}\
-.yt-uix-button-icon-c4-editor-plus, .yt-uix-button-icon-plus-button {\
+.c4-editor-plus:before, .yt-uix-button-icon-plus-button {\
     background-position: 0px -1287px !important;}\
 .yt-uix-button-icon-c4-grid-flow {\
     background-position: -28px -2001px !important;}\
@@ -559,7 +559,7 @@ var mainCss = '\
     .subscriptions-filter .filter-field-container {\
         border-color: #303030 !important;\
         background: #000 !important;}\
-    .pl-header-inlineedit .c4-module-is-editable:hover, .pl-message-panel .panel-content,\
+    .about-description-editor .c4-module-is-editable:hover, .about-business-email-editor .c4-module-is-editable:hover, .about-metadata-editor .c4-module-is-editable:hover, .pl-message-panel .panel-content,\
     #subscription-manager-container .even td, .pl-video-list-editable .pl-video:hover .pl-video-handle, .yt-uix-dragdrop-cursor-follower, .yt-uix-dragdrop-cursor-follower tr, .yt-uix-dragdrop-cursor-follower .pl-video-handle,\
     #collections-container, #subscriptions-container {\
         background: #222 !important;\
@@ -1291,6 +1291,8 @@ var noticesCss = '\
 .Nac, .XQb, .Pac, .nfe, .Ct, .Ub, .dR.d-s, .WR *, .d-r *, .cp *,\
 .MNn0h:hover .YGETNc, .MNn0h.RATVS .YGETNc, .y9fV .YGETNc {\
   color: #aaa !important;}\
+.f4a {\
+  background-color: #444 !important;}\
 .MNn0h, .Kza, .f4a.tta, .f4a.B70Reb, .tQb, .d-r {\
   background-color: #333 !important;}\
 .Gc.esw, .Dg, .wu, .cp, .Rd {\
@@ -1306,7 +1308,7 @@ var noticesCss = '\
   border-color: #222 transparent transparent !important;}\
 .Kza:after {\
   border-color: #333 transparent transparent !important;}\
-.fr .vt, .IO {\
+.fr .vt, .IO, .Fr > .Qp, .Fr + .bj {\
   border-color: #333 !important;}\
 .b-c-R.b-c-da-ja, .xD {\
   color: #aaa!important;\
@@ -1341,7 +1343,7 @@ div.t-Pa-mb-c.b-c-R , .wp > .Id > .Ae {\
   border-radius: 500px;}';
 
 var largePlayerCss = '\
-.playlist-videos-list {\
+.watch-wide .playlist-videos-list {\
     max-height: 410px !important;}\
 @media all and (min-width: 1066px) {\
     .custom-medium, .custom-medium #player-api,\

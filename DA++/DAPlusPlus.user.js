@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.3
+// @version     1.3.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -23,12 +23,10 @@ setWhen(function() {
 
 move().style('.navbar-menu-inner * {\
   font-size: 10px !important;}\
-.navbar-menu-inner, #navbar-menu {\
-  height: 25px !important;}\
+#navbar-menu *:not(.sticky), .navbar-menu-inner, #navbar-menu {\
+  height: 30px !important;}\
 #navbar-menu {\
   box-shadow: 0 0 5px 5px #526054;}\
-#navbar-menu *:not(.sticky) {\
-  height: 15px !important;}\
 #friendslink, #collectlink, #oh-menu-split .icon {\
     transition: color 0.5s ease;}\
 #friendslink:hover, #friendslink.active,\
@@ -49,9 +47,7 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 .sleekadfooter,\
 #gmi-MessageCenterDockAd,\
 #fake-col-left {\
-    display: none;}\
-#oh-menu-submit:not(.mmhover) > a > span {\
-    background: none repeat scroll 0% 0% rgba(0,0,0,0.1) !important;}');
+    display: none;}');
 
 
 function run() {
@@ -74,6 +70,7 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 .mczone-you-know-what,\
 .sleekadfooter').remove();
     if ($('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child iframe').length) {
+        $('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child + .pad-left').removeClass('pad-left');
         $('#fake-col-left + #gruze-columns > .gruze-sidebar:first-child, #fake-col-left').remove();
     }
 }
