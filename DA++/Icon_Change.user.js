@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name        Icon Change
+// @name        DeviantArt Icon Change
 // @namespace   sollace
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     0.1
+// @version     1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -20,6 +20,14 @@ document.onmousemove = document.onready = function() {
 function changeLogo(url, icon) {
   $('head link[rel="shortcut icon"]').attr('href', icon);
   $('#deviantart-logo .mark').html('<img style="margin-left:-10px" height="30px" src="' + url + '" />');
+  $('img[data-embed-id="619"], [collect_rid="emote:619"] img').attr({
+    'src': url,
+    'width': '19px',
+    'height': '12px'
+  }).css({
+    'width': '19px',
+    'height': '12px'
+  });
   
   var css = '\
 .dev-page-view .dev-right-bar-title.more-from-da-title {\
