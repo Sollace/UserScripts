@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.6
+// @version     1.3.8
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -641,7 +641,14 @@ body:not(.editing) .nav_bar .editor,\
   right: 0px;\
   border-radius: 0 0 100% 100%;\
   box-shadow: 0px -2px 2px rgba(0,0,0,0.1) inset;\
-  background-color: rgba(250, 240, 230, 0.6) !important;}');
+  background-color: rgba(250, 240, 230, 0.6) !important;}\
+\
+/*Dropdown radius fix*/\
+.user_toolbar > ul > li ul li:last-child a > i {\
+    border-bottom-left-radius: 4px;}\
+.user_toolbar > ul > li > ul ul {\
+    border-bottom-left-radius: 4px;\
+    border-bottom-right-radius: 4px;}');
         
         var buttonRegistry = new register();
         var usedButtons = new register();
