@@ -2,12 +2,38 @@
 // @name        Fimfiction Chapter Themes API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.1
+// @version     1.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
 // ==/UserScript==
-var ponyThemes = (function() {
+function RunScript(func, mustCall, params) {
+  var scr = document.createElement('SCRIPT');
+  if (mustCall) {
+    if (params) {
+      var pars = [];
+      for (var i = 2; i < arguments.length; i++) {
+        pars.push(arguments[i]);
+      }
+      scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
+    } else {
+      scr.innerHTML = '(' + func.toString() + ')();';
+    }
+  } else {
+    scr.innerHTML = func.toString();
+  }
+  document.body.appendChild(scr);
+  scr.parentNode.removeChild(scr);
+};
+RunScript.toString = (function() {
+  var result = function toString() {
+    return 'function ' + this.name + '() {\n  [native code]\n}';
+  }
+  result.toString = result;
+  return result;
+})();
+
+RunScript(function() {
   var data = {};
   function addGlobalStyle(css) {
     var style = document.createElement('style');
@@ -42,7 +68,7 @@ var ponyThemes = (function() {
       });
     });
   }
-  return {
+  window.ponyThemes = {
     apply: function() {
       var sheet = '';
       for (var i in data) {
@@ -62,6 +88,11 @@ var ponyThemes = (function() {
       return {one: category, two: name};
     }, remove: function(key) {
       data[key.one][key.two] = null;
+    }, toString: function() {
+      return '[object API] {\n  apply() -> undefined\n  add(category, name, style) -> Key\n  remove(key) -> undefined\n}';
     }
   }
-})();
+  for (var i in window.ponyThemes) {
+    window.ponyThemes[i].toString = RunScript.toString;
+  }
+}, true);
