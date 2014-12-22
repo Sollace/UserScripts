@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1
+// @version     1.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -18,7 +18,8 @@ document.onmousemove = document.onready = function() {
 }
 
 function changeLogo(url, icon) {
-  $('head link[rel="shortcut icon"]').attr('href', icon);
+  $('head link[rel="shortcut icon"]').remove();
+  $('head').first().append('<link rel="shortcut icon" href="' + icon + '" />');
   $('#deviantart-logo .mark').html('<img style="margin-left:-10px" height="30px" src="' + url + '" />');
   $('img[data-embed-id="619"], [collect_rid="emote:619"] img').attr({
     'src': url,
