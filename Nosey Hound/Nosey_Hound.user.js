@@ -3,14 +3,12 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.4.2
+// @version     1.4.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_deleteValue
 // ==/UserScript==
-
-var TESTING = false;
 
 var followerMapping = (function() {
     var internalMapping = [];
@@ -104,15 +102,17 @@ try {
         var name = getUserName();
         Dog = function(c) {
             this.container = c;
-            if (this.container.hasClass('infocard')) {
-                this.userName = this.container.find('.title').text();
-                this.userId = this.container.find('.info a').first().attr('href').split('&user=').reverse()[0].split('&')[0];
+            if (this.container.hasClass('user-page-header')) {
+                this.userName = this.container.find('.resize_text a').text();
+                this.userId = this.container.find('ul.tabs li a').first().attr('href').split('&user=').reverse()[0].split('&')[0];
+                this.tabs = this.container.find('ul.tabs');
             } else {
                 this.userName = this.container.find('.card-content > h2 a').text();
                 this.userId = this.container.find('.drop-down > ul > li > a > i.fa-warning').first().parent().attr('href').split('/').reverse()[0];
+                this.tabs = this.container.container.parent().find('.user-links');
             }
             this.myPage = this.userName == name;
-            this.oldFollowers = TESTING ? [{id:'dsfoj',name:'testee0'},{id:'sk',name:'testee1'},{id:'110493',name:'testee2'}] : getFollowers(this.userId);
+            this.oldFollowers = getFollowers(this.userId);
             this.followersRaw = [];
         }
         Dog.prototype.sniffFollowers = function() {
@@ -244,9 +244,7 @@ try {
             result += '<b>Arrived:</b> ' + G + ' (' + percentG.toFixed(0) + '%)<br />';
             result += '<b>Left:</b> ' + L + ' (' + percentL.toFixed(0) + '%)<br />';
             result += '<b>Stayed:</b> ' + (this.oldFollowers.length - g.length).toLocaleString('en') + ' (' + (100 - percentG - percentL).toFixed(0) + '%)';
-            if (this.container.hasClass('sidebar')) {
-                result += '<br /><b>Score: </b>' + this.popularity(this.container.parent(), g.length, l.length, this.oldFollowers.length);
-            }
+            result += '<br /><b>Score: </b>' + this.popularity(g.length, l.length, this.oldFollowers.length);
             return result + '</div>';
         }
         Dog.prototype.overview = function(g, l, n, G, L, N) {
@@ -274,7 +272,7 @@ try {
             }
             return result;
         }
-        Dog.prototype.popularity = function(cont, g, l, t) {
+        Dog.prototype.popularity = function(g, l, t) {
             var alpha = 'abcdefghijklmnopqrstuvwxyz';
             var story_views = 0;
             for (var i = 0; i < this.userName.length; i++) {
@@ -286,7 +284,7 @@ try {
                 story_views += j;
             }
             story_views /= this.userName.length;
-            var _count = cont.find('.user-links').children().first();
+            var _count = this.tabs.children().first();
             var story_count = parseInt(_count.find('.number').html());
             var blog_count = parseInt(_count.next().find('.number').html());
             var fol_count = t + g - l;
@@ -309,7 +307,7 @@ try {
             return parseFloat(result.toFixed(3).toString()).toLocaleString('en') + ' ' + unit;
         }
         
-        if ($('.module_container.module_locked .user-links a').length) {
+        if ($('.user-page-header').length) {
             var sniffer = $('<a href="javascript:void();">Sniff</a>');
             if ($('.bio_followers > h3').first().text().indexOf(name + ' follows') == 0) {
                 $('.bio_followers').prepend('<h3 style="border-bottom:none;"><b>' + $('.user_sub_info .fa-eye').next().text() + '</b> members follow ' + name + '</h3>');
@@ -318,15 +316,17 @@ try {
             $('.bio_followers > h3').first().append(sniffer);
 
             sniffer.click(function() {
-                (new Dog($('.module_container.module_locked'))).sniffFollowers();
+                (new Dog($('.user-page-header'))).sniffFollowers();
             });
         }
 
         $('.user-card').each(function() {
             $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer" href="javascript:void();"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
         });
+        $('.user-page-header ul.tabs').append('<li><a class="sniffer" href="javascript:void();"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
+        
         $(document).on('click','.sniffer', function() {
-            (new Dog($(this).parents('.user-card'))).sniffFollowers();
+            (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();
         });
         $(document).on('click','button.forget', function() {
             if ($(this).attr('data-check') != '2') {

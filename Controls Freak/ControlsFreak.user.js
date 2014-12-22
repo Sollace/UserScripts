@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.8
+// @version     1.8.9
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -564,12 +564,33 @@ body.editing .nav_bar,\
 body.editing .editor:not(.label) {\
   min-height: 40px;\
   height: auto !important;}\
-body.editing .user_toolbar ul:not(.editor),\
-body.editing .nav_bar ul:not(.editor),\
+body.editing .user_toolbar > ul:not(.editor),\
+body.editing .nav_bar ul:not(.editor):not(.non-editor),\
 body:not(.editing) .user_toolbar .editor,\
 body:not(.editing) .nav_bar .editor,\
 .user_toolbar .bin .items {\
+  display: none !important;}\
+.editor ul {\
+  border-radius: 0px !important;\
+  box-shadow: none !important;}\
+.editor ul:before {\
   display: none;}\
+.editing_button li i {\
+    border-radius: 0px !important;}\
+.editing_button li:hover > a {\
+    background: none !important;}\
+.editing_button li:hover .button > i {\
+    background: none repeat scroll 0% 0% #474543;\
+    color: #FFF;\
+    border: 1px solid rgba(0, 0, 0, 0.15);\
+    left: -1px;\
+    top: -1px;\
+    width: 36px;}\
+.editing_button .editing_button.hover > ul.items {\
+  margin-left: -11px !important;}\
+.editing_button ul {\
+    position: initial !important;\
+    display: inline-block !important;}\
 .editor > .editing_button[data-type="spacer"]:hover,\
 .editor > .editing_button[data-type="divider"]:hover {\
     background-color: rgba(0, 0, 0, 0.1);}\
@@ -657,7 +678,7 @@ body:not(.editing) .nav_bar .editor,\
         var customButtonData = [];
         
         var toolbar = $('nav.user_toolbar > ul').first();
-        var navbar = $('.nav-bar-list');
+        var navbar = $('.light > .nav-bar-list');
 
         var held = null;
 
@@ -713,13 +734,7 @@ body:not(.editing) .nav_bar .editor,\
             var b = $(this).closest("li");
             b.hasClass("hover") && (a.preventDefault(), b.removeClass("hover"))
         });
-        $(window).on('resize', function() {
-            updateSpacers();
-        });
-        
-        var control = $('<a href="javascript:void();" >Arrange Buttons</a>');
-        $('.banner-buttons').append(control);
-        control.click(function () {
+        $(document).on('click', '.toggle_edit_toolbar', function () {
             $('.user_toolbar > ul').css('background-color', $('.user_toolbar > ul').first().css('background-color'));
             if ($('body').hasClass('editing')) {
                 $('body').removeClass('editing')
@@ -728,10 +743,7 @@ body:not(.editing) .nav_bar .editor,\
             }
             updateSpacers();
         });
-
-        control = $('<a href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
-        $('.banner-buttons').append(control);
-        control.click(function () {
+        $(document).on('click', '.reset_toolbar', function () {
             setConfig(norm);
             clearUnusedButtons();
             usedButtons.flush(false);
@@ -747,6 +759,16 @@ body:not(.editing) .nav_bar .editor,\
             disabled.getEdit();
             updateSpacers();
         });
+        $(window).on('resize', function() {
+            updateSpacers();
+        });
+        
+        if ($('.banner-buttons').length) {
+            $('.banner-buttons').append('<a class="toggle_edit_toolbar" href="javascript:void();" >Arrange Buttons</a><a class="reset_toolbar" href="javascript:void();" style="margin-left: 5px;">Reset Toolbar</a>');
+        } else {
+            $('.nav_bar .right > ul').append('<li><a class="toggle_edit_toolbar" href="javascript:void();" ><i class="fa fa-pencil pin_link" /></a></li><li><a class="reset_toolbar" href="javascript:void();"><i class="fa fa-undo pin_link" /></a></li>');
+            $('.nav_bar .right > ul').addClass('non-editor');
+        }
     }
     
     function preInit() {
@@ -1044,7 +1066,7 @@ body:not(.editing) .nav_bar .editor,\
                 }
             }
 
-            var subs = $('<div class="items" />');
+            var subs = $('<ul class="items" />');
             if (this.listNode != null) {
                 for (var i = 0; i < this.children.length; i++) {
                     subs.append(this.children[i].getEditNode());
