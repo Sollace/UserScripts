@@ -7,7 +7,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6
+// @version     1.6.1
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------
@@ -35,21 +35,14 @@ function normalize(me){
     var result='';var space = true;
     for(var i=0;i<me.length;i++){result+=space?me[i].toUpperCase():me[i].toLowerCase();space=me[i]==' ';}
     return result;}
-function replaceAll(find,replace,me){
-    var escapeRegExp=function(str){return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,"\\$&");}
-    return me.replace(new RegExp(escapeRegExp(find),'g'),replace);}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    while (contains(input, '  ')) {
-        input = input.replace(/  /g, ' ');
-    }
+    while (contains(input, '  ')) input = input.replace(/  /g, ' ');
     var style = document.createElement('style');
     $(style).attr('type', 'text/css');
     $(style).append(input);
-    if (id != undefined && id != null) {
-        style.id = id;
-    }
+    if (id != undefined && id != null) style.id = id;
     $('head').append(style);
 }
 
@@ -62,7 +55,7 @@ function setDocCookie(name, val) {
 if (window.top != window) {
     var embeds = document.getElementsByTagName('EMBED');
     if (embeds.length > 0) {
-        document.body.innerHTML = replaceAll('<embed ', '<embed wmode="opaque" menu="false" ', document.body.innerHTML);
+        document.body.innerHTML = document.body.innerHTML.replace(/\<embed /g, '<embed wmode="opaque" menu="false" ');
     }
 }
 if (startsWith(document.location.href, "http://www.fimfiction.net/") || startsWith(document.location.href, "https://www.fimfiction.net/"))

@@ -3,11 +3,37 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.8.9
+// @version     1.3.10
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // ==/UserScript==
+
+function RunScript(func, mustCall, params) {
+  var scr = document.createElement('SCRIPT');
+  if (mustCall) {
+    if (params) {
+      var pars = [];
+      for (var i = 2; i < arguments.length; i++) {
+        pars.push(arguments[i]);
+      }
+      scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
+    } else {
+      scr.innerHTML = '(' + func.toString() + ')();';
+    }
+  } else {
+    scr.innerHTML = func.toString();
+  }
+  document.body.appendChild(scr);
+  scr.parentNode.removeChild(scr);
+};
+RunScript.toString = (function() {
+  var result = function toString() {
+    return 'function ' + this.name + '() {\n  [native code]\n}';
+  }
+  result.toString = result;
+  return result;
+})();
 
 $(document).ready(function () {
     function ToolBar(buttons) {
@@ -1257,11 +1283,6 @@ body:not(.editing) .nav_bar .editor,\
             spacers.css('width', (total - (taken * 1.2)) / spacers.length);
         }
     }
-    
-    function replaceAll(find, replace, me) {
-        var escapeRegExp = function (str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
-        return me.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-    }
 
     function register() {
         this.standard = [];
@@ -1310,51 +1331,28 @@ body:not(.editing) .nav_bar .editor,\
     function makeEditButtonPopup(node, index) {
         var pop = makeGlobalPopup('Custom Button', 'fa fa-edit');
 
-        $(pop.parentNode).css('width', '700px');
-
-        var tbl = $('<tbody />');
-        $(pop).append('<table class="properties" />');
-        $('table', pop).append(tbl);
-
-        var footer = $('<div class="drop-down-pop-up-footer" />');
-        $(pop).append(footer);
-
-        var done = $('<button class="styled_button"><i class="fa fa-save" />Save</button>');
-        footer.append(done);
-
-        var row = $('<tr />');
-        $(tbl).append(row);
-
-        $(row).append('<td class="label">Folder Name</td>');
-        $(row).append('<td><div><input id="custom_folder_name" type="text" placeholder="Custom" /></div></td>');
-
-        $('#custom_folder_name', row).val(customButtonData[index].name);
-
-        row = $('<tr />');
-        $(tbl).append(row);
-
-        $(row).append('<td class="label">Folder Icon</td>');
-        var select = '<td><div><select id="custom_folder_icon">';
+        pop.content.parent().css('width', '700px');
+        pop.content.append('<table class="properties"><tbody /></table><div class="drop-down-pop-up-footer"><button class="styled_button"><i class="fa fa-save" />Save</button></div>');
+        
+        pop.scope(pop.find('tbody')).append('<tr><td class="label">Folder Name</td><td><div><input id="custom_folder_name" type="text" placeholder="Custom" /></div></td></tr>');
+        
         var icons = ["ambulance", "anchor", "android", "apple", "archive", "asterisk", "ban", "bar-chart-o", "beer", "bell", "bell-o", "bolt", "book", "bookmark", "briefcase", "bug", "building-o", "bullhorn", "calendar", "camera", "certificate", "chain", "chain-broken", "check", "clipboard", "clock-o", "cloud", "cloud-download", "cloud-upload", "coffee", "comment", "comments", "compass", "credit-card", "cutlery", "dashboard", "desktop", "dollar", "download", "eject", "envelope", "envelope-o", "eraser", "euro", "exclamation", "eye", "facebook", "female", "fighter-jet", "file", "file-o", "file-text", "file-text-o", "film", "fire", "fire-extinguisher", "flag", "flag-checkered", "flag-o", "flask", "flickr", "folder", "folder-open", "frown-o", "gamepad", "gbp", "gear", "gears", "gift", "glass", "globe", "google-plus", "hdd-o", "headphones", "heart", "heart-o", "home", "hospital-o", "inbox", "info", "key", "keyboard-o", "laptop", "leaf", "legal", "lemon-o", "lightbulb-o", "linux", "list-ol", "list-ul", "lock", "magic", "magnet", "male", "medkit", "meh-o", "microphone", "minus-circle", "mobile", "money", "moon-o", "music", "pagelines", "paperclip", "pencil", "phone", "picture-o", "plane", "play-circle", "plus-circle", "power-off", "print", "puzzle-piece", "question", "quote-left", "quote-right", "refresh", "repeat", "road", "rocket", "rss", "save", "scissors", "search", "shield", "shopping-cart", "smile-o", "stack-exchange", "star", "star-half", "star-half-empty", "star-o", "stethoscope", "suitcase", "sun-o", "tablet", "tag", "tags", "thumb-tack", "thumbs-down", "thumbs-o-down", "thumbs-o-up", "thumbs-up", "ticket", "times-circle", "tint", "trash-o", "trophy", "truck", "tumblr", "twitter", "umbrella", "unlock", "upload", "user", "users", "video-camera", "warning", "wheelchair", "windows", "wrench", "youtube"];
-        for (var i = 0; i < icons.length; i++) {
-            select += '<option>' + icons[i] + '</option></div></div>';
-        }
-        $(row).append(select + '</select>');
-        $('#custom_folder_icon', row).val(customButtonData[index].icon);
-
-        $(done).click(function () {
-            var v = $('#custom_folder_name', tbl).val();
+        pop.content.append('<tr><td class="label">Folder Icon</td><td><div><select id="custom_folder_icon"><option>' + icons.join('</option><option>') + '</option></select></div></td></tr>');
+        
+        pop.find('button').click(function () {
+            var v = pop.find('#custom_folder_name').val();
             customButtonData[index].name = v == '' ? 'Custom' : v;
             node.find('.bind_name').html(customButtonData[index].name);
-
-            v = $('#custom_folder_icon', tbl).find('option:selected').text();
+            v = pop.find('#custom_folder_icon option:selected').text();
             customButtonData[index].icon = v;
             node.find('.bind_icon').attr('class', 'bind_icon fa fa-' + v);
             saveCustomButtons();
-            $("#message_close_button").click();
+            $('#message_close_button').click();
         });
-
-        position($(pop).parent().parent(), 'center', 'center');
+        pop.find('#custom_folder_name').val(customButtonData[index].name);
+        pop.find('#custom_folder_icon').val(customButtonData[index].icon);
+        
+        pop.position('center', 'center');
     }
 
     //==API FUNCTION==//
@@ -1368,55 +1366,67 @@ body:not(.editing) .nav_bar .editor,\
 
     //==API FUNCTION==//
     function makeStyle(input, id) {
-        while (input.indexOf('  ') != -1) {
-            input = replaceAll('  ', ' ', input);
-        }
+        while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
         var style = document.createElement('style');
         $(style).attr('type', 'text/css');
         $(style).append(input);
-        if (id != undefined && id != null) {
-            style.id = id;
-        }
+        if (id) style.id = id;
         $('head').append(style);
     }
 
     //==API FUNCTION==//
+    function Popup(holder, dark, cont, button) {
+        this.holder = holder;
+        this.dark = dark;
+        this.content = this.unscoped = cont;
+        this.button = button;
+        this.scoped = null;
+        this.position = function(x, y, buff) {
+            if (this.holder != null) position(this.holder, x, y, buff);
+        }
+        this.scope = function(el) {
+            if (typeof el == 'string') {
+                el = $(el);
+                this.content.append(el);
+            }
+            return this.content = el;
+        }
+        this.unscope = function(el) {
+            this.content = this.unscoped;
+            if (typeof el !== 'undefined') this.scope(el);
+            return this.content;
+        }
+        this.find = function(el) {
+            return this.content.find(el);
+        }
+    }
+    
+    //==API FUNCTION==//
     function makeGlobalPopup(title, fafaText, darken, close) {
         if (typeof (close) == 'undefined') close = true;
-        var holder = document.createElement("div");
+        var holder = $('<div style="position: fixed;z-index:2147483647;left:10px;top:10px" class="global_popup drop-down-pop-up-container" />');
         $("body").append(holder);
-        $(holder).addClass("drop-down-pop-up-container");
-        $(holder).attr("style", "position: fixed;z-index:2147483647;left:10px;top:10px");
-        $(holder).addClass('global_popup');
 
+        var dark = null;
         if (darken) {
-            var dark = $('<div class="dimmer" style="z-index:1001;" />');
-            if (typeof (darken) == 'number') {
-                dark.css('opacity', (darken / 100));
-            }
+            dark = $('<div class="dimmer" style="z-index:1001;" />');
+            if (typeof (darken) == 'number') dark.css('opacity', (darken / 100));
             $('#dimmers').append(dark);
         }
 
-        var pop = $("<div class=\"drop-down-pop-up\" style=\"width: auto\" />");
-        $(holder).append(pop);
+        var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
+        holder.append(pop);
 
-        var head = document.createElement("h1");
-        $(head).css("cursor","move");
-        $(pop).append(head);
-        if (fafaText != null) {
-            $(head).append("<i class=\"" + fafaText + "\" /i>");
-        } else if (img != null) {
-            $(head).append("<img src=\"" + img + "\" style=\"width:18px;height:18px;margin-right:5px;\" /img>");
-        }
-        $(head).append(title);
-
-        head.onmousedown = function(event) {
-            var x = event.clientX - parseInt(holder.style.left.split('px')[0]);
-            var y = event.clientY - parseInt(holder.style.top.split('px')[0]);
-            document.onmousemove = function(event) {
-                position(holder, event.clientX - x, event.clientY - y, 30);
+        var head = $('<h1 style="cursor:move">' + title + '</h1>');
+        pop.append(head);
+        if (fafaText) head.prepend("<i class=\"" + fafaText + "\" /i>");
+        head.onmousedown = function(e) {
+            var x = e.clientX - parseInt(holder.style.left.split('px')[0]);
+            var y = e.clientY - parseInt(holder.style.top.split('px')[0]);
+            document.onmousemove = function(e) {
+                position(holder, e.clientX - x, e.clientY - y, 30);
             };
-            event.preventDefault();
+            e.preventDefault();
         };
         head.onmouseup = function(e) {
             document.onmousemove = function(e) {};
@@ -1433,10 +1443,9 @@ body:not(.editing) .nav_bar .editor,\
             }
         });
 
-        var content = document.createElement("div");
-        $(content).addClass("drop-down-pop-up-content");
-        $(pop).append(content);
-        return content;
+        var content = $('<div class="drop-down-pop-up-content" />');
+        pop.append(content);
+        return new Popup(holder, dark, content, null);
     }
 
     //==API FUNCTION==//
@@ -1472,12 +1481,16 @@ body:not(.editing) .nav_bar .editor,\
         $(obj).css('top', y + "px");
         $(obj).css('left', x + "px");
     }
-
-    unsafeWindow.registerToolbarButton = function (obj, offsetType, index) {
-        if (offsetType == -1) {
-            index = def.children.length - index;
+    
+    RunScript(function() {
+        window.registerToolbarButton = function(obj, offsetType, index) {
+            $(window).trigger('registerToolbarButton', [obj,offsetType,index]);
         }
-
+        window.registerToolbarButton.toString = RunScript.toString;
+    }, true);
+    
+    $(window).on('registerToolbarButton', function(e, obj, offsetType, index) {
+        if (offsetType == -1) index = def.children.length - index;
         def.fromConfig(norm[1]);
         def.gen(toolbar);
         for (var i = 0; i < def.children.length; i++) {
@@ -1490,5 +1503,5 @@ body:not(.editing) .nav_bar .editor,\
         def.fromConfig(conf[1]);
         def.gen(toolbar);
         def.getEdit();
-    }
+    });
 });
