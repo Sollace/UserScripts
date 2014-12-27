@@ -103,7 +103,7 @@ try {
         Dog = function(c) {
             this.container = c;
             if (this.container.hasClass('user-page-header')) {
-                this.userName = this.container.find('.resize_text a').text();
+                this.userName = this.container.find('h1.resize_text > a').first().text();
                 this.userId = this.container.find('ul.tabs li a').first().attr('href').split('&user=').reverse()[0].split('&')[0];
                 this.tabs = this.container.find('ul.tabs');
             } else {
@@ -118,9 +118,9 @@ try {
         Dog.prototype.sniffFollowers = function() {
             var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
             pop.content.css({ width: '300px', height: '300px'});
-            pop.position('center', 'center');
             $('body').append($('#info-cards'));
             this.Sniff(true, pop.content);
+            pop.position('center', 'center');
         }
         Dog.prototype.snubFollowers = function(link) {
             var pop = $('<div></div>');
@@ -570,11 +570,10 @@ a:hover + .open-pin:after, .open-pin:hover:after {\
 } catch (e) {alert('Nosey Hound: ' + e);}
 
 //==API FUNCTION==//
-function Popup(holder, dark, cont, button) {
+function Popup(holder, dark, cont) {
   this.holder = holder;
   this.dark = dark;
   this.content = this.unscoped = cont;
-  this.button = button;
   this.scoped = null;
   this.position = function(x, y, buff) {
     if (this.holder != null) position(this.holder, x, y, buff);
@@ -598,7 +597,6 @@ function Popup(holder, dark, cont, button) {
 
 //==API FUNCTION==//
 function makeGlobalPopup(title, fafaText, darken, close) {
-    logger.Log('makeGlobalPopup: start');
     if (typeof (close) == 'undefined') close = true;
     var holder = $('<div style="position: fixed;z-index:2147483647;left:10px;top:10px" class="global_popup drop-down-pop-up-container" />');
     $("body").append(holder);
@@ -616,20 +614,20 @@ function makeGlobalPopup(title, fafaText, darken, close) {
     var head = $('<h1 style="cursor:move">' + title + '</h1>');
     pop.append(head);
     if (fafaText) head.prepend("<i class=\"" + fafaText + "\" /i>");
-    head.onmousedown = function(e) {
-        var x = e.clientX - parseInt(holder.style.left.split('px')[0]);
-        var y = e.clientY - parseInt(holder.style.top.split('px')[0]);
-        document.onmousemove = function(e) {
+    head.on('mousedown', function(e) {
+        var x = e.clientX - parseFloat(holder.css('left'));
+        var y = e.clientY - parseFloat(holder.css('top'));
+        $(document).on('mousemove.popup.global', function(e) {
             position(holder, e.clientX - x, e.clientY - y, 30);
-        };
+        });
+        $(document).one('mouseup', function(e) {
+            $(this).off('mousemove.popup.global');
+        });
         e.preventDefault();
-    };
-    head.onmouseup = function(e) {
-        document.onmousemove = function(e) {};
-    };
+    });
     
     var c = $('<a id="message_close_button" class="close_button" />');
-    $(head).append(c);
+    head.append(c);
     $(c).click(function(e) {
         if (close) {
             $(dark).remove();
@@ -641,8 +639,7 @@ function makeGlobalPopup(title, fafaText, darken, close) {
     
     var content = $('<div class="drop-down-pop-up-content" />');
     pop.append(content);
-    logger.Log('makeGlobalPopup: end');
-    return new Popup(holder, dark, content, null);
+    return new Popup(holder, dark, content);
 }
 
 //==API FUNCTION==//

@@ -1375,11 +1375,10 @@ body:not(.editing) .nav_bar .editor,\
     }
 
     //==API FUNCTION==//
-    function Popup(holder, dark, cont, button) {
+    function Popup(holder, dark, cont) {
         this.holder = holder;
         this.dark = dark;
         this.content = this.unscoped = cont;
-        this.button = button;
         this.scoped = null;
         this.position = function(x, y, buff) {
             if (this.holder != null) position(this.holder, x, y, buff);
@@ -1400,7 +1399,7 @@ body:not(.editing) .nav_bar .editor,\
             return this.content.find(el);
         }
     }
-    
+
     //==API FUNCTION==//
     function makeGlobalPopup(title, fafaText, darken, close) {
         if (typeof (close) == 'undefined') close = true;
@@ -1420,20 +1419,20 @@ body:not(.editing) .nav_bar .editor,\
         var head = $('<h1 style="cursor:move">' + title + '</h1>');
         pop.append(head);
         if (fafaText) head.prepend("<i class=\"" + fafaText + "\" /i>");
-        head.onmousedown = function(e) {
-            var x = e.clientX - parseInt(holder.style.left.split('px')[0]);
-            var y = e.clientY - parseInt(holder.style.top.split('px')[0]);
-            document.onmousemove = function(e) {
+        head.on('mousedown', function(e) {
+            var x = e.clientX - parseFloat(holder.css('left'));
+            var y = e.clientY - parseFloat(holder.css('top'));
+            $(document).on('mousemove.popup.global', function(e) {
                 position(holder, e.clientX - x, e.clientY - y, 30);
-            };
+            });
+            $(document).one('mouseup', function(e) {
+                $(this).off('mousemove.popup.global');
+            });
             e.preventDefault();
-        };
-        head.onmouseup = function(e) {
-            document.onmousemove = function(e) {};
-        };
+        });
 
         var c = $('<a id="message_close_button" class="close_button" />');
-        $(head).append(c);
+        head.append(c);
         $(c).click(function(e) {
             if (close) {
                 $(dark).remove();
@@ -1445,7 +1444,7 @@ body:not(.editing) .nav_bar .editor,\
 
         var content = $('<div class="drop-down-pop-up-content" />');
         pop.append(content);
-        return new Popup(holder, dark, content, null);
+        return new Popup(holder, dark, content);
     }
 
     //==API FUNCTION==//
