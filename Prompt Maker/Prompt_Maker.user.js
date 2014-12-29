@@ -3,7 +3,7 @@
 // @description Adds a button to FimFiction to generate random prompts
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4.4
+// @version     1.4.5
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -440,46 +440,47 @@ function pickOne(arr) {
 
 //==API FUNCTION==//
 function Popup(holder, dark, cont) {
-    this.holder = holder;
-    this.dark = dark;
-    this.content = this.unscoped = cont;
-    this.scoped = null;
-    this.position = function(x, y, buff) {
-        if (this.holder != null) position(this.holder, x, y, buff);
-    }
-    this.scope = function(el) {
-        if (typeof el == 'string') {
-            el = $(el);
-            this.content.append(el);
-        }
-        return this.content = el;
-    }
-    this.unscope = function(el) {
-        this.content = this.unscoped;
-        if (typeof el !== 'undefined') this.scope(el);
-        return this.content;
-    }
-    this.find = function(el) {
-        return this.content.find(el);
-    }
+  this.holder = holder;
+  this.dark = dark;
+  this.content = this.unscoped = cont;
+  this.scoped = null;
+  this.position = function(x, y, buff) {
+    if (this.holder != null) position(this.holder, x, y, buff);
+  }
+  this.scope = function(el) {
+      if (typeof el == 'string') {
+          el = $(el);
+          this.content.append(el);
+      }
+      return this.content = el;
+  }
+  this.unscope = function(el) {
+      this.content = this.unscoped;
+      if (typeof el !== 'undefined') this.scope(el);
+      return this.content;
+  }
+  this.find = function(el) {
+      return this.content.find(el);
+  }
 }
 
 //==API FUNCTION==//
 function makeGlobalPopup(title, fafaText, darken, close) {
     if (typeof (close) == 'undefined') close = true;
+    if (typeof (darken) == 'undefined') darken = 100;
     var holder = $('<div style="position: fixed;z-index:2147483647;left:10px;top:10px" class="global_popup drop-down-pop-up-container" />');
     $("body").append(holder);
-
+    
     var dark = null;
     if (darken) {
         dark = $('<div class="dimmer" style="z-index:1001;" />');
         if (typeof (darken) == 'number') dark.css('opacity', (darken / 100));
         $('#dimmers').append(dark);
     }
-
+    
     var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
     holder.append(pop);
-
+    
     var head = $('<h1 style="cursor:move">' + title + '</h1>');
     pop.append(head);
     if (fafaText) head.prepend("<i class=\"" + fafaText + "\" /i>");
@@ -487,25 +488,27 @@ function makeGlobalPopup(title, fafaText, darken, close) {
         var x = e.clientX - parseFloat(holder.css('left'));
         var y = e.clientY - parseFloat(holder.css('top'));
         $(document).on('mousemove.popup.global', function(e) {
-            position(holder, e.clientX - x, e.clientY - y, 30);
+            position(holder, e.clientX - x, e.clientY - y);
         });
         $(document).one('mouseup', function(e) {
             $(this).off('mousemove.popup.global');
         });
         e.preventDefault();
     });
-
+    
     var c = $('<a id="message_close_button" class="close_button" />');
     head.append(c);
     $(c).click(function(e) {
         if (close) {
-            $(dark).remove();
+            $(dark).fadeOut('fast', function () {
+                $(this).remove()
+            });
             $(holder).remove();
         } else {
-            $(holder).css('display','none');
+           $(holder).css('display','none');
         }
     });
-
+    
     var content = $('<div class="drop-down-pop-up-content" />');
     pop.append(content);
     return new Popup(holder, dark, content);

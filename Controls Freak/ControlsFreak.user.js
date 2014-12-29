@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.10
+// @version     1.3.11
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -1403,6 +1403,7 @@ body:not(.editing) .nav_bar .editor,\
     //==API FUNCTION==//
     function makeGlobalPopup(title, fafaText, darken, close) {
         if (typeof (close) == 'undefined') close = true;
+        if (typeof (darken) == 'undefined') darken = 100;
         var holder = $('<div style="position: fixed;z-index:2147483647;left:10px;top:10px" class="global_popup drop-down-pop-up-container" />');
         $("body").append(holder);
 
@@ -1423,7 +1424,7 @@ body:not(.editing) .nav_bar .editor,\
             var x = e.clientX - parseFloat(holder.css('left'));
             var y = e.clientY - parseFloat(holder.css('top'));
             $(document).on('mousemove.popup.global', function(e) {
-                position(holder, e.clientX - x, e.clientY - y, 30);
+                position(holder, e.clientX - x, e.clientY - y);
             });
             $(document).one('mouseup', function(e) {
                 $(this).off('mousemove.popup.global');
@@ -1435,7 +1436,9 @@ body:not(.editing) .nav_bar .editor,\
         head.append(c);
         $(c).click(function(e) {
             if (close) {
-                $(dark).remove();
+                $(dark).fadeOut('fast', function () {
+                    $(this).remove()
+                });
                 $(holder).remove();
             } else {
                 $(holder).css('display','none');
