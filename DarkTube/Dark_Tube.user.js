@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.2
+// @version     2.2.1
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -91,14 +91,17 @@ var mainCss = '\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -81px -62px !important;}\
 .yt-uix-button:hover .yt-uix-button-icon-playlist-dislike {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -209px -399px !important;}\
-.yt-uix-button-icon-action-panel-transcript {\
-    background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -172px -159px !important;}\
 .addto-watch-later-button:before, .addto-watch-later-button-sign-in:before {\
   background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -169px -339px !important;}\
+.action-panel-trigger-transcript:before {\
+    opacity: 0.6;\
+    background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -172px -159px !important;}\
 .yt-uix-button-icon-comment-actions-menu,\
-.yt-uix-button-icon-action-panel-report {\
+.action-panel-trigger-report:before {\
+    opacity: 0.6;\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -81px -62px !important;}\
-.yt-uix-button-icon-action-panel-stats {\
+.action-panel-trigger-stats:before {\
+    opacity: 0.6;\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -61px -225px !important;}\
 .yt-uix-form-input-checkbox-container input:checked+.yt-uix-form-input-checkbox-element {\
     background: no-repeat #2a2a2a url(http://i.imgur.com/DDNZc3U.png) -155px -62px !important;\
@@ -198,6 +201,7 @@ var mainCss = '\
 \
 /*Hitchhiker positions*/\
 #yt-masthead #logo, #masthead-logo {\
+    background-repeat: no-repeat !important;\
     background-position: 0px -1414px !important;}\
 #footer-logo img, .footer-container .footer-logo, .footer-logo-icon {\
     background-position: 0px -1414px !important;}\
