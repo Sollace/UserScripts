@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.2.1
+// @version     2.2.2
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -75,7 +75,7 @@ var mainCss = '\
 .yt-uix-button-icon-footer-language,\
 .yt-uix-button-icon-questionmark,\
 .yt-uix-button-icon-sprite_send_message,\
-#watch-like:before, #watch-dislike:before, .ad-info-icon {\
+#watch-like:before, #watch-dislike:before, .ad-info-icon, .yt-help-icon {\
     background-image: url(' + resources.highjacker + ') !important;}\
 \
 .dashboard-widget-handle {\
@@ -159,6 +159,8 @@ var mainCss = '\
     background-image: url(' + resources.editor + ') !important;}\
 \
 /*Highjacker positions*/\
+.yt-help-icon {\
+  background-position: -125px -5px !important;}\
 .ad-info-icon {\
   background-position: -65px -26px !important;\
   opacity: 0.6;}\
@@ -1146,6 +1148,13 @@ var mainCss = '\
         margin-left: 5px !important;}\
     #stpdownload {\
         color: #fff !important;}\
+\
+/*Cellphone verification*/\
+.yt-default p, p.yt, #verify-phone-page label {\
+  color: #999 !important;}\
+#verify-phone-page {\
+  color: #fff !important;\
+  border-color: #303030 !important;}\
 \
 /* New Dashboard */\
 .add-widget-button, .add-widget-button:hover {\
