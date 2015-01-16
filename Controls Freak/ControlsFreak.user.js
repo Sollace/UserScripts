@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.3.11
+// @version     1.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -102,7 +102,11 @@ $(document).ready(function () {
         return JSON.stringify(result);
     }
     ToolBar.prototype.fromConfig = function (config) {
-        config = JSON.parse(config);
+        try {
+            config = JSON.parse(config);
+        } catch (e) {
+            return e;
+        }
         
         var childs = [];
         for (var i = 0; i < this.children.length; i++) {
@@ -142,7 +146,7 @@ $(document).ready(function () {
         this.children.push(new Button(this, 0, $('#private-message-drop-down'), false, 'pin'));
         this.children.push(new Button(this, 1, $('.nav-bar-list .feed-link').parent(), false, 'pin'));
         this.children.push(new Button(this, 2, $('#notifications-drop-down'), false, 'pin'));
-        this.children.push(new Button(this, 3, $('#form_search_sidebar'), false, 'pin'));
+        this.children.push(new Button(this, 3, $('#site-search').parent(), false, 'pin', 'Search'));
 
         this.gen = function () {
             for (var i = this.children.length - 1; i >= 0; i--) {
@@ -153,31 +157,26 @@ $(document).ready(function () {
         }
     }
     Deck.prototype = ToolBar.prototype;
-    
     if (getIsLoggedIn()) {
         preInit();
         makeStyle('\
 .editing_button > .button {\
     padding: 0px 10px;}\
-.iconize, .mail-link:before, .notifications-link:before, .feed-link:before {\
+.mail-link:before, .notifications-link:before, .feed-link:before {\
     line-height: 45px;\
     text-align: center;\
     display: inline-block;\
     font-family: FontAwesome;\
     font-weight: normal;}\
-.user_toolbar > ul > li > .iconize, .user_toolbar > ul > li > .notifications-link:before, .user_toolbar > ul > li > .mail-link:before, .user_toolbar > ul > li > .feed-link:before {\
+.user_toolbar > ul > li > .notifications-link:before, .user_toolbar > ul > li > .mail-link:before, .user_toolbar > ul > li > .feed-link:before {\
     margin-right: 5px;\
     font-size: 16px;\
     line-height: inherit;}\
-.user_toolbar > ul > li > ul li .iconize, .user_toolbar > ul > li > ul li .notifications-link:before, .user_toolbar > ul > li > ul li .mail-link:before, .user_toolbar > ul > li > ul li .feed-link:before {\
+.user_toolbar > ul > li > ul li .notifications-link:before, .user_toolbar > ul > li > ul li .mail-link:before, .user_toolbar > ul > li > ul li .feed-link:before {\
     margin-right: 8px;\
     text-align: center;\
     color: #666;\
     font-size: 14px;\
-    position: absolute;\
-    left: 0px;\
-    top: 0px;\
-    bottom: 0px;\
     background: none repeat scroll 0% 0% #F8F8F8;\
     line-height: 38px;\
     width: 34px;\
@@ -493,6 +492,10 @@ $(document).ready(function () {
 .nav-bar-list .iconize {\
   display: block;\
   font-size: 14px;}\
+.user_toolbar > ul > li ul .iconize > .label {\
+  margin-left: -10px;}\
+.nav-bar-list .iconize > .label {\
+  display: none;}\
 .nav-bar-list .editing_button[data-type="spacer"]:before, .nav-bar-list .iconize {\
   color: #C8CCE0;\
   padding: 0px 8px;\
@@ -524,55 +527,123 @@ $(document).ready(function () {
 .nav-bar-list > .divider {\
   background: none !important;\
   width: 5px;}\
-.user_toolbar > ul > #form_search_sidebar {\
-  background-color: rgba(255, 255, 255, 0.1);}\
-.user_toolbar > ul > #form_search_sidebar .nav-bar-search {\
+\
+.user_toolbar > ul > li.no-hover {\
+  background: none;}\
+.user_toolbar #site-search > div {\
+  height: 35px !important;\
+  vertical-align: baseline !important;}\
+.user_toolbar #site-search .button-group {\
+  margin: 0px;\
+  padding: 0px;}\
+.user_toolbar #site-search .button-group > a.styled_button {\
+  margin-top: -40px;\
+  margin-bottom: -40px;\
+  line-height: 28px;}\
+.user_toolbar > ul > li > #site-search .drop-down-show ul {\
+  display: block;}\
+.user_toolbar > ul > li > #site-search input {\
   background-color: rgba(0,0,0,0.3);\
   border: 1px solid rgba(0, 0, 0, 0.2);\
   background-clip: padding-box;\
   padding: 6px;\
   margin-top: -4px;\
-  margin-bottom: -1px;\
   outline: medium none;\
   color: #C8CCE0;\
   vertical-align: middle;\
   line-height: 26px;\
   width: 200px;}\
-.user_toolbar > ul > li ul .search_submit,\
-.user_toolbar > ul > #form_search_sidebar .search_submit {\
-  background: none;\
+.user_toolbar > ul > li ul #site-search .styled_button,\
+.user_toolbar > ul > li > #site-search .styled_button {\
+  box-shadow: none;\
+  border-radius: 0px;\
   border: none;\
-  padding: 5px;\
-  outline: medium none;\
-  vertical-align: middle;\
-  font-family: "FontAwesome";\
   line-height: 26px;\
-  margin-top: -4px;\
-  margin-bottom: -1px;}\
-.user_toolbar > ul > li ul #form_search_sidebar {\
-  position: relative;\
-  height: 40px;\
-  margin: 0px;\
-  padding: 0px;}\
-.user_toolbar > ul > #form_search_sidebar .search_submit:hover {\
-  background-color: rgba(0,0,0, 0.1);}\
-.user_toolbar > ul > li ul .search_submit,\
-.user_toolbar > ul > li ul #form_search_sidebar .nav-bar-search {\
+  padding: 5px;\
+  vertical-align: middle;\
+  border-right: 1px solid rgba(0, 0, 0, 0.2);\
+  border-top: 1px solid rgba(0, 0, 0, 0.2);\
+  margin: -4px 0px 0px 0px;\
+  background: none repeat scroll 0% 0% rgba(255, 255, 255, 0.1);}\
+.user_toolbar > ul > li > #site-search .styled_button,\
+.user_toolbar > ul > li > #site-search .styled_button i {\
+  text-shadow: none;\
+  color: rgba(0, 0, 0, 0.85);\
+  font-weight: bold;\
+  margin-right: 0px;}\
+.user_toolbar > ul > li ul #site-search > div {\
+  position: initial !important;\
+  display: block !important;}\
+.user_toolbar > ul > li ul #site-search > div:first-child + div {\
+  margin-bottom: -20px;\
+  margin-top: -11px;}\
+.user_toolbar > ul > li ul #site-search > div:first-child + div + div {\
+  margin-bottom: 0px;\
+  border-bottom: solid 1px #CCC;}\
+.user_toolbar > ul > li ul #site-search input {\
   position: absolute;\
-  border: 1px solid #CCC;}\
-.user_toolbar > ul > li ul #form_search_sidebar .nav-bar-search {\
+  border: none;\
+  border-top: solid 1px #CCC;\
+  padding-right: 5px;\
   line-height: 38px;\
   top: 0px;\
   bottom: 0px;\
   left: 0px;\
-  padding-right: 18px;}\
-.user_toolbar > ul > li ul .search_submit {\
-  top: 0px;\
   right: 0px;\
-  bottom: 0px;\
+  width: 100%;}\
+.user_toolbar > ul > li ul #site-search .drop-down ul {\
+  left: 0 !important;}\
+.user_toolbar > ul > li ul #site-search .styled_button {\
+  height: 35px;}\
+.user_toolbar > ul > li ul #site-search > div > .styled_button {\
+  position: absolute;\
+  right: 0px;\
+  bottom: -4px;\
   width: 35px;\
-  margin-top: 0px;\
-  margin-bottom: 0px;}\
+  margin-right: 0px;\
+  margin-bottom: 5px;}\
+.user_toolbar > ul > li ul #site-search .button-group {\
+  position: absolute;\
+  left: 0px;\
+  bottom: -4px;\
+  right: 35px;}\
+.user_toolbar > ul > li ul #site-search .button-group > a span {\
+  margin-left: 40px;\
+  color: initial;\
+  text-shadow: none;}\
+.user_toolbar > ul > li ul #site-search > div > .styled_button i {\
+  border-right: none !important;}\
+.user_toolbar > ul > li ul #site-search > div > .styled_button i,\
+.user_toolbar > ul > li ul #site-search .button-group > a i {\
+  margin: 0px;\
+  color: initial;}\
+.user_toolbar #site-search .drop-down-show > .drop-down {\
+  display: block !important;}\
+.user_toolbar #site-search .button-group .drop-down ul,\
+.user_toolbar #site-search .button-group-vertical .drop-down ul {\
+  background: none;}\
+.user_toolbar #site-search .drop-down ul li a {\
+  display: block !important;\
+  padding: 0px !important;\
+  margin: 0px !important;\
+  color: inherit;}\
+.user_toolbar #site-search .drop-down ul li:hover i {\
+  color: inherit;\
+  width: 35px;}\
+.user_toolbar #site-search .button-group .drop-down i,\
+.user_toolbar #site-search .button-group-vertical .drop-down i {\
+  margin-right: 8px !important;\
+  background: none;\
+  border: none;\
+  position: initial;}\
+\
+/*Search Dropdown fix*/\
+.nav_bar .no-hover .button-group:not(.drop-down-show) > .drop-down {\
+  display: none !important;}\
+.nav_bar .no-hover .button-group.drop-down-show > .drop-down {\
+  display: block !important;}\
+.nav_bar .no-hover .button-group > .drop-down {\
+  left: auto;}\
 \
 .editor > li {\
   vertical-align: top !important;}\
@@ -631,6 +702,8 @@ body:not(.editing) .nav_bar .editor,\
 .items .editing_button[data-type="divider"] {\
   height: 5px;\
   background: none repeat scroll 0% 0% #CCC;}\
+.editing_button .editing_button a {\
+padding-left: 0px !important;}\
 .editing_button a {\
   pointer-events: none !important;}\
 .editing_button {\
@@ -705,22 +778,23 @@ body:not(.editing) .nav_bar .editor,\
         
         var toolbar = $('nav.user_toolbar > ul').first();
         var navbar = $('.light > .nav-bar-list');
-
+        
         var held = null;
 
         var nav = new Deck();
         var def = new ToolBar(toolbar.children());
         var disabled = new ToolBar([]);
-
+        
         makeCustomButtons(3);
         
         var norm = [
             nav.getConfig(),
             def.getConfig()
         ];
+        
         var conf = getConfig();
-
-        if (conf != norm) {
+        
+        if (conf != norm && conf.length == 2) {
             usedButtons.flush(false);
             unusedButtons.flush(false);
             nav.fromConfig(conf[0]);
@@ -731,7 +805,7 @@ body:not(.editing) .nav_bar .editor,\
         }
         
         loadUnusedButtons(disabled);
-                
+        
         nav.getContainer(navbar, ['nav-bar-list'], function () {
             return this.isPinnable();
         });
@@ -739,12 +813,13 @@ body:not(.editing) .nav_bar .editor,\
         disabled.getContainer(toolbar, ['bin'], function () {
             return this.type != 'pin' && this.children.length == 0;
         });
+        
         $(toolbar).after('<ul class="editor label"><span><i class="fa fa-trash-o" /> Disabled Items</span></ul>');
         
         def.getContainer(toolbar, ['inner'], function () {
             return true;
         });
-
+        
         $(document).mousemove(function (e) {
             if ($('#button_moving').length > 0) {
                 $('#button_moving').css('top', (e.clientY - $('#button_moving').attr('data_offset_Y')) + 'px');
@@ -761,9 +836,11 @@ body:not(.editing) .nav_bar .editor,\
             b.hasClass("hover") && (a.preventDefault(), b.removeClass("hover"))
         });
         $(document).on('click', '.toggle_edit_toolbar', function () {
-            $('.user_toolbar > ul').css('background-color', $('.user_toolbar > ul').first().css('background-color'));
+            if ($('.user_toolbar > ul:not(.editor)').first().css('background-color') != 'transparent') {
+                $('.user_toolbar > ul.editor').css('background', $('.user_toolbar > ul:not(.editor)').first().css('background-color'));
+            }
             if ($('body').hasClass('editing')) {
-                $('body').removeClass('editing')
+                $('body').removeClass('editing');
             } else {
                 $('body').addClass('editing')
             }
@@ -799,16 +876,18 @@ body:not(.editing) .nav_bar .editor,\
     
     function preInit() {
         var but = $('.user_toolbar > ul > li > a[href^="/user/"]').children('span').first();
-        but.html(but.html().replace(' ▼',' <span class="arrow">▼</span>'));
+        but.html(but.html().replace('▼','<span class="arrow">▼</span>'));
     }
 
     function getConfig() {
-        return GM_getValue('config', norm);
+        var result = GM_getValue('config', norm);
+        if (typeof result === 'string') return JSON.parse(result);
+        return norm;
     }
 
     function setConfig(used) {
         conf = used;
-        GM_setValue('config', used);
+        GM_setValue('config', JSON.stringify(used));
     }
 
     function loadUnusedButtons(p) {
@@ -929,8 +1008,8 @@ body:not(.editing) .nav_bar .editor,\
         return null;
     }
 
-  //function Button(custom, el, handleChilds, typ) {
-    function Button(p, index, el, handleChilds, typ) {
+  //function Button(custom, el, handleChilds, typ, name) {
+    function Button(p, index, el, handleChilds, typ, name) {
         if (p == true) {
             buttonRegistry.cust(this);
             usedButtons.cust(false);
@@ -938,6 +1017,7 @@ body:not(.editing) .nav_bar .editor,\
             this.id = buttonRegistry.neglength();
             
             p = disabled;
+            name = typ;
             typ = handleChilds;
             handleChilds = el;
             el = index;
@@ -963,7 +1043,8 @@ body:not(.editing) .nav_bar .editor,\
         this.timeout = true;
         this.listNode = null;
         this.children = [];
-
+        this.name = name;
+        
         this.originalParent = $($(el).parent());
         this.originalIndex = this.originalElement.index();
         
@@ -1086,7 +1167,7 @@ body:not(.editing) .nav_bar .editor,\
             } else {
                 bs = copy.find('button');
                 if (bs.length > 0) {
-                    result.html('<div class="button iconize">' + bs.first().html() + '</div>');
+                    result.html('<div class="button iconize">' + bs.first().html() + (this.name ? '<span class="label">' + this.name + '</span>' : '') + '</div>');
                 } else {
                     result.append(copy.html());
                 }
