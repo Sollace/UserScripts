@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.2
+// @version     1.3
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -21,8 +21,15 @@ document.onmousemove();
 
 function changeLogo(url, icon, holi) {
   if (typeof $ === 'undefined') {
-    if (document.head.innerHTML.indexOf('shortcut icon') == -1) {
-      document.head.innerHTML += '<link rel="shortcut icon" href="' + icon + '" />';
+    var head = document.head;
+    if (typeof document.head === 'undefined') {
+      var svg = document.getElementsByTagName('svg');
+      if (svg != null && svg.length) {
+        head = document.getElementsByTagName('svg')[0];
+      }
+    }
+    if (head.innerHTML.indexOf('shortcut icon') == -1) {
+      head.innerHTML = '<link xmlns="http://www.w3.org/1999/xhtml" rel="shortcut icon" href="' + icon + '" />' + head.innerHTML;
     }
   } else {
     $('head link[rel="shortcut icon"]').remove();
