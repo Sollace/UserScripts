@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.2.2
+// @version     2.3
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -66,7 +66,7 @@ var mainCss = '\
 .yt-search-field-search-button .yt-uix-button-content {\
     background: no-repeat url(' + resources.hitchhiker + ') 0px 0px !important;}\
 \
-.action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before,\
+.watch-secondary-actions .addto-button:before, .action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before,\
 .action-panel-trigger-share:before,\
 #action-panel-overflow-button:before, .action-panel-trigger-overflow:before,\
 .playlist-status,\
@@ -190,7 +190,7 @@ var mainCss = '\
 #pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like {\
     opacity: 0.3;\
     background-position: -4px -25px !important;}\
-.action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before {\
+.watch-secondary-actions .addto-button:before, .action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before {\
     background-position: 0px -4px !important;}\
 .action-panel-trigger-share:before {\
     background-position: -60px -4px !important;}\
@@ -907,7 +907,7 @@ var mainCss = '\
         border-bottom-color: #303030 !important;\
         background: #1b1b1b !important;}\
     .html5-compatibility-table li {\
-        background-color: rgba(255,255,255,0.3);}\
+        background-color: rgba(255,255,255,0.3) !important;}\
     .yt-alert-naked .yt-alert-content {\
         color: #ccc !important;}\
     /* Playlist View */\
@@ -1356,6 +1356,10 @@ div.t-Pa-mb-c.b-c-R , .wp > .Id > .Ae {\
   border-radius: 500px;}';
 
 var largePlayerCss = '\
+.video-ads {\
+  display: none !important;}\
+.html5-progress-bar {\
+  width: 100% !important;}\
 .watch-wide .playlist-videos-list {\
     max-height: 410px !important;}\
 @media all and (min-width: 1066px) {\
@@ -1603,19 +1607,32 @@ function run() {
         but.name = "themeButton";
         but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
         but.onclick = function () {
-            if (theme == "Dark") {
-                switchToLight();
-            } else {
-                switchToDark();
-            }
-            reloadComments();
-            this.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
+            updateState(theme == "Dark" ? 1 : 0);
         }
         
         if (theme == "Dark") {
             switchToDark();
         } else {
             setTheme("Light");
+        }
+        
+        window.onready = function() {
+            $(window).focus(function() {
+                var them = getTheme();
+                if (them != theme) {
+                    updateState(them == "Dark" ? 0 : 1);
+                }
+            });
+        }
+        
+        function updateState(mode) {
+            if (mode == 1) {
+                switchToLight();
+            } else {
+                switchToDark();
+            }
+            reloadComments();
+            but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
         }
     } else {
         if (theme == "Dark") {
@@ -1684,3 +1701,22 @@ function addCss(sheet) {
     result.innerHTML = sheet;
     document.head.appendChild(result);
 }
+
+function RunScript(func, mustCall, params) {
+  var scr = document.createElement('SCRIPT');
+  if (mustCall) {
+    if (params) {
+      var pars = [];
+      for (var i = 2; i < arguments.length; i++) {
+        pars.push(arguments[i]);
+      }
+      scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
+    } else {
+      scr.innerHTML = '(' + func.toString() + ')();';
+    }
+  } else {
+    scr.innerHTML = func.toString();
+  }
+  document.body.appendChild(scr);
+  scr.parentNode.removeChild(scr);
+};
