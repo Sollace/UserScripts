@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.4
+// @version     1.4.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -334,6 +334,13 @@ $(document).ready(function () {
     overflow: auto;\
     position: relative;\
     border: none;}\
+.user_toolbar ul.drop-down-notifications li.new,\
+.user_toolbar .nav-bar-drop-down.drop-down-notifications li.new,\
+.user_toolbar ul.drop-down-notifications li.new:hover,\
+.user_toolbar .nav-bar-drop-down.drop-down-notifications li.new:hover {\
+    background: none repeat scroll 0% 0% #F3FAEF;\
+    color: #6F7A67;\
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;}\
 .user_toolbar li .drop-down-notifications li * {\
   line-height: 0px;}\
 .user_toolbar li > ul.drop-down-notifications li,\

@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.3
+// @version     2.3.1
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -1589,6 +1589,37 @@ var buttonStyle = '\
     right: 0px !important;\
     bottom: 0px !important;\
     opacity: 1;}';
+
+mainCss += '\
+\
+body[class*=ytcenter] #watch-slike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-like.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
+    background-image: url(' + resources.highjacker + ') !important;}\
+\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after {\
+    background-position: -2px -39px !important;}\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
+    background-position: -46px -40px !important;}\
+\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled) .yt-uix-button-content,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-content {\
+    color: #fff !important;}\
+\
+.element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg {\
+  background: #1B1B1B !important;}\
+#ytcenter-dialog-bg {\
+  background-color: #000 !important;}\
+.ytcenter-dialog-header, .ytcenter-dialog-content, .ytcenter-dialog-fg,\
+.ltr .ytcenter-settings-panel-left, .ytcenter-settings-subcat-header {\
+  border-color: #303030 !important;}';
 
 var theme = getTheme();
 run();
