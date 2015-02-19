@@ -1605,12 +1605,16 @@ body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after {\
     background-position: -2px -39px !important;}\
+\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):after,\
 body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
 body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
     background-position: -46px -40px !important;}\
 \
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled) .yt-uix-button-content,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-content {\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-content,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-content {\
     color: #fff !important;}\
 \
 .element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg {\
@@ -1625,47 +1629,49 @@ var theme = getTheme();
 run();
 
 function run() {
-    if (window.top == window && document.location.href.indexOf('youtube.com/embed') == -1) {
-        var ls = document.createElement("style");
-        ls.setAttribute("type", "text/css");
-        ls.innerHTML = largePlayerCss + buttonStyle;
-        document.head.appendChild(ls);
-        
-        var but = createButton();
-        document.ready = function() {
-            document.body.appendChild(but);
-        }
-        but.name = "themeButton";
-        but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
-        but.onclick = function () {
-            updateState(theme == "Dark" ? 1 : 0);
-        }
-        
-        if (theme == "Dark") {
-            switchToDark();
-        } else {
-            setTheme("Light");
-        }
-        
-        window.onready = function() {
-            $(window).focus(function() {
-                var them = getTheme();
-                if (them != theme) {
-                    updateState(them == "Dark" ? 0 : 1);
-                }
-            });
-        }
-        
-        function updateState(mode) {
-            if (mode == 1) {
-                switchToLight();
-            } else {
-                switchToDark();
+    if (window.top == window) {
+        if (document.location.href.indexOf('youtube') != -1 && document.location.href.indexOf('youtube.com/embed') == -1) {
+            var ls = document.createElement("style");
+            ls.setAttribute("type", "text/css");
+            ls.innerHTML = largePlayerCss + buttonStyle;
+            document.head.appendChild(ls);
+
+            var but = createButton();
+            document.ready = function() {
+                document.body.appendChild(but);
             }
-            reloadComments();
+            but.name = "themeButton";
             but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
+            but.onclick = function () {
+                updateState(theme == "Dark" ? 1 : 0);
+            }
+
+            if (theme == "Dark") {
+                switchToDark();
+            } else {
+                setTheme("Light");
+            }
+
+            window.onready = function() {
+                $(window).focus(function() {
+                    var them = getTheme();
+                    if (them != theme) {
+                        updateState(them == "Dark" ? 0 : 1);
+                    }
+                });
+            }
+
+            function updateState(mode) {
+                if (mode == 1) {
+                    switchToLight();
+                } else {
+                    switchToDark();
+                }
+                reloadComments();
+                but.innerHTML = "<span class='yt-uix-button-content' >" + theme + "</span>";
+            }
         }
-    } else {
+    } else if (document.referrer.indexOf('youtube') != -1) {
         if (theme == "Dark") {
             if (document.location.href.indexOf('https://plus.google.com') == 0 && document.location.href.indexOf('/notifications/frame') != -1) {
                 addCss(noticesCss);
