@@ -1617,13 +1617,56 @@ body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-
 body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-content {\
     color: #fff !important;}\
 \
-.element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg {\
+.element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg, .ytcenter-list {\
   background: #1B1B1B !important;}\
 #ytcenter-dialog-bg {\
   background-color: #000 !important;}\
 .ytcenter-dialog-header, .ytcenter-dialog-content, .ytcenter-dialog-fg,\
-.ltr .ytcenter-settings-panel-left, .ytcenter-settings-subcat-header {\
-  border-color: #303030 !important;}';
+.ltr .ytcenter-settings-panel-left, .ytcenter-settings-subcat-header, .ytcenter-resize-panel {\
+  border-color: #303030 !important;}\
+.ytcenter-selected .ytcenter-settings-subcat-header-item-content {\
+    color : #aaa !important;}\
+.ytcenter-settings-subcat-header-item-content {\
+    color : #666;}\
+\
+.ytcenter-modules-range, .ytcenter-modules-rangetext {\
+    background: rgba(0,0,0,0.3) !important;\
+    border-color: rgba(0,0,0,0.4) !important;\
+    color: #aaa;}\
+.ytcenter-modules-range-handle {\
+    background: rgba(255,255,255,0.2) !important;\
+    border-color: rgba(0,0,0,0.4) !important;}\
+.ytcenter-settings-table thead tr {\
+    background-color: rgba(0,0,0,0.7) !important;}\
+.ytcenter-settings-table tr {\
+    border-top: 1px solid #CCC !important;\
+    background-color: rgba(0,0,0,0.3) !important;}\
+.ytcenter-settings-table tr:nth-child(2n) {\
+    background-color: rgba(0,0,0,0.1) !important;}\
+.ytcenter-settings-table tr td {\
+    border-color: #303030 !important;}\
+.ytcenter-list-item.ytcenter-dragdrop-dragging,\
+.ytcenter-list.ytcenter-dragdrop-notdragging .ytcenter-list-item:hover {\
+    background: rgba(0,0,0,0.3) !important;}\
+.ytcenter-resize-panel-content,\
+.ltr .ytcenter-resize-panel-header,\
+.ltr .ytcenter-panel,\
+.ltr .ytcenter-resize-panel-list,\
+.rtl .ytcenter-resize-panel-header,\
+.rtl .ytcenter-panel,\
+.rtl .ytcenter-resize-panel-list,\
+.ytcenter-list,\
+.ytcenter-list-item {\
+    border-color: #303030 !important;}\
+.ytcenter-list-item-title {\
+    color: #aaa !important;}\
+.ytcenter-resize-panel-right > *:before {\
+    box-shadow: 0px 0px 5px #000 inset !important;}\
+.rtl .ytcenter-list-header-btn,\
+.ltr .ytcenter-list-header-btn {\
+    border-color: #303030 !important;\
+    background: none !important;\
+    color: #aaa !important;}';
 
 var theme = getTheme();
 run();
