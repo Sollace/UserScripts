@@ -52,7 +52,7 @@ var mainCss = '\
 .feed-author-bubble, .yt-uix-button-icon-bell,\
 .yt-uix-subscription-preferences-button:hover .yt-uix-button-icon-subscription-preferences,\
 .yt-uix-button-icon-c4-grid-flow, .yt-uix-button-icon-c4-list-flow, .yt-uix-button-icon-gear, .yt-uix-button-icon-gear-active,\
-.yt-uix-button-icon-icon-account-settings, .yt-uix-button-icon-playlist-share,\
+.yt-uix-button-icon-icon-account-settings, .playlist-share:before,\
 .c4-editor-plus:before, .yt-uix-button-icon-plus-button,\
 #storyboard .timeline-zoomslider .slider-icon,\
 .yt-uix-button-icon-footer-history, .yt-uix-button-icon-action-panel-dismiss {\
@@ -225,7 +225,7 @@ var mainCss = '\
 .yt-uix-button-icon-gear, .yt-uix-button-icon-gear-active {\
     opacity: 0.3;\
     background-position: -50px -905px !important;}\
-.yt-uix-button-icon-playlist-share {\
+.playlist-share:before {\
     opacity: 0.3;\
     background-position: 0px -336px !important;}\
 .c4-editor-plus:before, .yt-uix-button-icon-plus-button {\
@@ -478,10 +478,14 @@ var mainCss = '\
         border-width: 0px !important;\
         color: #aaa !important;}\
     .caption-line {\
-        border-color: #303030 !important;\
-        -moz-border-radius: 0px !important;\
-        -webkit-border-radius: 0px !important;\
-        border-radius: 0px !important;}\
+        border-color: transparent !important;}\
+    .caption-line:hover {\
+        background: rgba(0,0,0,0.2) !important;}\
+    .caption-line.caption-line-highlight {\
+        background: rgba(0,0,0,0.4) !important;\
+        color: #bbb;}\
+    .caption-line.caption-line-highlight:hover {\
+        background: rgba(0,0,0,0.6) !important;}\
     #watch-transcript-track-selector {\
         background: #1b1b1b !important;\
         color: #aaa !important;}\
@@ -1618,12 +1622,12 @@ body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-conten
     color: #fff !important;}\
 \
 .element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg, .ytcenter-list {\
-  background: #1B1B1B !important;}\
+    background: #1B1B1B !important;}\
 #ytcenter-dialog-bg {\
-  background-color: #000 !important;}\
+    background-color: #000 !important;}\
 .ytcenter-dialog-header, .ytcenter-dialog-content, .ytcenter-dialog-fg,\
 .ltr .ytcenter-settings-panel-left, .ytcenter-settings-subcat-header, .ytcenter-resize-panel {\
-  border-color: #303030 !important;}\
+    border-color: #303030 !important;}\
 .ytcenter-selected .ytcenter-settings-subcat-header-item-content {\
     color : #aaa !important;}\
 .ytcenter-settings-subcat-header-item-content {\
@@ -1662,11 +1666,14 @@ body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-conten
     color: #aaa !important;}\
 .ytcenter-resize-panel-right > *:before {\
     box-shadow: 0px 0px 5px #000 inset !important;}\
-.rtl .ytcenter-list-header-btn,\
-.ltr .ytcenter-list-header-btn {\
+.rtl button.ytcenter-list-header-btn,\
+.ltr button.ytcenter-list-header-btn {\
     border-color: #303030 !important;\
     background: none !important;\
-    color: #aaa !important;}';
+    color: #aaa !important;}\
+\
+#watch7-content.watch-main-col > .yt-card {\
+    background: #1B1B1B !important;}';
 
 var theme = getTheme();
 run();
