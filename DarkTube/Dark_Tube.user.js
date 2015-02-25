@@ -50,12 +50,13 @@ var mainCss = '\
 #yt-masthead #logo, #masthead-logo, #footer-logo img, .footer-container .footer-logo, .footer-logo-icon, .yt-uix-button-icon-appbar-guide,\
 .pl-header-privacy-only-me, .pl-header-privacy-everyone,\
 .feed-author-bubble, .yt-uix-button-icon-bell,\
+.yt-uix-button-icon-dismissal,\
 .yt-uix-subscription-preferences-button:hover .yt-uix-button-icon-subscription-preferences,\
 .yt-uix-button-icon-c4-grid-flow, .yt-uix-button-icon-c4-list-flow, .yt-uix-button-icon-gear, .yt-uix-button-icon-gear-active,\
 .yt-uix-button-icon-icon-account-settings, .playlist-share:before,\
 .c4-editor-plus:before, .yt-uix-button-icon-plus-button,\
 #storyboard .timeline-zoomslider .slider-icon,\
-.yt-uix-button-icon-footer-history, .yt-uix-button-icon-action-panel-dismiss {\
+.yt-uix-button-icon-footer-history, #action-panel-dismiss:before, .action-panel-trigger-dismiss:before {\
     background-image: url(' + resources.hitchhiker + ') !important;}\
 \
 #masthead-search .search-btn-component .yt-uix-button-content,\
@@ -89,6 +90,8 @@ var mainCss = '\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -34px -62px !important;}\
 .yt-uix-button-icon-report-user {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -81px -62px !important;}\
+.comments .sprite_flag {\
+    background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -83px -62px !important;}\
 .yt-uix-button:hover .yt-uix-button-icon-playlist-dislike {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -209px -399px !important;}\
 .addto-watch-later-button:before, .addto-watch-later-button-sign-in:before {\
@@ -246,8 +249,10 @@ var mainCss = '\
 .yt-uix-button-icon-footer-history {\
     opacity: 0.3;\
     background-position: -55px -275px !important;}\
-.yt-uix-button-icon-action-panel-dismiss {\
+#action-panel-dismiss:before, .action-panel-trigger-dismiss:before {\
   background-position: -53px -1288px !important;}\
+.yt-uix-button-icon-dismissal {\
+    background-position: -48px -1288px !important;}\
 \
 /*Developer Page*/\
 #page #yt-microsite {\
@@ -277,7 +282,9 @@ var mainCss = '\
     #content { background: none !important;}\
     #masthead-appbar-container, #yt-masthead-container,\
     #masthead-appbar, #page #masthead-container {\
-        background: #1b1b1b !important;\
+        background: #1b1b1b !important;}\
+    #yt-masthead-container,\
+    #masthead-appbar, #page #masthead-container {\
         border-bottom: 1px solid #292929 !important;}\
     #masthead-search-terms {\
         background-color: #333 !important;\
@@ -383,15 +390,16 @@ var mainCss = '\
         color: #999 !important;}\
     #player, .yt-ui-ellipsis, .yt-uix-expander-ellipsis {\
         background: none !important;}\
-.yt-ui-menu-content, #yt-uix-videoactionmenu-menu, .add-to-widget .playlists {\
+.yt-ui-menu-content, #yt-uix-videoactionmenu-menu, .add-to-widget .playlists, .comments .mod-list {\
     background: #222 !important;\
     border-color: #444343 !important;}\
-.yt-ui-menu-content h3, .yt-uix-button-menu-item, .yt-ui-menu-item {\
+.yt-ui-menu-content h3, .yt-uix-button-menu-item, .yt-ui-menu-item, .comments .mod-list-button {\
     color: #888 !important;}\
 #yt-uix-videoactionmenu-menu .addto-playlist-item:hover, #yt-uix-videoactionmenu-menu .create-playlist-item:hover,\
-.yt-uix-menu-trigger-selected .yt-ui-menu-item, .yt-ui-menu-item:hover, .yt-ui-menu-item:hover:focus, .yt-ui-menu-content:hover > .selected:hover {\
+.yt-uix-menu-trigger-selected .yt-ui-menu-item, .yt-ui-menu-item:hover, .yt-ui-menu-item:hover:focus, .yt-ui-menu-content:hover > .selected:hover,\
+.comments .mod-list-button:hover, .comments .mod-list-button:hover:focus {\
     background-color: #333232 !important;}\
-.yt-ui-menu-item:focus {\
+.yt-ui-menu-item:focus, .comments .mod-list-button, .comments .mod-list-button:focus {\
     background: none !important;}\
     .player-unavailable {\
         float: inherit !important;}\
@@ -638,8 +646,8 @@ var mainCss = '\
     .watch-editable:hover {\
         background-color: #222 !important;}\
     /* Creator Sidebar */\
-    #creator-sidebar .creator-sidebar-channel-link a, #creator-sidebar .creator-sidebar-channel-link a:hover {\
-        color: #aaa !important;}\
+    #creator-sidebar h3, #creator-sidebar h3 a,\
+    #creator-sidebar .creator-sidebar-channel-link a, #creator-sidebar .creator-sidebar-channel-link a:hover,\
     #creator-sidebar .creator-sidebar-section a {\
         color: #aaa !important;}\
     #creator-sidebar .creator-sidebar-section.selected > a.selected, #creator-sidebar .creator-sidebar-item.selected > a {\
@@ -647,7 +655,7 @@ var mainCss = '\
     #creator-sidebar .creator-sidebar-section.selected,\
     .creator-sidebar-section {\
         border-color: #303030 !important;}\
-    .creator-sidebar-section a:hover, .creator-sidebar-section.selected .creator-sidebar-section-link {\
+.creator-sidebar-section .creator-sidebar-item:not(.selected) a:hover, .creator-sidebar-section.selected .creator-sidebar-section-link, .creator-sidebar-section-link:hover {\
         background: #222 !important;}\
     /* Inbox */\
     #folder_title {\
@@ -722,6 +730,18 @@ var mainCss = '\
         background: #222 !important;}\
     .creator-confirmation-overlay .creator-confirmation-overlay-body {\
         color: #bbb !important;}\
+/* Messages */\
+.comments .comment-item:hover .mod-buttonbar, .comments .comment-item:hover .mod-buttonbar .mod-button {\
+  border-color: #303030 !important;}\
+.commenthub .comments .mod-buttonbar .mod-button-content:hover {\
+  background-color: rgba(0,0,0,0.3) !important;}\
+.comments .mod-arrow {\
+  color: #aaa !important;}\
+.comments .channel-owner .comment-header .user-name {\
+  background-color: rgba(155,155,255,0.15) !important;}\
+.yt-commentbox-text {\
+  background: none !important;\
+  color: #aaa !important;}\
     	/* Widgets */\
     .dashboard-widget-todos .todo-item {\
         border-color: #303030 !important;}\
@@ -1203,9 +1223,20 @@ var mainCss = '\
     background-color: #303030 !important;}\
 .track .container {\
     background-color: #CFCFCF;}\
+.track-list li.track {\
+  background: rgba(0,0,0,0.5) !important;\
+  border-top-color: #303030 !important;\
+  border-bottom-color: #303030 !important;\
+  border-radius: 5px 0 0 5px;}\
+.track-list .popularity-bar .empty-part {\
+  background: rgba(0,0,0,0.5) !important;}\
+.audiolibrary-column, .audiolibrary-column-title-expand {\
+  color: #aaa !important;}\
+.track-list li.track:hover .audiolibrary-column, .track-list .track:hover .audiolibrary-column-title-expand {\
+  color: #CC181E !important;}\
 .video-dds, .tabs-wrapper {\
     border-color: #303030 !important;}\
-.video-dds .list {\
+.video-dds .list, .top-menu {\
     background: #222 !important;\
     border-color: #303030 !important;}\
 .video-dds .entry:hover .highlight {\
@@ -1290,6 +1321,14 @@ var mainCss = '\
 .stats-bragbar * {\
     color: #aaa !important;}\
 \
+/*Viewind-as button*/\
+#view-as-done {\
+  border-color: rgba(255,255,255,0.3) !important;\
+  background: rgba(255,255,255,0.1) !important;\
+  color: #fff !important;}\
+#view-as-done:hover, #view-as-done:active, #view-as-done:focus {\
+  border-color: rgba(255,255,255,0.2) !important;\
+  background: none !important;}\
 \
 /*Notices Popup*/\
 .sb-on {\
@@ -1507,6 +1546,10 @@ button[name="cancel"]:hover {\
 .PA:hover .Uv:before {\
   border-color: #343333 !important;}\
 \
+.sk {\
+  background: rgba(0,0,0,0.3) !important;\
+  border-color: rgba(0,0,0,0.2) !important;}\
+\
 /*Lazy fix for loading sprite*/\
 .B1 {\
   position: relative !important;}\
@@ -1576,23 +1619,36 @@ var subEmbedCss = '\
   background: #222 !important;}';
 
 var buttonStyle = '\
-.dark-theme-button {\
-    position: fixed;\
-    z-index: 999999999;\
-    bottom: -30px;\
-    right: -30px;\
-    border-radius: 500px 0 0 0 !important;\
-    transition: all 0.125s linear;\
-    box-shadow: 0 0 0 rgba(255,255,255,1.3) inset;\
-    height: 60px !important;\
-    width: 60px !important;\
-    opacity: 0.5;\
-    padding-top: 10px;\
-    padding-left: 10px;}\
+.dark-theme-button, .dark-theme-button[disabled], .dark-theme-button[disabled]:hover, .dark-theme-button[disabled]:active, .dark-theme-button[disabled]:focus {\
+  border-color: #167AC6;\
+  background: none repeat scroll 0% 0% #167AC6;\
+  color: #FFF;\
+  display: inline-block;\
+  border: 1px solid transparent;\
+  padding: 10px 0 0 10px !important;\
+  outline: 0px none;\
+  font-weight: bold;\
+  font-size: 11px;\
+  text-decoration: none;\
+  white-space: nowrap;\
+  word-wrap: normal;\
+  line-height: normal;\
+  vertical-align: middle;\
+  cursor: pointer;\
+  position: fixed;\
+  z-index: 999999999;\
+  bottom: -30px;\
+  right: -30px;\
+  border-radius: 500px 0 0 0 !important;\
+  transition: all 0.125s linear;\
+  box-shadow: 0 0 0 rgba(255,255,255,1.3) inset;\
+  height: 60px !important;\
+  width: 60px !important;\
+  opacity: 0.5;}\
 .dark-theme-button:hover {\
-    right: 0px !important;\
-    bottom: 0px !important;\
-    opacity: 1;}';
+  right: 0px !important;\
+  bottom: 0px !important;\
+  opacity: 1;}';
 
 mainCss += '\
 \
