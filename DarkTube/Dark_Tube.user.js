@@ -71,7 +71,7 @@ var mainCss = '\
 .action-panel-trigger-share:before,\
 #action-panel-overflow-button:before, .action-panel-trigger-overflow:before,\
 .playlist-status,\
-#pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like,\
+#pl-header .yt-uix-playlistlike:not(.yt-uix-button-toggled):before,\
 .play-all-icon-btn:before,\
 .yt-uix-button-icon-footer-language,\
 .yt-uix-button-icon-questionmark,\
@@ -189,9 +189,9 @@ var mainCss = '\
   background-position: -125px -5px !important;}\
 .play-all-icon-btn:before {\
     opacity: 0.3;\
-    background-position: -20px -22px !important;}\
-#pl-header .yt-uix-button:not(.yt-uix-button-toggled) .yt-uix-button-icon-playlist-like {\
-    opacity: 0.3;\
+    background-position: -22px -22px !important;}\
+#pl-header .yt-uix-playlistlike:not(.yt-uix-button-toggled):before {\
+    opacity: 0.5;\
     background-position: -4px -25px !important;}\
 .watch-secondary-actions .addto-button:before, .action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before {\
     background-position: 0px -4px !important;}\
