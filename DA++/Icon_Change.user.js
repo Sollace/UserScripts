@@ -4,7 +4,9 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.3
+// @include     http://sta.sh*
+// @include     https://sta.sh*
+// @version     1.3.2
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==

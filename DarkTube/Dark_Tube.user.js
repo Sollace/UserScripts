@@ -29,7 +29,7 @@ var mainCss = '\
 \
 .yt-uix-button-arrow {\
     border-top-color: #B8B8B8 !important;}\
-.yt-uix-inlineedit-form, .yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit {\
+.yt-uix-inlineedit-form, .yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit, .yt-lockup-notifications-container {\
     border-color: #303030 !important;}\
 \
 #creator-page-content.yt-card {\
@@ -332,6 +332,8 @@ var mainCss = '\
         border-color: #303030 !important;\
         background: #242323 !important;\
         color: #aaa !important;}\
+    .yt-uix-button.addto-watch-later-button-success {\
+        background-image: linear-gradient(to bottom, #74A446 0px, #4D7730 100%) !important;}\
     #sb-button-notify {\
         background: none !important;}\
     .browse-list-item-container:hover .compact-shelf .yt-uix-shelfslider-prev, .compact-shelf:hover .yt-uix-shelfslider-prev,\
@@ -1688,6 +1690,13 @@ body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-conten
     color : #aaa !important;}\
 .ytcenter-settings-subcat-header-item-content {\
     color : #666;}\
+\
+button.yt-uix-button.ytcenter-uix-button-toggled {\
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.8) inset !important;\
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0.2) 100%) !important;}\
+button.yt-uix-button.ytcenter-uix-button-toggled:hover {\
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.8) inset !important;\
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 100%) !important;}\
 \
 .ytcenter-modules-range, .ytcenter-modules-rangetext {\
     background: rgba(0,0,0,0.3) !important;\
