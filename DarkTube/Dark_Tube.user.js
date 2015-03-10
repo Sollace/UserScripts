@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.3.1
+// @version     2.3.2
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -336,6 +336,9 @@ var mainCss = '\
         background-image: linear-gradient(to bottom, #74A446 0px, #4D7730 100%) !important;}\
     #sb-button-notify {\
         background: none !important;}\
+    #sb-button-notify .yt-uix-button-content {\
+      border-color: #000 !important;\
+      color: #eee !important;}\
     .browse-list-item-container:hover .compact-shelf .yt-uix-shelfslider-prev, .compact-shelf:hover .yt-uix-shelfslider-prev,\
     .browse-list-item-container:hover .compact-shelf .yt-uix-shelfslider-next, .compact-shelf:hover .yt-uix-shelfslider-next {\
         border-color: #303030!important;}\
