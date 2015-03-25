@@ -7,7 +7,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6.1
+// @version     1.6.2
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ var Ponies = [
     new SpecialPony('Apple Bloom', 'cmc1', 4,
              "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery.;Not the cupcakes!;Likely story.;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!"),
     new SpecialPony('Sweetie Belle', 'cmc2', 3,
-              "I'm Sweeetiee Belle!;I wonder how that happened...;Aww. That was such a sweet story.;Are you sure I can't help?;Hush now, quiet now.I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.",
+              "I'm Sweeetiee Belle!;I wonder how that happened...;Aww. That was such a sweet story.;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.",
               {1: "Ughh! I'm so BORED!;Dumb fabric!",
                2: "I know this one!;Hammer!;You cannot run from me!;We could form our own secret society!;♪ We are the Cutie Mark Crusaders! ♫"}),
     isOnDay(1, 4) ?
