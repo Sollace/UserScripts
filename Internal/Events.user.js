@@ -35,7 +35,7 @@ RunScript.toString = (function() {
 })();
 
 (function (win) {
-  var ver = 1.3;
+  var ver = 1.4;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -87,16 +87,16 @@ RunScript.toString = (function() {
   if (window != win) {
     window.FimFicEvents = {
       'on': function(name, func) {
-        return win.FimFicEvents.on(name, func);
+        return $(document).on(name, func);
       },
       'off': function(name, event) {
-        win.FimFicEvents.off(name, event);
+        $(document).off(name, event);
       },
       'trigger': function(name, e) {
-        win.FimFicEvents.trigger(name, e);
+        $(document).trigger(name, e);
       },
       'getEventName': function(url) {
-        return win.FimFicEvents.getEventname(url);
+        return win.FimFicEvents.getEventName(url);
       },
       'version': function() {
         return win.FimFicEvents.version();
@@ -110,7 +110,7 @@ RunScript.toString = (function() {
       return this();
     }
   }
-    
+
   if (startup) {
     RunScript(function() {
       var original = window.AjaxRequest;
