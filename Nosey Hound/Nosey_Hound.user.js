@@ -3,8 +3,9 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/user/*
 // @include     https://www.fimfiction.net/user/*
-// @version     1.4.5
+// @version     1.5
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_deleteValue
@@ -14,8 +15,8 @@ var followerMapping = (function() {
     var internalMapping = [];
     var idToChildMapping = {};
     var openedMapping = [];
-    var structure;
-    var dirty = true;
+    var structured = {};
+    var dirty = false;
     
     function structuredChilds(x, y) {
         var result = {
@@ -26,8 +27,13 @@ var followerMapping = (function() {
             },
             html: function(filter) {
                 var t = '<li data-item="' + x + '|' + y + '"><a ';
-                if (result.opened()) t += 'class="opened" ';
-                t += 'target="_blank" href="/user/' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
+                if (result.opened() || result.children.length == 0) {
+                    t += 'class="';
+                    if (result.opened()) t+= 'opened ';
+                    if (result.children.length == 0) t += 'unloaded';
+                    t += '" ';
+                }
+                t += 'target="_blank" href="/user/' + result.content + '" data-user="' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
                 if (result.children.length > 0) {
                     t += '<span class="open-pin" /><div class="dog"><div class="list content"><ol>';
                     var s = '';
@@ -64,17 +70,17 @@ var followerMapping = (function() {
         registerChild: function(id, arr) {
             var ch = this.registerList(arr);
             idToChildMapping[id] = ch;
-            $('body').append('<div>' + JSON.stringify(idToChildMapping) + '</div>');
-            $('body').append('<div>' + JSON.stringify(internalMapping) + '</div>');
             dirty = true;
             return ch;
         },
         setOpened: function(id, val) {
             openedMapping[id] = val;
         },
-        structured: function() {
-            if (structure == null || dirty) {
+        structured: function(id) {
+            if (structured == null || structured.user != id || dirty) {
                 var result = {
+                    dirty: false,
+                    user: id,
                     children: [],
                     html: function(filter) {
                         var nod = '<ol>';
@@ -84,13 +90,13 @@ var followerMapping = (function() {
                         return nod + '</ol>';
                     }
                 };
-                for (var i = 0; i < internalMapping[0].length; i++) {
-                    result.children.push(structuredChilds(0, i));
+                for (var i = 0; i < internalMapping[id].length; i++) {
+                    result.children.push(structuredChilds(id, i));
                 }
                 dirty = false;
-                structure = result;
+                structured = result;
             }
-            return structure;
+            return structured;
         }
     }
 })();
@@ -103,13 +109,13 @@ try {
         Dog = function(c) {
             this.container = c;
             if (this.container.hasClass('user-page-header')) {
-                this.userName = this.container.find('h1.resize_text > a').first().text();
+                this.userName = this.container.find('h1.resize_text > a').last().text();
                 this.userId = this.container.find('ul.tabs li a').first().attr('href').split('&user=').reverse()[0].split('&')[0];
                 this.tabs = this.container.find('ul.tabs');
             } else {
                 this.userName = this.container.find('.card-content > h2 a').text();
                 this.userId = this.container.find('.drop-down > ul > li > a > i.fa-warning').first().parent().attr('href').split('/').reverse()[0];
-                this.tabs = this.container.container.parent().find('.user-links');
+                this.tabs = this.container.parent().find('.user-links');
             }
             this.myPage = this.userName == name;
             this.oldFollowers = getFollowers(this.userId);
@@ -117,9 +123,10 @@ try {
         }
         Dog.prototype.sniffFollowers = function() {
             var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
-            pop.content.css({ width: '300px', height: '300px'});
+            pop.content.css({ 'min-width': '400px', 'min-height': '400px', width: '400px', height: '400px'});
             $('body').append($('#info-cards'));
             this.Sniff(true, pop.content);
+            pop.content.after('<div class="resize-handle" />');
             pop.position('center', 'center');
         }
         Dog.prototype.snubFollowers = function(link) {
@@ -127,6 +134,7 @@ try {
             link.after(pop);
             link.after('<span class="open-pin" />');
             link.addClass('opened');
+            link.removeClass('unloaded');
             followerMapping.setOpened(link.parent().attr('data-item'), true);
             this.Sniff(false, pop);
         }
@@ -203,18 +211,21 @@ try {
             
             tabs.append('<div data_tab="0" class="button selected">Overview</div>');
             pop.append('<div data_id="0" class="tab shown selected" >' + (firstTime ? this.loaded() : this.overview(gained, lost, named, localeG, localeL, localeN)) + '</div>');
-            tabs.append('<div data_tab="3" class="button">Stats</div>');
-            pop.append('<div data_id="3" class="tab shown">' + this.stats(gained, lost, localeG, localeL) + forgetButton(this.userId) + '</div>');
+            tabs.append('<div data_tab="1" class="button">Stats</div>');
+            pop.append('<div data_id="1" class="tab shown">' + this.stats(gained, lost, localeG, localeL) + forgetButton(this.userId) + '</div>');
             if (gained.length > 0) {
-                tabs.append('<div data_tab="1" class="button">Gained</div>');
-                pop.append('<div data_id="1" class="tab shown" ><b>Total Gained:</b> ' + localeG + '<div class="main">' + list(gained) + '</div></div>');
+                tabs.append('<div data_tab="2" class="button">Gained</div>');
+                pop.append('<div data_id="2" class="tab shown" ><b>Total Gained:</b> ' + localeG + '<div class="main">' + linkList(gained) + '</div></div>');
             }
             if (lost.length > 0) {
-                tabs.append('<div data_tab="2" class="button">Lost</div>');
-                pop.append('<div data_id="2" class="tab shown" ><b>Total Lost:</b> ' + localeL + '<div class="main">' + list(lost) + '</div></div>');
+                tabs.append('<div data_tab="3" class="button">Lost</div>');
+                pop.append('<div data_id="3" class="tab shown" ><b>Total Lost:</b> ' + localeL + '<div class="main">' + linkList(lost) + '</div></div>');
             }
             tabs.append('<div data_tab="4" class="button hidden">List</div>');
             pop.append(listing(this.userName, this.followersRaw, '<div data_id="4" class="tab hidden" />'));
+            
+            tabs.append('<div data_tab="5" class="button hidden">History</div>');
+            pop.append(this.history(gained, lost, named));
             
             $('.button', tabs).click(function() {
                 var id = $(this).attr('data_tab');
@@ -232,7 +243,7 @@ try {
             });
         }
         Dog.prototype.loaded = function() {
-            return '<div class="score fresh">' + this.oldFollowers.length + '</div>' + (this.myPage ? 'Welcome! Your' : this.userName + '\'s') + ' followers have been successfully saved.';
+            return '<div class="score fresh">' + this.oldFollowers.length + '</div><div class="main">' + (this.myPage ? 'Welcome! Your' : this.userName + '\'s') + ' followers have been successfully saved.</div>';
         }
         Dog.prototype.stats = function(g, l, G, L) {
             var result = '';
@@ -303,8 +314,34 @@ try {
                     }
                 }
             }
-
             return parseFloat(result.toFixed(3).toString()).toLocaleString('en') + ' ' + unit;
+        }
+        Dog.prototype.history = function(gained, lost, named) {
+            this.oldFollowers
+            this.followersRaw = [];
+            var history = getHistory(this.userId);
+            for (var i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
+                if (i < gained.length) {
+                    history.push({type:'j', display: gained[i], name: gained[i]});
+                }
+                if (i < lost.length) {
+                    history.push({type:'l', display: lost[i], name: lost[i]});
+                }
+                if (i < named.length) {
+                    history.push({type:'n', display: named[i].name, old:named[i].oldName});
+                }
+            }
+            for (var i = 0; i < history.length; i++) {
+                if (history[i].type != 'n') {
+                    for (var j = 0; j < named.length; j++) {
+                        if (history[i].name == named[j].oldName) {
+                            history[i].name = named[j].name;
+                        }
+                    }
+                }
+            }
+            setHistory(this.userId, history);
+            return '<div data_id="5" class="tab hidden">' + (history.length > 0 ? historyList(history) : 'No items to display') + '</div>';
         }
         
         if ($('.user-page-header').length) {
@@ -319,7 +356,7 @@ try {
                 (new Dog($('.user-page-header'))).sniffFollowers();
             });
         }
-
+        
         $('.user-card').each(function() {
             $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer" href="javascript:void();"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
         });
@@ -327,6 +364,14 @@ try {
         
         $(document).on('click','.sniffer', function() {
             (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();
+        });
+        $(document).on('click', 'a.snuffer', function(e) {
+            if ($('.dog .list a.unloaded.hover').length) {
+                (new Dog($('a.snuffer:hover').first().parents('.user-card'))).snubFollowers($('.dog a.hover').first());
+            } else {
+                (new Dog($('a.snuffer:hover').first().parents('.user-card'))).sniffFollowers();
+            }
+            $('a.snuffer').parents('.info-card-container').hide();
         });
         $(document).on('click','button.forget', function() {
             if ($(this).attr('data-check') != '2') {
@@ -338,10 +383,27 @@ try {
                         opacity: '0.3',
                         'pointer-events': 'none'
                     });
-                    $(this).attr('data-check','2');
+                    $(this).attr('data-check','2').text('Forgot this User');
                     clearFollowers($(this).attr('data-id'));
                 }
             }
+        });
+        $(document).on('mouseleave','button.forget', function() {
+            if ($(this).attr('data-check') != '2') {
+                $(this).attr('data-check','0').text('Forget this User');
+            }
+        });
+        $(document).on('mousedown', '.resize-handle', function(e) {
+            var holder = $(this).parent().find('.drop-down-pop-up-content');
+            $(document).on('mousemove.resizeHandle', function(e) {
+                var width = e.pageX - holder.offset().left;
+                var height = e.pageY - holder.offset().top;
+                holder.css('width', width + 'px');
+                holder.css('height', height + 'px');
+            });
+            $(document).one('mouseup', function() {
+                $(document).off('mousemove.resizeHandle');
+            });
         });
         $(document).on('click', '.dog .open-pin', function(e) {
             e.preventDefault();
@@ -353,22 +415,25 @@ try {
                 a.addClass('opened');
             }
         });
-        $(document).on('mouseleave','button.forget', function() {
-            $(this).attr('data-check','0').text('Forget this User');
-        });
         $(document).on('mouseenter', '.dog .list a', function() {
             $('.dog .list a.hover').removeClass('hover');
+            var name = $(this).attr('data-user');
             $(this).addClass('hover');
         });
-        
-        function snuffButton(context) {
-            var l = $(context).find('.top-info .button-group').first();
-            var snif = $('<a class="snuff styled_button button-icon-only dark styled_button_dark_grey" href="javascript:void()">Sniff</a>');
-            l.prepend(snif);
-            snif.click(function() {
-                (new Dog($(this).parents('.info-card').find('.user-links a').first().attr('href').split('&user=')[1])).snubFollowers($('.dog a.hover').first());
+        FimFicEvents.on('afterinfocard', function(e, event) {
+            $('.info-card-container').each(function() {
+                var el = $(this).find('.top-info .button-group > .button-group').first();
+                if (!el.find('.snuffer').length) {
+                    var butt = $('<a class="snuffer styled_button button-icon-only styled_button_dark_grey" href="javascript:void()"><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>');
+                    butt.attr('data-user', event.user);
+                    butt.attr('style', $(this).find('.top-info .button-group > .button-group a').attr('style'));
+                    if ($(this).find('.top-info .button-group > .button-group a').hasClass('dark')) {
+                        butt.addClass('dark');
+                    }
+                    el.prepend(butt);
+                }
             });
-        }
+        });
         
         function forgetButton(id) {
             return '<div class="main"><button data-id="' + id + '" class="forget styled_button">Forget this User</button></div>';
@@ -380,33 +445,69 @@ try {
             return result;
         }
         
-        function clearFollowers(id) {
-            GM_deleteValue('followers_' + id);
-        }
-
+        
         function getFollowers(id) {
             var result = GM_getValue('followers_' + id);
             return result == null ? [] : JSON.parse(result);
         }
-                
+        
+        function clearFollowers(id) {
+            GM_deleteValue('followers_' + id);
+            GM_deleteValue('changes_' + id);
+        }
+        
+        function setHistory(id, items) {
+            GM_setValue('changes_' + id, JSON.stringify(items));
+        }
+        
+        function getHistory(id) {
+            var result = GM_getValue('changes_' + id);
+            return result == null ? [] : JSON.parse(result);
+        }
+        
         function listing(name, followers, node) {
-            followerMapping.registerList(followers);
+            var id = followerMapping.registerList(followers);
             node = $(node);
             var list = $('<div class="list content">');
             var search = $('<input id="nosey_follower_searcher" type="text" placeholder="search followers" />');
             $(search).on('input', function () {
                 list.empty();
                 try {
-                    list.html(followerMapping.structured().html(search.val().toUpperCase()));
+                    list.html(followerMapping.structured(id).html(search.val().toUpperCase()));
                 } catch (e) {alert(e)}
             });
             node.append(search);
             node.append(list);
-            list.html(followerMapping.structured().html(search.val().toUpperCase()));
+            list.html(followerMapping.structured(id).html(search.val().toUpperCase()));
             return node;
-        }
+        }        
         
         function list(arr) {
+            var result = '<div class="list"><ul>';
+            for (var i = 0; i < arr.length; i++) {
+                result += '<li>' + arr[i].replace(/\+/g, ' ') + '</li>';
+            }
+            return result + '</ul></div>';
+        }
+        
+        function historyList(arr) {
+            var result = '<div class="list"><ul>';
+            for (var i = 0; i < arr.length; i++) {
+                result += '<li class="history ' + arr[i].type;
+                result += '"><a target="_blank" href="/user/' + arr[i][arr[i].type == 'n' ? 'display' : 'name'] + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
+                if (arr[i].type == 'j') {
+                    result += '<i>joined</i>';
+                } else if (arr[i].type == 'l') {
+                    result += '<i>left</i>';
+                } else if (arr[i].type == 'n') {
+                    result += '<i>changed names to</i> ' + arr[i].old;
+                }
+                result += '</li>';
+            }
+            return result + '</ul></div>';
+        }
+        
+        function linkList(arr) {
             var result = '<div class="list"><ol>';
             for (var i = 0; i < arr.length; i++) {
                 result += '<li><a target="_blank" href="/user/' + arr[i] + '">' + arr[i].replace(/\+/g, ' ') + '</a></li>';
@@ -442,6 +543,8 @@ try {
         }
 
         makeStyle('\
+.drop-down-pop-up-content.dog {\
+    position: relative;}\
 .dog .button {\
     display: inline-block;\
     background: linear-gradient(to bottom, #eee 0%, #ddd 100%);\
@@ -461,14 +564,39 @@ try {
     border-bottom: solid 1px rgba(0,0,0,0.6);}\
 .dog .tab {\
     display: none;\
+    position: absolute;\
+    bottom: 0px;\
+    top: 30px;\
+    left: 0px;\
+    right: 0px;\
     background: #ddd;\
-    height: 270px;\
+    min-height: 270px;\
     overflow-y: auto;\
     padding: 10px;}\
 .dog .list {\
     padding: 5px;}\
 .dog .tab .main .li {\
     height: 20px;}\
+.dog .list .history {\
+    font-size: 80%;\
+    padding-left: 5px;\
+    margin-left: -10px;\
+    margin-right: -10px;\
+    box-shadow: 0 0 2px rgba(0,0,0,0.3) inset;}\
+.dog .list .history:first-child {\
+    border-top-left-radius: 5px;\
+    border-top-right-radius: 5px;}\
+.dog .list .history:last-child {\
+    border-bottom-left-radius: 5px;\
+    border-bottom-right-radius: 5px;}\
+.history.j {\
+    background: rgba(0, 240, 0, 0.07);}\
+.history.l {\
+    background: rgba(240, 0, 0, 0.07);}\
+.dog .list .history.j:before {\
+    content: "+ ";}\
+.dog .list .history.l:before {\
+    content: "- ";}\
 .dog .tab .main {\
     background: rgb(220, 250, 200);\
     border-radius: 20px;\
@@ -531,31 +659,31 @@ try {
     bottom: 0px;\
     background: #B15B5B;}\
 .dog li .dog {\
-  display: none;}\
+    display: none;}\
 .dog li a.opened ~ .dog {\
-  display: block;}\
+    display: block;}\
 .open-pin:after {\
-  content: "";\
-  float: right;\
-  display: inline-block;\
-  width: 0px;\
-  height: 0px;\
-  text-align: center;\
-  line-height: 15px;\
-  margin-top: 10px;\
-  cursor: pointer;\
-  border: solid;\
-  border-width: 5px;\
-  border-color: #507E2C transparent transparent transparent;}\
+    content: "";\
+    float: right;\
+    display: inline-block;\
+    width: 0px;\
+    height: 0px;\
+    text-align: center;\
+    line-height: 15px;\
+    margin-top: 10px;\
+    cursor: pointer;\
+    border: solid;\
+    border-width: 5px;\
+    border-color: #507E2C transparent transparent transparent;}\
 a:hover + .open-pin:after, .open-pin:hover:after {\
-  border-color: #609734 transparent transparent transparent;}\
+    border-color: #609734 transparent transparent transparent;}\
 .opened:hover + .open-pin:after, .opened + .open-pin:hover:after {\
-  border-color: transparent transparent #609734 transparent;}\
+    border-color: transparent transparent #609734 transparent;}\
 .opened + .open-pin:after {\
-  margin-top: 5px;\
-  border-color: transparent transparent #507E2C transparent;}\
+    margin-top: 5px;\
+border-color: transparent transparent #507E2C transparent;}\
 #info-cards > * {\
-  z-index: 99999999999999999 !important;}\
+    z-index: 99999999999999999 !important;}\
 .global_popup input[type="text"], .global_popup input[type="url"] {\
     padding: 8px;\
     width: 100%;\
@@ -565,7 +693,16 @@ a:hover + .open-pin:after, .open-pin:hover:after {\
     color: #333;\
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;\
     border-radius: 3px;\
-    margin: 5px 0px;}');
+    margin: 5px 0px;}\
+.resize-handle {\
+    height: 10px;\
+    width: 10px;\
+    display: inline-block;\
+    position: absolute;\
+    bottom: 30px;\
+    right: 30px;\
+    border-bottom: solid 2px;\
+border-right: solid 2px;}');
     })();
 } catch (e) {alert('Nosey Hound: ' + e);}
 

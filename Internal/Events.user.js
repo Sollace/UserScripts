@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3
+// @version     1.4
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -33,6 +33,20 @@ RunScript.toString = (function() {
   result.toString = result;
   return result;
 })();
+RunScript.build = function(functionText) {
+    return {
+        run: function(mustCall) {
+            var scr = document.createElement('SCRIPT');
+            if (mustCall) {
+                scr.innerHTML = '(' + functionText + ')();';
+            } else {
+                scr.innerHTML = functionText;
+            }
+            document.body.appendChild(scr);
+            scr.parentNode.removeChild(scr);
+        }
+    }
+};
 
 (function (win) {
   var ver = 1.4;
@@ -87,13 +101,13 @@ RunScript.toString = (function() {
   if (window != win) {
     window.FimFicEvents = {
       'on': function(name, func) {
-        return $(document).on(name, func);
+          RunScript.build('function() {FimFicEvents.on("' + name + '", (' + func.toString() + '));}').run(true);
       },
       'off': function(name, event) {
-        $(document).off(name, event);
+          RunScript.build('function() {FimFicEvents.off("' + name + '", ' + JSON.stringify(event) + ');}').run(true);
       },
       'trigger': function(name, e) {
-        $(document).trigger(name, e);
+          RunScript.build('function() {FimFicEvents.trigger("' + name + '", ' + JSON.stringify(e) + ');}').run(true);
       },
       'getEventName': function(url) {
         return win.FimFicEvents.getEventName(url);
