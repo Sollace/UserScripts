@@ -86,7 +86,7 @@ RunScript.toString = (function() {
   }
   if (window != win) {
     window.FimFicEvents = {
-      'on': function() {
+      'on': function(name, func) {
         return win.FimFicEvents.on(name, func);
       },
       'off': function(name, event) {
