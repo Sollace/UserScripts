@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Nosey Hound
 // @namespace   fimfiction-sollace
-// @include     http://www.fimfiction.net/user/*
-// @include     https://www.fimfiction.net/user/*
+// @include     http://www.fimfiction.net/*
+// @include     https://www.fimfiction.net/*
 // @version     1.5
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
