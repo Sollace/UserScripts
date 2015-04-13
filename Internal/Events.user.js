@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4
+// @version     1.4.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -34,27 +34,28 @@ RunScript.toString = (function() {
   return result;
 })();
 RunScript.build = function(functionText) {
-    return {
-        run: function(mustCall) {
-            var scr = document.createElement('SCRIPT');
-            if (mustCall) {
-                scr.innerHTML = '(' + functionText + ')();';
-            } else {
-                scr.innerHTML = functionText;
-            }
-            document.body.appendChild(scr);
-            scr.parentNode.removeChild(scr);
-        }
+  return {
+    run: function(mustCall) {
+      var scr = document.createElement('SCRIPT');
+      if (mustCall) {
+        scr.innerHTML = '(' + functionText + ')();';
+      } else {
+        scr.innerHTML = functionText;
+      }
+      document.body.appendChild(scr);
+      scr.parentNode.removeChild(scr);
     }
+  }
 };
 
 (function (win) {
-  var ver = 1.4;
+  var ver = 1.4.1;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
   if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
     RunScript(function(ver) {
+      var eventRegister = {};
       window.FimFicEvents = {
         'version': function() {
           return ver;
@@ -65,8 +66,14 @@ RunScript.build = function(functionText) {
         'off': function(name, event) {
           $(document).off(name,event);
         },
-        'trigger': function(name, e) {
-          $(document).trigger(name, [e]);
+        'trigger': function(name, event) {
+          $(document).trigger(name, [event]);
+        },
+        'subscribe': function(url, evFunc) {
+          if (typeof eventRegister[url] === 'undefined') {
+            eventRegister[url] = [];
+          }
+          eventRegister[url].push(evFunc);
         },
         'getEventName': function(url) {
           if (typeof(url) == 'string') {
@@ -76,12 +83,22 @@ RunScript.build = function(functionText) {
               case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
               case '/ajax/add_comment.php': return {'eventName': 'addcomment'};
               case '/compose_private_message.php': return {'eventName':'composepm'};
+              case '/ajax/notifications/mark_read.php': return {'eventName':'note_markread'};
+              case '/ajax/private_messages/mark-all-read.php': return {'eventName':'pm_markread'};
             }
             if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
               return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
             }
             if (url.indexOf('/ajax/infocard_user.php') == 0) {
               return {'eventName': 'infocard', 'user':url.split('&')[0].split('?name=')[1]};
+            }
+            if (typeof eventRegister(url) !== 'undefined') {
+              try {
+                var result = eventRegister[url][i](url);
+                if (typeof result == 'string') {
+                  return {'eventName': result};
+                }
+              }
             }
             return null;
           }
@@ -101,13 +118,16 @@ RunScript.build = function(functionText) {
   if (window != win) {
     window.FimFicEvents = {
       'on': function(name, func) {
-          RunScript.build('function() {FimFicEvents.on("' + name + '", (' + func.toString() + '));}').run(true);
+        RunScript.build('function() {FimFicEvents.on("' + name + '", (' + func.toString() + '));}').run(true);
       },
       'off': function(name, event) {
-          RunScript.build('function() {FimFicEvents.off("' + name + '", ' + JSON.stringify(event) + ');}').run(true);
+        RunScript.build('function() {FimFicEvents.off("' + name + '", ' + JSON.stringify(event) + ');}').run(true);
       },
       'trigger': function(name, e) {
-          RunScript.build('function() {FimFicEvents.trigger("' + name + '", ' + JSON.stringify(e) + ');}').run(true);
+        RunScript.build('function() {FimFicEvents.trigger("' + name + '", ' + JSON.stringify(e) + ');}').run(true);
+      },
+      'subscribe': function(url, func) {
+        RunScript.build('function() {FimFicEvents.subscribe("' + name + '", (' + func.toString() + '));}').run(true);
       },
       'getEventName': function(url) {
         return win.FimFicEvents.getEventName(url);
