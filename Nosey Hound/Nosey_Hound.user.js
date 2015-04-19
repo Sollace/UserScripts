@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.5
+// @version     1.5.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -33,7 +33,7 @@ var followerMapping = (function() {
                     if (result.children.length == 0) t += 'unloaded';
                     t += '" ';
                 }
-                t += 'target="_blank" href="/user/' + result.content + '" data-user="' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
+                t += 'target="_blank" href="/user/' + result.content.replace(/ /g,'+') + '" data-user="' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
                 if (result.children.length > 0) {
                     t += '<span class="open-pin" /><div class="dog"><div class="list content"><ol>';
                     var s = '';
@@ -328,15 +328,16 @@ try {
                     history.push({type:'l', display: lost[i], name: lost[i]});
                 }
                 if (i < named.length) {
-                    history.push({type:'n', display: named[i].name, old:named[i].oldName});
+                    history.push({type:'n', display: named[i].name, name: named[i].name, old: named[i].oldName});
                 }
             }
             for (var i = 0; i < history.length; i++) {
-                if (history[i].type != 'n') {
-                    for (var j = 0; j < named.length; j++) {
-                        if (history[i].name == named[j].oldName) {
-                            history[i].name = named[j].name;
-                        }
+                if (history[i].type == 'n' && history[i].name === undefined) {
+                    history[i].name = history[i].display;
+                }
+                for (var j = 0; j < named.length; j++) {
+                    if (history[i].name == named[j].oldName) {
+                        history[i].name = named[j].name;
                     }
                 }
             }
@@ -492,15 +493,19 @@ try {
         
         function historyList(arr) {
             var result = '<div class="list"><ul>';
-            for (var i = 0; i < arr.length; i++) {
+            for (var i = arr.length - 1; i >= 0; i--) {
                 result += '<li class="history ' + arr[i].type;
-                result += '"><a target="_blank" href="/user/' + arr[i][arr[i].type == 'n' ? 'display' : 'name'] + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
+                if (arr[i].type == 'j' || arr[i].type == 'l') {
+                   result += '"><a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
+                } else {
+                    result += '">' + arr[i].old.replace(/\+/g, ' ') + ' ';
+                }
                 if (arr[i].type == 'j') {
                     result += '<i>joined</i>';
                 } else if (arr[i].type == 'l') {
                     result += '<i>left</i>';
                 } else if (arr[i].type == 'n') {
-                    result += '<i>changed names to</i> ' + arr[i].old;
+                    result += '<i>changed names to</i> <a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a>';
                 }
                 result += '</li>';
             }
@@ -510,7 +515,7 @@ try {
         function linkList(arr) {
             var result = '<div class="list"><ol>';
             for (var i = 0; i < arr.length; i++) {
-                result += '<li><a target="_blank" href="/user/' + arr[i] + '">' + arr[i].replace(/\+/g, ' ') + '</a></li>';
+                result += '<li><a target="_blank" href="/user/' + arr[i].replace(/ /g,'+') + '">' + arr[i].replace(/\+/g, ' ') + '</a></li>';
             }
             return result + '</ol></div>';
         }
