@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4.2
+// @version     1.4.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -49,7 +49,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.42;
+  var ver = 1.43;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -92,12 +92,10 @@ RunScript.build = function(functionText) {
             if (url.indexOf('/ajax/infocard_user.php') == 0) {
               return {'eventName': 'infocard', 'user':url.split('&')[0].split('?name=')[1]};
             }
-            if (typeof eventRegister(url) !== 'undefined') {
-              try {
-                var result = eventRegister[url][i](url);
-                if (typeof result == 'string') {
-                  return {'eventName': result};
-                }
+            if (typeof eventRegister[url] !== 'undefined') {
+              var result = eventRegister[url][i](url);
+              if (typeof result == 'string') {
+                return {'eventName': result};
               }
             }
             return null;
