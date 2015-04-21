@@ -2,7 +2,7 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1
+// @version     1.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -33,9 +33,23 @@ RunScript.toString = (function() {
   result.toString = result;
   return result;
 })();
+RunScript.build = function(functionText) {
+  return {
+    run: function(mustCall) {
+      var scr = document.createElement('SCRIPT');
+      if (mustCall) {
+        scr.innerHTML = '(' + functionText + ')();';
+      } else {
+        scr.innerHTML = functionText;
+      }
+      document.body.appendChild(scr);
+      scr.parentNode.removeChild(scr);
+    }
+  }
+};
 
 (function (win) {
-  var ver = 1.1;
+  var ver = 1.2;
   var startup =
       (typeof (SpecialTitles) === 'undefined') && (typeof (win.SpecialTitles) === 'undefined') &&
       (win == window || (typeof (window.SpecialTitles) === 'undefined'));
@@ -72,6 +86,9 @@ RunScript.toString = (function() {
         return ver;
       };
       this.registeredTitles = function (v) {
+        if (typeof v === 'string') {
+          v = JSON.parse(v);
+        }
         if (v != null) {
           _registeredTitles = v;
         }
@@ -85,7 +102,7 @@ RunScript.toString = (function() {
     };
     STs.prototype.setSpecialTitle = function (userIds, title) {
       for (var i = 0; i < userIds.length; i++) {
-        $(".author > .avatar > img[src^='//www.fimfiction-static.net/images/avatars/" + userIds[i] + "']").each(function (item) {
+        $(".author > .avatar > img[src*='/images/avatars/" + userIds[i] + "']").each(function (item) {
           var prev = this.parentNode.previousSibling;
           if (prev != null && prev != undefined && prev.innerHTML != title) {
             $(this.parentNode).before("<div class=\"author-badge\" >" + title + "</div>");
@@ -119,13 +136,13 @@ RunScript.toString = (function() {
         return win.SpecialTitles.version();
       },
       registeredTitles: function (v) {
-        return win.SpecialTitles.registeredTitles(v);
+        return win.SpecialTitles.registeredTitles(JSON.stringify(v));
       },
       setSpecialTitle: function (userIds, title) {
-        win.SpecialTitles.setSpecialTitle(userIds, title);
+        RunScript.build('function() {SpecialTitles.setSpecialTitle(' + JSON.stringify(userIds) + ',"' + title + '");}').run(true);
       },
       setUpSpecialTitles: function () {
-        win.SpecialTitles.setUpSpecialTitles();
+        RunScript.build('function() {SpecialTitles.setUpSpecialTitles();}').run(true);
       },
       registerUserTitle: function (user, title) {
         win.SpecialTitles.registerUserTitle(user, title);
