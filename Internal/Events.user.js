@@ -49,7 +49,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.4.1;
+  var ver = 1.41;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
