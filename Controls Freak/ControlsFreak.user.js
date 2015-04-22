@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.4.1
+// @version     1.4.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -34,6 +34,20 @@ RunScript.toString = (function() {
   result.toString = result;
   return result;
 })();
+RunScript.build = function(functionText) {
+  return {
+    run: function(mustCall) {
+      var scr = document.createElement('SCRIPT');
+      if (mustCall) {
+        scr.innerHTML = '(' + functionText + ')();';
+      } else {
+        scr.innerHTML = functionText;
+      }
+      document.body.appendChild(scr);
+      scr.parentNode.removeChild(scr);
+    }
+  }
+};
 
 $(document).ready(function () {
     function ToolBar(buttons) {
@@ -1422,10 +1436,10 @@ padding-left: 0px !important;}\
         pop.content.parent().css('width', '700px');
         pop.content.append('<table class="properties"><tbody /></table><div class="drop-down-pop-up-footer"><button class="styled_button"><i class="fa fa-save" />Save</button></div>');
         
-        pop.scope(pop.find('tbody')).append('<tr><td class="label">Folder Name</td><td><div><input id="custom_folder_name" type="text" placeholder="Custom" /></div></td></tr>');
+        pop.find('tbody').append('<tr><td class="label">Folder Name</td><td><div><input id="custom_folder_name" type="text" placeholder="Custom" /></div></td></tr>');
         
         var icons = ["ambulance", "anchor", "android", "apple", "archive", "asterisk", "ban", "bar-chart-o", "beer", "bell", "bell-o", "bolt", "book", "bookmark", "briefcase", "bug", "building-o", "bullhorn", "calendar", "camera", "certificate", "chain", "chain-broken", "check", "clipboard", "clock-o", "cloud", "cloud-download", "cloud-upload", "coffee", "comment", "comments", "compass", "credit-card", "cutlery", "dashboard", "desktop", "dollar", "download", "eject", "envelope", "envelope-o", "eraser", "euro", "exclamation", "eye", "facebook", "female", "fighter-jet", "file", "file-o", "file-text", "file-text-o", "film", "fire", "fire-extinguisher", "flag", "flag-checkered", "flag-o", "flask", "flickr", "folder", "folder-open", "frown-o", "gamepad", "gbp", "gear", "gears", "gift", "glass", "globe", "google-plus", "hdd-o", "headphones", "heart", "heart-o", "home", "hospital-o", "inbox", "info", "key", "keyboard-o", "laptop", "leaf", "legal", "lemon-o", "lightbulb-o", "linux", "list-ol", "list-ul", "lock", "magic", "magnet", "male", "medkit", "meh-o", "microphone", "minus-circle", "mobile", "money", "moon-o", "music", "pagelines", "paperclip", "pencil", "phone", "picture-o", "plane", "play-circle", "plus-circle", "power-off", "print", "puzzle-piece", "question", "quote-left", "quote-right", "refresh", "repeat", "road", "rocket", "rss", "save", "scissors", "search", "shield", "shopping-cart", "smile-o", "stack-exchange", "star", "star-half", "star-half-empty", "star-o", "stethoscope", "suitcase", "sun-o", "tablet", "tag", "tags", "thumb-tack", "thumbs-down", "thumbs-o-down", "thumbs-o-up", "thumbs-up", "ticket", "times-circle", "tint", "trash-o", "trophy", "truck", "tumblr", "twitter", "umbrella", "unlock", "upload", "user", "users", "video-camera", "warning", "wheelchair", "windows", "wrench", "youtube"];
-        pop.content.append('<tr><td class="label">Folder Icon</td><td><div><select id="custom_folder_icon"><option>' + icons.join('</option><option>') + '</option></select></div></td></tr>');
+        pop.find('tbody').append('<tr><td class="label">Folder Icon</td><td><div><select id="custom_folder_icon"><option>' + icons.join('</option><option>') + '</option></select></div></td></tr>');
         
         pop.find('button').click(function () {
             var v = pop.find('#custom_folder_name').val();
