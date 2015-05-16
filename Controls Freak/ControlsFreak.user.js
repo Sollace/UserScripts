@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.4.2
+// @version     1.4.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -140,12 +140,6 @@ $(document).ready(function () {
             }
         }
         this.children = childs;
-
-        for (var i = 0; i < buttonRegistry.poslength() ; i++) {
-            if (!usedButtons.get(i) && !unusedButtons.get(i)) {
-                searchButton(this, norm);
-            }
-        }
     }
     ToolBar.prototype.flush = function() {
         for (var i = 0; i < this.children.length; i++) {
@@ -294,11 +288,14 @@ $(document).ready(function () {
   content: "Mail ( "}\
 .user_toolbar > ul > li ul li.hover > .drop-down ul,\
 .user_toolbar > ul > li > .drop-down ul,\
+.user_toolbar > ul > li ul li.hover > ul,\
 .user_toolbar > ul > li.hover > .drop-down {\
     display: block !important;}\
+.user_toolbar > ul > li ul li > ul {\
+    display: none !important;}\
 .user_toolbar > ul > li ul li > .drop-down,\
 .user_toolbar > ul > li > .drop-down {\
-    display: none;\
+    display: none !important;\
     position: absolute;\
     top: 39px;\
     left: 0px;\
@@ -794,7 +791,7 @@ padding-left: 0px !important;}\
         var buttonRegistry = new register();
         var usedButtons = new register();
         var unusedButtons = new register();
-
+        
         var customButtonData = [];
         
         var toolbar = $('nav.user_toolbar > ul').first();
@@ -818,6 +815,7 @@ padding-left: 0px !important;}\
         if (conf != norm && conf.length == 2) {
             usedButtons.flush(false);
             unusedButtons.flush(false);
+            flushButtonRegistry();
             nav.fromConfig(conf[0]);
             def.fromConfig(conf[1]);
             nav.gen();
@@ -826,6 +824,7 @@ padding-left: 0px !important;}\
         }
         
         loadUnusedButtons(disabled);
+        loadUnAssignedButtons(nav, def, disabled);
         
         nav.getContainer(navbar, ['nav-bar-list'], function () {
             return this.isPinnable();
@@ -871,7 +870,8 @@ padding-left: 0px !important;}\
             setConfig(norm);
             clearUnusedButtons();
             usedButtons.flush(false);
-            unusedButtons.flush(false, true);
+            unusedButtons.flush(false);
+            flushButtonRegistry();
             nav.flush();
             nav.fromConfig(norm[0]);
             def.fromConfig(norm[1]);
@@ -983,23 +983,7 @@ padding-left: 0px !important;}\
         }
         GM_setValue('unused', JSON.stringify(defaultUnused()));
     }
-
-    function searchButton(holder, i, buttons) {
-        for (var j = 0; j < norm.length; j++) {
-            if (norm[j]['i'] == i) {
-                var b = buttonRegistry.get(i);
-                b._index = holder.children.length;
-                b._parent = button;
-                holder.children.push();
-                usedButtons.set(i, true);
-                unusedButtons.set(i, false);
-                break;
-            } else if (norm[j]['c'] != null) {
-                searchButton(buttonRegistry.get(i), norm[j]['c']);
-            }
-        }
-    }
-
+    
     function getButton(entry) {
         var index = parseInt(entry['i']);
         if (index >= buttonRegistry.neglength() && index < buttonRegistry.poslength()) {
@@ -1084,7 +1068,19 @@ padding-left: 0px !important;}\
                 }
             }
         }
-
+        
+        this.detach = function() {
+            var newchilds = [];
+            for (var i = 0; i < this._parent.children.length; i++) {
+                if (this._parent.children[i] != this) {
+                    newchilds.push(this._parent.children[i]);
+                }
+            }
+            for (var i = 0; i < newchilds.length; i++) {
+                newchilds[i]._index = i;
+            }
+            this._parent.children = newchilds;
+        }
         this.getconfigEntry = function () {
             var result = {
                 'i': this.id
@@ -1101,16 +1097,7 @@ padding-left: 0px !important;}\
         }
         this.remove = function () {
             if (!_removed) {
-                var newchilds = [];
-                for (var i = 0; i < this._parent.children.length; i++) {
-                    if (this._parent.children[i] != this) {
-                        newchilds.push(this._parent.children[i]);
-                    }
-                }
-                for (var i = 0; i < newchilds.length; i++) {
-                    newchilds[i]._index = i;
-                }
-                this._parent.children = newchilds;
+                this.detach();
                 _removed = true;
             }
         }
@@ -1383,6 +1370,33 @@ padding-left: 0px !important;}\
                 }
             });
             spacers.css('width', (total - (taken * 1.2)) / spacers.length);
+        }
+    }
+    
+    function flushButtonRegistry() {
+        for (var i = buttonRegistry.neglength(); i < buttonRegistry.poslength(); i++) {
+            var button = buttonRegistry.get(i);
+            if (button.type != 'hidden') {
+                button.detach();
+                button._parent = null;
+                button._children = [];
+            }
+        }
+    }
+    
+    function loadUnAssignedButtons(navBar, activeBar, disabledBar) {
+        for (var i = buttonRegistry.neglength(); i < buttonRegistry.poslength(); i++) {
+            if (!usedButtons.get(i) && !unusedButtons.get(i)) {
+                var button = buttonRegistry.get(i);
+                if (button.type != 'hidden') {
+                    var panel = button.type == 'pin' ? navBar : disabledBar;
+                    button._index = panel.children.length;
+                    button._parent = panel;
+                    panel.children.push(button);
+                    usedButtons.set(i, true);
+                    unusedButtons.set(i, false);
+                }
+            }
         }
     }
 
