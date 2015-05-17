@@ -2,7 +2,7 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2
+// @version     1.2.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -49,7 +49,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.2;
+  var ver = 1.21;
   var startup =
       (typeof (SpecialTitles) === 'undefined') && (typeof (win.SpecialTitles) === 'undefined') &&
       (win == window || (typeof (window.SpecialTitles) === 'undefined'));
@@ -102,7 +102,7 @@ RunScript.build = function(functionText) {
     };
     STs.prototype.setSpecialTitle = function (userIds, title) {
       for (var i = 0; i < userIds.length; i++) {
-        $(".author > .avatar > img[src*='/images/avatars/" + userIds[i] + "']").each(function (item) {
+        $(this.avatarSelector(userIds[i])).each(function (item) {
           var prev = this.parentNode.previousSibling;
           if (prev != null && prev != undefined && prev.innerHTML != title) {
             $(this.parentNode).before("<div class=\"author-badge\" >" + title + "</div>");
@@ -110,6 +110,9 @@ RunScript.build = function(functionText) {
         });
       }
     };
+    STs.prototype.avatarSelector = function(userId) {
+      return ".author > .avatar > img[src*='" + userId + "']";
+    }
     STs.prototype.registerUserTitle = function (user, title) {
       if (typeof user != 'number') return;
       if (this.registeredTitles()[title] == null) {
@@ -123,7 +126,7 @@ RunScript.build = function(functionText) {
 
     if (typeof (window.SpecialTitles) !== 'undefined') {
       if (window.SpecialTitles.version() < ver) {
-        window.SpecialTitles = new STs(win.SpecialTitles);
+        window.SpecialTitles = new STs(window.SpecialTitles);
       }
     } else {
       window.SpecialTitles = new STs();

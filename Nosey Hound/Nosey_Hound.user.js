@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.5.1
+// @version     1.5.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -160,8 +160,11 @@ try {
             $('.user-avatar', xml).each(function() {
                 var name = $(this).parent().find('.name').clone();
                 name.find('*').remove();
+                var bgimg = $(this).css('background-image');
                 followers.push({
-                    id: $(this).css('background-image').split('avatars/').reverse()[0].split('_')[0],
+                    id: bgimg.indexOf('avatars/') != -1 ?
+                       bgimg.split('avatars/').reverse()[0].split('_')[0] :
+                       bgimg.split('user/').reverse()[0].split('-')[2],
                     name: name.text()
                 });
                 me.followersRaw.push(name.text());
