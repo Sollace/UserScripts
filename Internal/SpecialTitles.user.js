@@ -2,7 +2,7 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2.1
+// @version     1.2.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -151,6 +151,17 @@ RunScript.build = function(functionText) {
     } else {
       window.SpecialTitles = new STs();
     }
+    
+    if (startup) {
+      window.SpecialTitles.setUpSpecialTitles();
+      setTimeout(function () {
+        try {
+          window.SpecialTitles.setUpSpecialTitles();
+        } catch (e) {
+          alert('Error in ticking win.SpecialTitles.setUpSpecialTitles()\n' + e);
+        }
+      }, 500);
+    }
   }, true, ver, startup);
 
   if (win != window) {
@@ -171,19 +182,5 @@ RunScript.build = function(functionText) {
         win.SpecialTitles.registerUserTitle(user, title);
       }
     };
-  }
-  
-  if (startup) {
-    if (win.SpecialTitles) {
-      win.SpecialTitles.setUpSpecialTitles();
-    } else {
-      setTimeout(function () {
-        try {
-          win.SpecialTitles.setUpSpecialTitles();
-        } catch (e) {
-          alert('Error in ticking win.SpecialTitles.setUpSpecialTitles()\n' + e);
-        }
-      }, 500);
-    }
   }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
