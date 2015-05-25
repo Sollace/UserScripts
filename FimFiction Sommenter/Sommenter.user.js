@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2.4
+// @version     2.2.5
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -13,30 +13,30 @@
 
 var interactiveP = $('input[name="show_interactive_pony"]');
 if (interactiveP.length > 0) {
-    interactiveP = interactiveP.parent().parent().parent().parent();
-    var Option = $('<input type="checkbox" name="pin_comments">');
-    var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
-    row.find('.toggleable-switch').prepend(Option);
-    interactiveP.before(row);
-    Option.attr('checked', getPinComments());
-    Option.click(function () {
-        setPinComments(this.checked);
-    });
+  interactiveP = interactiveP.parent().parent().parent().parent();
+  var Option = $('<input type="checkbox" name="pin_comments">');
+  var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
+  row.find('.toggleable-switch').prepend(Option);
+  interactiveP.before(row);
+  Option.attr('checked', getPinComments());
+  Option.click(function () {
+    setPinComments(this.checked);
+  });
 }
 
 var commentBox = $("#add_comment_box .toolbar_buttons");
 if (commentBox.length > 0) {
-    setupTogglePin(commentBox[0]);
-    $(document).ready(function () {
-        $('#add_comment_box .form_submitter').on('click', function () {
-            $('body.pin_comment #comment_preview').css('opacity', 0);
-            setTimeout(function () {
-                $('body.pin_comment #comment_preview').html('');
-                $('body.pin_comment #comment_preview').css('display', '');
-                $('body.pin_comment #comment_preview').css('opacity', '');
-            }, 500);
-        });
+  setupTogglePin(commentBox[0]);
+  $(document).ready(function () {
+    $('#add_comment_box .form_submitter').on('click', function () {
+      $('body.pin_comment #comment_preview').css('opacity', 0);
+      setTimeout(function () {
+        $('body.pin_comment #comment_preview').html('');
+        $('body.pin_comment #comment_preview').css('display', '');
+        $('body.pin_comment #comment_preview').css('opacity', '');
+      }, 500);
     });
+  });
 }
 
 unsafeWindow.AddQuote = function(id, shift) {};
@@ -140,22 +140,22 @@ body.pin_comment #add_comment_box:hover + #comment_preview {\
 //--------------------------------------------------------------------------------------------------
 
 function setupTogglePin(toolbar) {
-    if ($('#add_comment_box_pin').length == 0) {
-        var tog = makeButton(toolbar, "Toggle Pin (Temporary)", "fa comments_pinner");
-        $(tog).attr('id', 'add_comment_box_pin');
-        $(tog).click(function () {
-            var bod = $('body');
-            if (bod.hasClass('pin_comment')) {
-                bod.removeClass('pin_comment');
-            } else {
-                bod.addClass('pin_comment');
-            }
-        });
+  if ($('#add_comment_box_pin').length == 0) {
+    var tog = makeButton(toolbar, "Toggle Pin (Temporary)", "fa comments_pinner");
+    $(tog).attr('id', 'add_comment_box_pin');
+    $(tog).click(function () {
+      var bod = $('body');
+      if (bod.hasClass('pin_comment')) {
+        bod.removeClass('pin_comment');
+      } else {
+        bod.addClass('pin_comment');
+      }
+    });
 
-        if (getPinComments()) {
-            $('body').addClass('pin_comment');
-        }
+    if (getPinComments()) {
+      $('body').addClass('pin_comment');
     }
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -164,11 +164,11 @@ function setupTogglePin(toolbar) {
 
 //==API FUNCTION==//
 function getPinComments() {
-    return GM_getValue('pin_comments', 0) == 1;
+  return GM_getValue('pin_comments', 0) == 1;
 }
 
 function setPinComments(val) {
-    GM_setValue('pin_comments', val ? 1 : 0);
+  GM_setValue('pin_comments', val ? 1 : 0);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -176,21 +176,31 @@ function setPinComments(val) {
 //--------------------------------------------------------------------------------------------------
 
 //==API FUNCTION==//
-function makeButton(a, text, img) {
-    var b = document.createElement("li");
-    $(b).append("<button title=\"" + text + "\"><i class=\"" + img + "\"></i></button>");
-    $(a).append(b);
-    return b;
+function makeButton(a, text, img){
+  var result = $('<li class="button-group"><button class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button></li>');
+  $(a).append(result);
+  return result.find('button');
+}
+
+var vendor = vendor || null;
+//==API FUNCTION==//
+function getVendorPrefix() {
+  if (vendor == null) {
+    var styles = window.getComputedStyle(document.documentElement, '');
+    var pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1];
+    var dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
+    vendor = {dom: dom, lowercase: pre, css: '-' + pre + '-', js: pre[0].toUpperCase() + pre.substring(1)};
+  }
+  return vendor;
 }
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
-    var style = document.createElement('style');
-    $(style).attr('type', 'text/css');
-    $(style).append(input);
-    if (id != undefined && id != null) {
-        style.id = id;
-    }
-    $('head').append(style);
+  while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
+  input = input.replace(/-\{0\}-/g, getVendorPrefix().css);
+  var style = document.createElement('style');
+  style.setAttribute('type', 'text/css');
+  style.innerHTML = input;
+  if (id) style.id = id;
+  document.head.appendChild(style);
 }

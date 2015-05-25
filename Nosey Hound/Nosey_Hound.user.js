@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.5.2
+// @version     1.5.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -17,7 +17,7 @@ var followerMapping = (function() {
     var openedMapping = [];
     var structured = {};
     var dirty = false;
-    
+
     function structuredChilds(x, y) {
         var result = {
             content: internalMapping[x][y],
@@ -344,8 +344,20 @@ try {
                     }
                 }
             }
-            setHistory(this.userId, history);
-            return '<div data_id="5" class="tab hidden">' + (history.length > 0 ? historyList(history) : 'No items to display') + '</div>';
+            var finalHistory = [];
+            for (var i = 0; i < history.length; i++) {
+                if (i < history.length - 1) {
+                    if (history[i].type != 'n' && history[i + 1].type != 'n') {
+                        if (history[i].name == history[i + 1].name) {
+                            i++;
+                            continue;
+                        }
+                    }
+                }
+                finalHistory.push(history[i]);
+            }
+            setHistory(this.userId, finalHistory);
+            return '<div data_id="5" class="tab hidden">' + (finalHistory.length > 0 ? historyList(finalHistory) : 'No items to display') + '</div>';
         }
         
         if ($('.user-page-header').length) {
@@ -835,14 +847,10 @@ function isMyPage() {
 function getUserNameEncoded() { return encodeURIComponent(getUserName()); }
 
 //==API FUNCTION==//
-function getUserName() {
-    return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/").reverse()[0] : 'Anon';
-}
+function getUserName() {return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/").reverse()[0] : 'Anon';}
 
 //==API FUNCTION==//
-function getUserButton() {
-    return $('.user_toolbar a.button[href^="/user/"]')[0];
-}
+function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]')[0];}
 
 //==API FUNCTION==//
 function getIsLoggedIn() {
