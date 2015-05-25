@@ -9,46 +9,6 @@
 // @grant       GM_setValue
 // ==/UserScript==
 
-function RunScript(func, mustCall, params) {
-  var scr = document.createElement('SCRIPT');
-  if (mustCall) {
-    if (params) {
-      var pars = [];
-      for (var i = 2; i < arguments.length; i++) {
-        pars.push(arguments[i]);
-      }
-      scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
-    } else {
-      scr.innerHTML = '(' + func.toString() + ')();';
-    }
-  } else {
-    scr.innerHTML = func.toString();
-  }
-  document.body.appendChild(scr);
-  scr.parentNode.removeChild(scr);
-};
-RunScript.toString = (function() {
-  var result = function toString() {
-    return 'function ' + this.name + '() {\n  [native code]\n}';
-  }
-  result.toString = result;
-  return result;
-})();
-RunScript.build = function(functionText) {
-  return {
-    run: function(mustCall) {
-      var scr = document.createElement('SCRIPT');
-      if (mustCall) {
-        scr.innerHTML = '(' + functionText + ')();';
-      } else {
-        scr.innerHTML = functionText;
-      }
-      document.body.appendChild(scr);
-      scr.parentNode.removeChild(scr);
-    }
-  }
-};
-
 $(document).ready(function () {
     function ToolBar(buttons) {
         this.container = null;
@@ -289,7 +249,8 @@ $(document).ready(function () {
 .user_toolbar > ul > li ul li.hover > .drop-down ul,\
 .user_toolbar > ul > li > .drop-down ul,\
 .user_toolbar > ul > li ul li.hover > ul,\
-.user_toolbar > ul > li.hover > .drop-down {\
+.user_toolbar > ul > li.hover > .drop-down,\
+.editing_button .items {\
     display: block !important;}\
 .user_toolbar > ul > li ul li > ul {\
     display: none !important;}\
@@ -1446,7 +1407,7 @@ padding-left: 0px !important;}\
 
     function makeEditButtonPopup(node, index) {
         var pop = makeGlobalPopup('Custom Button', 'fa fa-edit');
-
+        
         pop.content.parent().css('width', '700px');
         pop.content.append('<table class="properties"><tbody /></table><div class="drop-down-pop-up-footer"><button class="styled_button"><i class="fa fa-save" />Save</button></div>');
         
@@ -1467,27 +1428,36 @@ padding-left: 0px !important;}\
         });
         pop.find('#custom_folder_name').val(customButtonData[index].name);
         pop.find('#custom_folder_icon').val(customButtonData[index].icon);
-        
         pop.position('center', 'center');
     }
+    
+    //==API FUNCTION==//
+    function win() {return this['unsafeWindow'] || window;}
 
     //==API FUNCTION==//
-    function getIsLoggedIn() {
-        try {
-            return (typeof (unsafeWindow) != 'undefined' ? unsafeWindow : window).logged_in_user != null;
-        } catch (e) {
+    function getIsLoggedIn() {return !!win()['logged_in_user'];}
+
+    var vendor = vendor || null;
+    //==API FUNCTION==//
+    function getVendorPrefix() {
+        if (!vendor) {
+            var styles = window.getComputedStyle(document.documentElement, '');
+            var pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1];
+            var dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
+            vendor = {dom: dom, lowercase: pre, css: '-' + pre + '-', js: pre[0].toUpperCase() + pre.substring(1)};
         }
-        return false;
+        return vendor;
     }
 
     //==API FUNCTION==//
     function makeStyle(input, id) {
         while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
+        input = input.replace(/-\{0\}-/g, getVendorPrefix().css);
         var style = document.createElement('style');
-        $(style).attr('type', 'text/css');
-        $(style).append(input);
+        style.setAttribute('type', 'text/css');
+        style.innerHTML = input;
         if (id) style.id = id;
-        $('head').append(style);
+        document.head.appendChild(style);
     }
 
     //==API FUNCTION==//
@@ -1599,27 +1569,4 @@ padding-left: 0px !important;}\
         $(obj).css('top', y + "px");
         $(obj).css('left', x + "px");
     }
-    
-    RunScript(function() {
-        window.registerToolbarButton = function(obj, offsetType, index) {
-            $(window).trigger('registerToolbarButton', [obj,offsetType,index]);
-        }
-        window.registerToolbarButton.toString = RunScript.toString;
-    }, true);
-    
-    $(window).on('registerToolbarButton', function(e, obj, offsetType, index) {
-        if (offsetType == -1) index = def.children.length - index;
-        def.fromConfig(norm[1]);
-        def.gen(toolbar);
-        for (var i = 0; i < def.children.length; i++) {
-            if (i == index) {
-                def.children.splice(i, 0, new Button(def, i, obj, true));
-            }
-            def.children[i]._index = i;
-        }
-        norm[1] = def.getConfig();
-        def.fromConfig(conf[1]);
-        def.gen(toolbar);
-        def.getEdit();
-    });
 });
