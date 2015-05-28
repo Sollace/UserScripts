@@ -8,13 +8,16 @@
 // ==/UserScript==
 
 //==API FUNCTION==//
-function brightness(r,g,b) {return Math.sqrt((0.241 * r * r) + (0.691 * g * g) + (0.068 * b * b));}
+function isJQuery() {return !!win()['$'];}
 
 //==API FUNCTION==//
 function win() {return this['unsafeWindow'] || window;}
 
 //==API FUNCTION==//
 function getSafe(name, defaultValue) {var w = win();return w[name] || (w[name] = defaultValue);}
+
+//==API FUNCTION==//
+function brightness(r,g,b) {return Math.sqrt((0.241 * r * r) + (0.691 * g * g) + (0.068 * b * b));}
 
 //==API FUNCTION==//
 function getIsLoggedIn() {return !!win()['logged_in_user'];}

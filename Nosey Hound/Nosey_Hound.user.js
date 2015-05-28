@@ -376,7 +376,7 @@ try {
         $('.user-card').each(function() {
             $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer" href="javascript:void();"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
         });
-        $('.user-page-header ul.tabs').append('<li><a class="sniffer" href="javascript:void();"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
+        $('.user-page-header .tab-followers').after('<li class="tab nosey"><a class="sniffer" href="javascript:void();"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
         
         $(document).on('click','.sniffer', function() {
             (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();

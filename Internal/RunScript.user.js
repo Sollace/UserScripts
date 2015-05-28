@@ -45,9 +45,10 @@ RunScript.build = function(functionText) {
   return {
     run: function(mustCall) {
       if (!document.body) {
+        var me = this;
         var _ready = document.onready;
         document.onready = function() {
-          this.run(mustCall);
+          me.run(mustCall);
           if (typeof _ready === 'function') {
             _ready.apply(this, arguments);
           }

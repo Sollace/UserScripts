@@ -47,9 +47,10 @@ RunScript.build = function(functionText) {
   return {
     run: function(mustCall) {
       if (!document.body) {
+        var me = this;
         var _ready = document.onready;
         document.onready = function() {
-          this.run(mustCall);
+          me.run(mustCall);
           if (typeof _ready === 'function') {
             _ready.apply(this, arguments);
           }
@@ -73,8 +74,8 @@ RunScript.build = function(functionText) {
   var startup =
       (typeof (SpecialTitles) === 'undefined') && (typeof (win.SpecialTitles) === 'undefined') &&
       (win == window || (typeof (window.SpecialTitles) === 'undefined'));
-
-  RunScript(function(ver, startup) {
+  
+  var scriptBody = function(ver, startup) {
     function STs(load) {
       var _registeredTitles = load != null ? load.registeredTitles() : {};
 
@@ -162,9 +163,10 @@ RunScript.build = function(functionText) {
         }
       }, 500);
     }
-  }, true, ver, startup);
-
+  }
+  
   if (win != window) {
+    RunScript(scriptBody, true, ver, startup);
     window.SpecialTitles = {
       version: function () {
         return win.SpecialTitles.version();
@@ -179,8 +181,10 @@ RunScript.build = function(functionText) {
         RunScript.build('function() {SpecialTitles.setUpSpecialTitles();}').run(true);
       },
       registerUserTitle: function (user, title) {
-        win.SpecialTitles.registerUserTitle(user, title);
+        RunScript.build('function(user, title) {SpecialTitles.registerUserTitle("' + user + '","' + title + '");}').run(true);
       }
     };
+  } else {
+    scriptBody();
   }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);

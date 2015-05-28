@@ -47,9 +47,10 @@ RunScript.build = function(functionText) {
   return {
     run: function(mustCall) {
       if (!document.body) {
+        var me = this;
         var _ready = document.onready;
         document.onready = function() {
-          this.run(mustCall);
+          me.run(mustCall);
           if (typeof _ready === 'function') {
             _ready.apply(this, arguments);
           }
@@ -74,7 +75,7 @@ RunScript.build = function(functionText) {
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
   if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
-    RunScript(function(ver) {
+    var scriptBody = function(ver) {
       var eventRegister = {};
       window.FimFicEvents = {
         'version': function() {
@@ -135,7 +136,12 @@ RunScript.build = function(functionText) {
       window.FimFicEvents.version.toString = function() {
         return this();
       }
-    }, true, ver);
+    }
+    if (window != win) {
+      RunScript(scriptBody, true, ver);
+    } else {
+      scriptBody(ver);
+    }
   }
   if (window != win) {
     window.FimFicEvents = {
@@ -166,9 +172,8 @@ RunScript.build = function(functionText) {
       return this();
     }
   }
-
   if (startup) {
-    RunScript(function() {
+    var injected = function() {
       var original = window.AjaxRequest;
       window.AjaxRequest = function(a) {
         var event = window.FimFicEvents.getEventName(a.url);
@@ -224,6 +229,11 @@ RunScript.build = function(functionText) {
           return __ajax(param, n);
         };
       })();
-    },true);
+    }
+    if (window != win) {
+      RunScript(injected,true);
+    } else {
+      injected();
+    }
   }
 })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
