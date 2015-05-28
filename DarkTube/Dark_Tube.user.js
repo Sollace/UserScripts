@@ -599,7 +599,7 @@ var mainCss = '\
     .subscriptions-filter .filter-field-container {\
         border-color: #303030 !important;\
         background: #000 !important;}\
-    .about-description-editor .c4-module-is-editable:hover, .about-business-email-editor .c4-module-is-editable:hover, .about-metadata-editor .c4-module-is-editable:hover, .pl-message-panel .panel-content,\
+    .c4-module-is-editable:hover, .about-business-email-editor .c4-module-is-editable:hover, .about-metadata-editor .c4-module-is-editable:hover, .pl-message-panel .panel-content,\
     #subscription-manager-container .even td, .pl-video-list-editable .pl-video:hover .pl-video-handle, .yt-uix-dragdrop-cursor-follower, .yt-uix-dragdrop-cursor-follower tr, .yt-uix-dragdrop-cursor-follower .pl-video-handle,\
     #collections-container, #subscriptions-container {\
         background: #222 !important;\
@@ -638,7 +638,7 @@ var mainCss = '\
         background-color: #222 !important;\
         color: #aaa !important;}\
     .c4-module-editor-form {\
-        background-color: #222 !important;}\
+        background: none !important;}\
     .c4-shelf-preview {\
         border-color: #303030 !important;\
         background: #222 !important;}\
@@ -1455,47 +1455,57 @@ div.t-Pa-mb-c.b-c-R , .wp > .Id > .Ae {\
 
 var largePlayerCss = '\
 .video-ads {\
-  display: none !important;}\
+  display: none !important;\
+}\
 .html5-progress-bar {\
-  width: 100% !important;}\
+  width: 100% !important;\
+}\
 .watch-wide .playlist-videos-list {\
-    max-height: 410px !important;}\
+  max-height: 410px !important;\
+}\
 @media all and (min-width: 1066px) {\
-    .custom-medium, .custom-medium #player-api,\
-    .watch-medium, .watch-medium #player-api  {\
-        width: 1066px!important;}\
-    .custom-medium .watch7-playlist-bar,\
-    .watch-medium .watch7-playlist-bar {\
-        width: 1066px!important;}}\
-    #theater-background {\
-        height: 630px !important;}\
+  .watch-medium #player-api  {\
+    width: 1066px!important;\
+  }\
+  /*.watch-medium .watch7-playlist-bar {\
+    width: 1066px!important;\
+  }*/\
+}\
+#theater-background {\
+  height: 630px !important;\
+}\
 @media all and (max-width: 1066px) {\
-    .custom-medium, .custom-medium #player-api,\
-    .watch-medium, .watch-medium #player-api  {\
-        width: 99%!important;}\
-    .custom-medium .watch7-playlist-bar,\
-    .watch-medium .watch7-playlist-bar {\
-        width: 99%!important;}\
-    #theater-background {\
-        height: 100%!important;}}\
-    .custom-medium, .custom-medium #player-api,\
-    .watch-medium, .watch-medium #player-api {\
-        height: 630px!important;}\
-    .custom-medium .custom-playlist-bar-left,\
-    .watch-medium .watch7-playlist-bar-left {\
-        width: 700px !important;}\
-    .custom-medium #watch7-playlist-tray-container,\
-    .watch-medium #watch7-playlist-tray-container {\
-        left: 700px !important;}\
-    .custom-medium #watch7-creator-bar,\
-    .watch-medium #watch7-creator-bar {\
-        width: 960px !important;}\
-    .custom-medium .html5-video-content,\
-    .custom-medium #player-api video,\
-    .watch-medium .html5-video-content,\
-    .watch-medium #player-api video {\
-        width: 100% !important;\
-        height: 100% !important;}';
+  .watch-medium #player-api  {\
+    width: 99%!important;\
+  }\
+  .watch-medium .watch7-playlist-bar {\
+    width: 99%!important;\
+  }\
+  #theater-background {\
+    height: 100%!important;\
+  }\
+}\
+.watch-medium, .watch-medium #player-api {\
+  height: 630px !important;\
+}\
+.watch-medium #player-api {\
+  left: -490px !important;\
+}\
+.watch-medium .watch7-playlist-bar-left {\
+  width: 700px !important;\
+}\
+.watch-medium #watch7-playlist-tray-container {\
+  left: 700px !important;\
+}\
+.watch-medium #watch7-creator-bar {\
+  width: 960px !important;\
+}\
+.watch-medium .html5-video-content,\
+.watch-medium #player-api video {\
+  width: 100% !important;\
+  height: 100% !important;\
+}\
+';
 
 var commentsCss = '\
 div[role=menu] {\
@@ -1906,7 +1916,7 @@ function switchToLight() {
 
 function reloadComments() {
     try {
-        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id, #sb-target");
+        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id, #sb-target, #yt-comments-sb");
         comments = comments.find("iframe").each(function () {
             var split = this.src.split("?");
             var oldsrc = split[0] + "?r=2&" + split[1];

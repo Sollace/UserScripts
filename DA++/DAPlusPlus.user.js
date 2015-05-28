@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.3.2
+// @version     1.3.3
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -51,6 +51,9 @@ move.typeOf = function(obj) {
 }
 move.isArray = function(arr) {
     return this.typeOf(arr) == 'Array';
+}
+move.isJQuery = function() {
+    return !!window['$'];
 }
 
 var ready = false;
@@ -102,8 +105,13 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 
 
 function run() {
-    deAd();
-    ready = true;
+    try {
+        if (move.isJQuery()) {
+            deAd();
+            ready = true;
+        }
+    } catch (e) {
+    }
 }
 
 function deAd() {
