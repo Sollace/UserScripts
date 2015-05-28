@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     1.4.4
+// @version     1.4.5
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -1432,7 +1432,7 @@ padding-left: 0px !important;}\
     }
     
     //==API FUNCTION==//
-    function win() {return this['unsafeWindow'] || window;}
+    function win() {return this['unsafeWindow'] || window['unsafeWindow'] || window;}
 
     //==API FUNCTION==//
     function getIsLoggedIn() {return !!win()['logged_in_user'];}

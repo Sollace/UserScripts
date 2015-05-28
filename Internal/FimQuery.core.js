@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1
+// @version     1.0.1
 // @grant       none
 // ==/UserScript==
 
@@ -11,7 +11,7 @@
 function isJQuery() {return !!win()['$'];}
 
 //==API FUNCTION==//
-function win() {return this['unsafeWindow'] || window;}
+function win() {return this['unsafeWindow'] || window['unsafeWindow'] || window;}
 
 //==API FUNCTION==//
 function getSafe(name, defaultValue) {var w = win();return w[name] || (w[name] = defaultValue);}
