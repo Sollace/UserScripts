@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.4.3
+// @version     2.4.4
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -179,8 +179,11 @@ var mainCss = '\
   background-position: -79px -24px !important;\
   opacity: 0.6;}\
 .actionable #watch-like:active:before,\
+.actionable .like-button-renderer-like-button:active::before,\
 .actionable #watch-like[title="Unlike"]:before,\
-.actionable #watch-like.yt-uix-button-toggled:before {\
+.actionable .like-button-renderer-like-button[title="Unlike"]::before,\
+.actionable #watch-like.yt-uix-button-toggled:before,\
+.actionable .like-button-renderer-like-button.yt-uix-button-toggled::before {\
     opacity: 1;\
     background-position: -24px -39px !important;}\
 #watch-like:before, .like-button-renderer-like-button::before {\
