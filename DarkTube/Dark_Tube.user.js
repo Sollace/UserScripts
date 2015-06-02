@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.4.2
+// @version     2.4.3
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -79,7 +79,9 @@ var mainCss = '\
 .yt-uix-button-icon-questionmark,\
 .yt-uix-button-icon-sprite_send_message,\
 .add-to-widget .private-icon, .yt-uix-button-icon-privacy-private, .add-to-widget .public-icon,\
-#watch-like:before, #watch-dislike:before, .ad-info-icon, .autoplay-info-icon, .yt-help-icon,\
+#watch-like:before, .like-button-renderer-like-button::before,\
+#watch-dislike:before, .like-button-renderer-dislike-button::before,\
+.ad-info-icon, .autoplay-info-icon, .yt-help-icon,\
 .c4-module-editor-delete::before {\
     background-image: url(' + resources.highjacker + ') !important;}\
 \
@@ -181,11 +183,12 @@ var mainCss = '\
 .actionable #watch-like.yt-uix-button-toggled:before {\
     opacity: 1;\
     background-position: -24px -39px !important;}\
-#watch-like:before {\
+#watch-like:before, .like-button-renderer-like-button::before {\
     background-position: -2px -39px !important;}\
-#watch-dislike:before {\
+#watch-dislike:before, .like-button-renderer-dislike-button::before {\
     background-position: -46px -40px !important;}\
-#watch-like:before, #watch-dislike:before {\
+#watch-like:before, .like-button-renderer-like-button::before,\
+#watch-dislike:before, .like-button-renderer-dislike-button::before {\
     opacity: 0.6;}\
 .yt-uix-button-icon-sprite_send_message {\
     opacity: 0.6;\
@@ -1727,24 +1730,31 @@ var buttonStyle = '\
 
 mainCss += '\
 \
-body[class*=ytcenter] #watch-slike.yt-uix-button-toggled:not(:hover):before,\
 body[class*=ytcenter] #watch-like.yt-uix-button-toggled:not(:hover):before,\
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-like-button.yt-uix-button-toggled:not(:hover)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after,\
 body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
 body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
 body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button.yt-uix-button-toggled:not(:hover)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
     background-image: url(' + resources.highjacker + ') !important;}\
 \
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after {\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after {\
     background-position: -2px -39px !important;}\
 \
-body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
-body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):after,\
 body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after {\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
     background-position: -46px -40px !important;}\
 \
 body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled) .yt-uix-button-content,\
