@@ -213,8 +213,12 @@ function position(obj, x, y, buff) {
 
 //==API FUNCTION==//
 function tryParseFloat(s,d) {
-    s = parseFloat(s);
-    return isNaN(s) ? d : s;
+    return (!s || isNaN(s)) ? d : parseFloat(s);
+}
+
+//==API FUNCTION==//
+function tryParseInt(s,d) {
+    return (!s || isNaN(s)) ? d : parseInt(s);
 }
 
 //==API FUNCTION==//
