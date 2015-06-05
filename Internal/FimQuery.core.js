@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.1
+// @version     1.0.2
 // @grant       none
 // ==/UserScript==
 
