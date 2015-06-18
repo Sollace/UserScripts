@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.5.3
+// @version     1.6
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -162,8 +162,8 @@ try {
                 name.find('*').remove();
                 var bgimg = $(this).css('background-image');
                 followers.push({
-                    id: bgimg.indexOf('avatars/') != -1 ?
-                       bgimg.split('avatars/').reverse()[0].split('_')[0] :
+                    id: bgimg.indexOf('images/') != -1 ?
+                       bgimg.split('images/').reverse()[0].split('_')[0] :
                        bgimg.split('user/').reverse()[0].split('-')[2],
                     name: name.text()
                 });
@@ -183,8 +183,10 @@ try {
                 }
             }
             for (var i = 0; i < this.oldFollowers.length; i++) {
-                if (isPresent(followers, this.oldFollowers[i]) == null) {
-                    lost.push(this.oldFollowers[i].name);
+                if (this.oldFollowers[i].id.indexOf('/') == -1) {
+                    if (isPresent(followers, this.oldFollowers[i]) == null) {
+                        lost.push(this.oldFollowers[i].name);
+                    }
                 }
             }
             
@@ -215,7 +217,7 @@ try {
             tabs.append('<div data_tab="0" class="button selected">Overview</div>');
             pop.append('<div data_id="0" class="tab shown selected" >' + (firstTime ? this.loaded() : this.overview(gained, lost, named, localeG, localeL, localeN)) + '</div>');
             tabs.append('<div data_tab="1" class="button">Stats</div>');
-            pop.append('<div data_id="1" class="tab shown">' + this.stats(gained, lost, localeG, localeL) + forgetButton(this.userId) + '</div>');
+            pop.append('<div data_id="1" class="tab shown">' + this.stats(gained, lost, localeG, localeL) + forgetButton(this.userId) + emptyHistoryButton(this.userId) + '</div>');
             if (gained.length > 0) {
                 tabs.append('<div data_tab="2" class="button">Gained</div>');
                 pop.append('<div data_id="2" class="tab shown" ><b>Total Gained:</b> ' + localeG + '<div class="main">' + linkList(gained) + '</div></div>');
@@ -268,7 +270,7 @@ try {
             if (diff != 0) {
                 result += diff > 0 ? 'Good job! ' : 'I\'m sorry. ';
                 result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.oldFollowers.length + '</b> followers' + (g.length > 0 ? ' of which' : '');
-                result += diff > 0 ? (g.length > 0 ? ' <b>' + G + '</b>' : 'none of which') + ' are new additions whilst ' + (l.length > 0 ? 'only ' : '') :  (g.length > 0 ? ' only <b>' + G + '</b>' : '<b>none</b> of which') + ' are new additions whilst ';
+                result += diff > 0 ? (g.length > 0 ? ' <b>' + G + '</b>' : ' none of which') + ' are new additions whilst ' + (l.length > 0 ? 'only ' : '') :  (g.length > 0 ? ' only <b>' + G + '</b>' : '<b>none</b> of which') + ' are new additions whilst ';
                 result += '<b>' + (l.length > 0  ? L : 'none') + '</b> of ' + (this.myPage ? 'your' : this.userName + '\'s') + ' old followers have left.';
             } else if (g.length == 0) {
                 result += (this.myPage ? 'Be happy. You have ' : this.userName + ' has ') + 'not lost any followers, but ' + (this.myPage ? 'you have ' : 'he has ') + 'not gained any either.' + (this.myPage ? ' Is there something else you can do to improve this?' : '');
@@ -287,37 +289,17 @@ try {
             return result;
         }
         Dog.prototype.popularity = function(g, l, t) {
-            var alpha = 'abcdefghijklmnopqrstuvwxyz';
-            var story_views = 0;
-            for (var i = 0; i < this.userName.length; i++) {
-                var j = parseInt(this.userName[i]);
-                if (j + '' === 'NaN') {
-                    j = alpha.indexOf(this.userName[i].toLowerCase());
-                    if (j < 0) j = 0;
-                }
-                story_views += j;
-            }
-            story_views /= this.userName.length;
             var _count = this.tabs.children().first();
             var story_count = parseInt(_count.find('.number').html());
             var blog_count = parseInt(_count.next().find('.number').html());
             var fol_count = t + g - l;
             
-            var result = ((t > 0 ? (g - l * 100) / t : 100) + t + (blog_count * ((story_views * story_count > 0 ? story_count : 0) * fol_count / 12))) / 10;
-            var unit = 'inches';
-            if (result >= 12) {
-                unit = 'feet';
-                result /= 12;
-                if (result >= 3) {
-                    unit = 'yards';
-                    result /= 3;
-                    if (result >= 1760) {
-                        unit = 'miles';
-                        result /= 1760;
-                    }
-                }
-            }
-            return parseFloat(result.toFixed(3).toString()).toLocaleString('en') + ' ' + unit;
+            return parseImperial(this.computeScore(story_count, blog_count, fol_count));
+        }
+        Dog.prototype.computeScore = function(story_count, blog_count, fol_count) {
+            var fol_per_story = story_count > 0 ? fol_count/story_count : 0;
+            var fol_per_blog = blog_count > 0 ? fol_count/blog_count : 0;
+            return ((fol_per_story + fol_per_blog)/4)*(story_count*9 + blog_count) / 55;
         }
         Dog.prototype.history = function(gained, lost, named) {
             this.oldFollowers
@@ -357,7 +339,7 @@ try {
                 finalHistory.push(history[i]);
             }
             setHistory(this.userId, finalHistory);
-            return '<div data_id="5" class="tab hidden">' + (finalHistory.length > 0 ? historyList(finalHistory) : 'No items to display') + '</div>';
+            return '<div data_id="5" class="tab hidden">' + (finalHistory.length ? historyList(finalHistory) : 'No items to display') + '</div>';
         }
         
         if ($('.user-page-header').length) {
@@ -390,23 +372,48 @@ try {
             $('a.snuffer').parents('.info-card-container').hide();
         });
         $(document).on('click','button.forget', function() {
-            if ($(this).attr('data-check') != '2') {
-                if ($(this).attr('data-check') != '1') {
-                    $(this).attr('data-check','1');
-                    $(this).text('Are you sure?');
+            if (confirm($(this), 'Forgot this User')) {
+                clearFollowers($(this).attr('data-id'));
+            }
+        });
+        $(document).on('click','button.hforget', function() {
+            if (confirm($(this), 'Alrighty then...')) {
+                var id = $(this).attr('data-id');
+                var limit = $(this).attr('data-limit');
+                if (limit && (limit = parseInt(limit)) > 0) {
+                    var history = getHistory(id);
+                    if (history.length > limit) {
+                        history.splice(0, history.length - limit);
+                        $('.dog .list.history').parent().html(history.length ? historyList(history) : 'No items to display');
+                        setHistory(id, history);
+                    }
                 } else {
-                    $(this).css({
-                        opacity: '0.3',
-                        'pointer-events': 'none'
-                    });
-                    $(this).attr('data-check','2').text('Forgot this User');
-                    clearFollowers($(this).attr('data-id'));
+                    $('.dog .button[data_tab="5"],.dog .tab[data_id="5"]').remove();
+                    setHistory(id, []);
                 }
             }
         });
-        $(document).on('mouseleave','button.forget', function() {
+        
+        function confirm(button, finalMessage) {
+            if (button.attr('data-check') != '2') {
+                if (button.attr('data-check') != '1') {
+                    button.attr('data-check','1');
+                    button.text('Are you sure?');
+                } else {
+                    button.css({
+                        opacity: '0.3',
+                        'pointer-events': 'none'
+                    });
+                    button.attr('data-check','2').text(finalMessage ? finalMessage : button.attr('data-text'));
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        $(document).on('mouseleave','button.forget, button.hforget', function() {
             if ($(this).attr('data-check') != '2') {
-                $(this).attr('data-check','0').text('Forget this User');
+                $(this).attr('data-check','0').text($(this).attr('data-text'));
             }
         });
         $(document).on('mousedown', '.resize-handle', function(e) {
@@ -452,7 +459,11 @@ try {
         });
         
         function forgetButton(id) {
-            return '<div class="main"><button data-id="' + id + '" class="forget styled_button">Forget this User</button></div>';
+            return '<div class="main"><button data-id="' + id + '" data-text="Forget this User" class="forget styled_button">Forget this User</button></div>';
+        }
+        
+        function emptyHistoryButton(id) {
+            return '<div class="main"><button data-id="' + id + '" data-limit="30" data-text="Trim History" title="Deletes all but the lastt 30 items" class="hforget styled_button">Trim History</button><button data-id="' + id + '" data-text="Clear History" title="Deletes all history for this user" class="hforget styled_button">Clear History</button></div>';
         }
         
         function setFollowers(id, val) {
@@ -460,7 +471,6 @@ try {
             GM_setValue('followers_' + id, JSON.stringify(val));
             return result;
         }
-        
         
         function getFollowers(id) {
             var result = GM_getValue('followers_' + id);
@@ -507,9 +517,9 @@ try {
         }
         
         function historyList(arr) {
-            var result = '<div class="list"><ul>';
+            var result = '<div class="history list"><ul>';
             for (var i = arr.length - 1; i >= 0; i--) {
-                result += '<li class="history ' + arr[i].type;
+                result += '<li data-index="' + i + '" class="history ' + arr[i].type;
                 if (arr[i].type == 'j' || arr[i].type == 'l') {
                    result += '"><a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
                 } else {
@@ -873,4 +883,53 @@ function makeStyle(input, id) {
         style.id = id;
     }
     $('head').append(style);
+}
+
+function parseImperial(amount) {
+    var units = [['Inch',1,'Inches'],['Foot',12,'Feet'],['Yard',3,'Yards'],['Mile',1760,'Miles']];
+    if (!amount) return '0 ' + units[0][2];
+    var result = '';
+    if (amount < 0) {
+        amount = -amount;
+        result += 'negative ';
+    }
+    if (amount < units[0][1]) return amount.toFixed(3).toString().toLocaleString('en') + units[0][2];
+    var measure = {
+        data: 0,
+        index: units.length - 1,
+        step: (function() {
+            var r = 1;
+            for (var i = units.length - 1; i; --i) r *= units[i][1];
+            return r;
+        })(),
+        next: function() {
+            if (amount < this.step) {
+                if (this.index) {
+                    this.write();
+                    this.step /= units[this.index--][1];
+                    return true;
+                }
+                this.write();
+                return false;
+            }
+            return true;
+        },
+        write: function() {
+            if (this.data) {
+                result += this.data + ' ' + units[this.index][this.data > 1 ? 2 : 0] + ' ';
+                this.data = 0;
+            }
+        },
+        tick: function() {
+            if (amount >= this.step) {
+                if (!result[units[this.index][0]]) {
+                    result[units[this.index][0]] = 0;
+                }
+                this.data++;
+                amount -= this.step;
+            }
+        }
+    }
+    while (measure.next()) measure.tick();
+    return result;
 }
