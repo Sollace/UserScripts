@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.2
+// @version     1.0.3
 // @grant       none
 // ==/UserScript==
 
@@ -48,6 +48,31 @@ function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]');}
+
+$(document).ready(function() {
+    var id = getUserId();
+    if (id != -1) {
+        var possibleAvatars = $('img[src*="cdn-img.fimfiction.net/user/"][src*="-' + id + '-"]');
+        if (possibleAvatars.length) {
+            localStorage['user_avatar'] = possibleAvatars.first().attr('src').split(id)[0] + id + '-';
+        }
+    }
+});
+
+function getUserAvatar(size) {
+    var id = getUserId();
+    if (id != -1) {
+        var stored = localStorage['user_avatar'];
+        if (stored && stored.indexOf('-' + id + '-') != -1) {
+            return stored + (size > 256 ? 256 : size);
+        }
+    }
+    return getDefaultAvatar();
+}
+
+function getDefaultAvatar() {
+    return staticFimFicDomain() + '/images/none_64.png;
+}
 
 //==API FUNCTION==//
 function isMyBlogPage() {
@@ -259,9 +284,9 @@ function inbounds(el, buff) {
 function getUserCommentThumb(size) {
     var hold = $('<div class="author" style="line-height:1.1em;" />');
     if (getIsLoggedIn()) {
-        hold.append('<a class="name" href="/user/' + getUserNameEncoded() + '">' + getUserName() + '</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + staticFimFicDomain() + '/images/avatars/' + logged_in_user.id + '_' + size + '.png" /></div>');
+        hold.append('<a class="name" href="/user/' + getUserNameEncoded() + '">' + getUserName() + '</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + getUserAvatar(size) + '" /></div>');
     } else {
-        hold.append('<a class="name">Anon</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + staticFimFicDomain() + '/images/avatars/none_64.png" /></div>');
+        hold.append('<a class="name">Anon</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + getDefaultAvatar() + '" /></div>');
     }
     return $('<div class="comment" />').append(hold);
 }
