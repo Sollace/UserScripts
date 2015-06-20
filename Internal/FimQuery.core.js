@@ -49,7 +49,7 @@ function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
 //==API FUNCTION==//
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]');}
 
-$(document).ready(function() {
+document.addEventListener('ready', function() {
     var id = getUserId();
     if (id != -1) {
         var possibleAvatars = $('img[src*="cdn-img.fimfiction.net/user/"][src*="-' + id + '-"]');
