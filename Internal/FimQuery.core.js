@@ -71,7 +71,7 @@ function getUserAvatar(size) {
 }
 
 function getDefaultAvatar() {
-    return staticFimFicDomain() + '/images/none_64.png;
+    return staticFimFicDomain() + '/images/none_64.png';
 }
 
 //==API FUNCTION==//
