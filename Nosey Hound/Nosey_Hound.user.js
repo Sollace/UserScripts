@@ -125,7 +125,7 @@ try {
             var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
             pop.content.css({ 'min-width': '400px', 'min-height': '400px', width: '400px', height: '400px'});
             $('body').append($('#info-cards'));
-            this.Sniff(true, pop.content);
+            this.Sniff(true, pop);
             pop.content.after('<div class="resize-handle" />');
             pop.position('center', 'center');
         }
@@ -139,17 +139,28 @@ try {
             this.Sniff(false, pop);
         }
         Dog.prototype.Sniff = function(type, pop) {
+            var closed = false;
+            pop.onclose(function() {closed = true;});
+            pop = pop.content;
             pop.addClass('dog');
-            pop.append('<div style="width:100%;height:100%;text-align:center;line-height:300px;" ><i style="font-size:50px;" class="fa fa-spinner fa-spin" /></div>');
+            pop.html('<div style="width:100%;height:100%;text-align:center;line-height:300px;" ><i style="font-size:50px;" class="fa fa-spinner fa-spin" /></div>');
             
             var me = this;
-            $.get('/ajax/fetch_watchers.php', { 
-                watching: this.userId
-            }, function(xml) {
-                try {
-                    me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml + '</ul>'))
-                } catch (e) {
-                    pop.html(e + '');
+            $.ajax({
+                type: 'GET',
+                url: '/ajax/fetch_watchers.php',
+                data: {watching: this.userId},
+                success: function(xml) {
+                    if (!closed) {
+                        try {
+                            me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml + '</ul>'))
+                        } catch (e) {
+                            pop.html(e + '');
+                        }
+                    }
+                },
+                error: function(e) {
+                    if (!closed) pop.html('<b>' + e.statusText + '</b><br />' + e.responseText);
                 }
             });
         }
@@ -182,6 +193,7 @@ try {
                     }
                 }
             }
+            this.oldFollowers.push({'id':'//static.fimfiction.net/images/none', 'name':'testUser'})
             for (var i = 0; i < this.oldFollowers.length; i++) {
                 if (this.oldFollowers[i].id.indexOf('/') == -1) {
                     if (isPresent(followers, this.oldFollowers[i]) == null) {
@@ -267,18 +279,18 @@ try {
             var result = '';
             var diff = g.length - l.length;        
             result += '<div class="score ' + (diff >= 0 ? (diff == 0 ? 'neutral">' : 'good">') : 'bad">') + named(diff) + '</div><div class="main">';
-            if (diff != 0) {
-                result += diff > 0 ? 'Good job! ' : 'I\'m sorry. ';
-                result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.oldFollowers.length + '</b> followers' + (g.length > 0 ? ' of which' : '');
-                result += diff > 0 ? (g.length > 0 ? ' <b>' + G + '</b>' : ' none of which') + ' are new additions whilst ' + (l.length > 0 ? 'only ' : '') :  (g.length > 0 ? ' only <b>' + G + '</b>' : '<b>none</b> of which') + ' are new additions whilst ';
-                result += '<b>' + (l.length > 0  ? L : 'none') + '</b> of ' + (this.myPage ? 'your' : this.userName + '\'s') + ' old followers have left.';
-            } else if (g.length == 0) {
-                result += (this.myPage ? 'Be happy. You have ' : this.userName + ' has ') + 'not lost any followers, but ' + (this.myPage ? 'you have ' : 'he has ') + 'not gained any either.' + (this.myPage ? ' Is there something else you can do to improve this?' : '');
+            if (diff) {
+                result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.oldFollowers.length + '</b> followers';
+                result += (g.length ? ' of which' : '');
+                result += (diff > 0 ? ' only' : '') + (g.length > 0 ? ' <b>' + G + '</b>' : '<b>none</b>') + ' are new additions whilst ';
+                result += (l.length ? 'only <b>' + L : '<b>none') + '</b> of ' + (this.myPage ? 'your' : this.userName + '\'s') + ' old followers have left.';
+            } else if (!g.length) {
+                result += '<b>No changes detected!</b><br />' + (this.myPage ? 'You have ' : this.userName + ' has ') + 'not lost any followers, but ' + (this.myPage ? 'you have ' : 'he has ') + 'not gained any either.';
             } else {
                 result += (this.myPage ? 'You' : this.userName) + ' simultaneously gained and lost <b>' + G + '</b> followers.';
             }
             result += '</div>';
-            if (n.length > 0) {
+            if (n.length) {
                 result += '<b>Name changes (' + N + '):</b>';
                 result += '<div class="main"><ol>';
                 for (var i = 0; i < n.length; i++) {
@@ -292,9 +304,7 @@ try {
             var _count = this.tabs.children().first();
             var story_count = parseInt(_count.find('.number').html());
             var blog_count = parseInt(_count.next().find('.number').html());
-            var fol_count = t + g - l;
-            
-            return parseImperial(this.computeScore(story_count, blog_count, fol_count));
+            return parseImperial(this.computeScore(story_count, blog_count, t + g - l));
         }
         Dog.prototype.computeScore = function(story_count, blog_count, fol_count) {
             var fol_per_story = story_count > 0 ? fol_count/story_count : 0;
@@ -741,7 +751,6 @@ function Popup(holder, dark, cont) {
   this.holder = holder;
   this.dark = dark;
   this.content = this.unscoped = cont;
-  this.scoped = null;
   this.position = function(x, y, buff) {
     if (this.holder != null) position(this.holder, x, y, buff);
   }
@@ -759,6 +768,23 @@ function Popup(holder, dark, cont) {
   }
   this.find = function(el) {
       return this.content.find(el);
+  }
+  this.onclose = function(func) {
+      if (typeof func === 'function') {
+          holder.on('close', func);
+      } else {
+          holder.trigger('close');
+      }
+  }
+  this.close = function() {
+      $(this.dark).fadeOut('fast', function () {
+          $(this).remove()
+      });
+      this.onclose();
+      this.holder.remove();
+  }
+  this.hide = function() {
+      this.holder.css('display','none');
   }
 }
 
@@ -779,9 +805,8 @@ function makeGlobalPopup(title, fafaText, darken, close) {
     var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
     holder.append(pop);
     
-    var head = $('<h1 style="cursor:move">' + title + '</h1>');
+    var head = $('<h1 style="cursor:move">' + (fafaText ? '<a class="' + fafaText + '" />' : '') + title + '</h1>');
     pop.append(head);
-    if (fafaText) head.prepend("<i class=\"" + fafaText + "\" /i>");
     head.on('mousedown', function(e) {
         var x = e.clientX - parseFloat(holder.css('left'));
         var y = e.clientY - parseFloat(holder.css('top'));
@@ -796,20 +821,20 @@ function makeGlobalPopup(title, fafaText, darken, close) {
     
     var c = $('<a id="message_close_button" class="close_button" />');
     head.append(c);
-    $(c).click(function(e) {
-        if (close) {
-            $(dark).fadeOut('fast', function () {
-                $(this).remove()
-            });
-            $(holder).remove();
-        } else {
-           $(holder).css('display','none');
-        }
-    });
     
     var content = $('<div class="drop-down-pop-up-content" />');
     pop.append(content);
-    return new Popup(holder, dark, content);
+    
+    var result = new Popup(holder, dark, content);
+    $(c).click(function(e) {
+        if (close) {
+            result.close();
+        } else {
+           result.hide();
+        }
+    });
+    
+    return result;
 }
 
 //==API FUNCTION==//
