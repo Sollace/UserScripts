@@ -64,14 +64,14 @@ function getUserAvatar(size) {
     if (id != -1) {
         var stored = localStorage['user_avatar'];
         if (stored && stored.indexOf('-' + id + '-') != -1) {
-            return stored + (size > 256 ? 256 : size);
+            return stored + size;
         }
     }
-    return getDefaultAvatar();
+    return getDefaultAvatar(size);
 }
 
-function getDefaultAvatar() {
-    return staticFimFicDomain() + '/images/none_64.png';
+function getDefaultAvatar(size) {
+    return staticFimFicDomain() + '/images/none_' + size + '.png';
 }
 
 //==API FUNCTION==//

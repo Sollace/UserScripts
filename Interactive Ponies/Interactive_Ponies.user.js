@@ -54,7 +54,7 @@ function setDocCookie(name, val) {
 
 if (window.top != window) {
     var embeds = document.getElementsByTagName('EMBED');
-    if (embeds.length > 0) {
+    if (embeds && embeds.length) {
         document.body.innerHTML = document.body.innerHTML.replace(/\<embed /g, '<embed wmode="opaque" menu="false" ');
     }
 }
@@ -67,11 +67,10 @@ var pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,
     "Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more",
     { 3: "Oppan Pinkie Style;Pinkie Style;Eh~ Sexy Pony;Pinkie Pie Time;What does the Pony say? Chipi-chi-pow-chippy-cheep-chip-chip" });
 var Ponies = [
-    new Spacer('Mane Six'),
-    new DummyPony('Rainbow Dash'),
+    Spacer('Mane Six', new DummyPony('Rainbow Dash')),
     new SpecialPony('Twilight Sparkle', 'twi', 6, "Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!"),
     new SpecialPony('Princess Twilight', 'ptwi', 4, "Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!"),
-    new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;COck-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no"),
+    new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no"),
     new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*"),
     new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*"),
     isOnDay(31, 10) ? attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!"))), {
@@ -107,14 +106,13 @@ var Ponies = [
             if (Math.random() * 40 <= 5) this.Speak("*blushes*;Um, uh, oh my;...ow");
         }
     }),
-    new Spacer('Secondary/Background Ponies'),
-    new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!"),
+    Spacer('Secondary/Background Ponies', new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!"),
     new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", {
         1: "Oh this, it's just my BASS CANNON!;Rock on!;Let's have some WUBS!;*WUB WUB WUB WUB*;Crank it up!;I do my dishes with WUBS!;Toothpaste? I don't need that, I have WUBS!;*BOOMWOOM-BOOMWOOM*",
         'effect': {
             'target': '.interactive_pony .speech_container',
             'label': 'animation',
-            'value': 'wub 1.5s infinite alternate'}}),
+            'value': 'wub 1.5s infinite alternate'}})),
     new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs"),
     attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", {
         'effect': {
@@ -188,8 +186,7 @@ var Ponies = [
     //Thunderlane
     //Fleetfoot
     new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;.... . .... . ... .. .;."),
-    new Spacer('Fillies'),
-    new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining"),
+    Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining")),
     extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!Hey!"), 0.3),
     new SpecialPony('Apple Bloom', 'cmc1', 4, "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery.;Not the cupcakes!;Likely story.;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!"),
     new SpecialPony('Sweetie Belle', 'cmc2', 3, "I'm Sweeetiee Belle!;I wonder how that happened...;Stupid Horn!;Aww. That was such a sweet story;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.", {
@@ -213,8 +210,8 @@ var Ponies = [
             })('Hey!;Leave him alone!;What are you doing to Pip!?'.split(';'))
         }), {'special': false}),
     new SpecialPony('Babs Seed', 'cmc4', 1, "Hey! That's not how you talk to my friends!;See ya later, Cutie Mark Crybabies!;Looks like somepony's pumpkin just got squashed!;*pooft*;Sup;Welcome to the Babs side 'a town;~bad seed, bad seed~ What? It's a catchy tune;Eh, I've seen better"),
-    attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate", {
-        1: 'Pipsqueak the pirate, at your service;Pipsqueak the pirate, at your service. Arrg;Arrrg matey;Scary, but fun;I be pirate Pip at yer service'})), {
+    attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate", {
+        1: 'Ever since I lost my eye, I\'ve been craving nothing but candy!;Pipsqueak the pirate, at your service;Pipsqueak the pirate, at your service. Arrg;Arrrg matey;Scary, but fun;I be pirate Pip at yer service'})), {
         'anger': 0
     }), {
         'mouseenter': function() {
@@ -252,15 +249,16 @@ var Ponies = [
             return null;
         }
     }),
-    new Spacer('Other'),
-    new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P")
+    Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P"))
 ];
+
 PoniesRegister = {};
 for (var i = 0; i < Ponies.length; i++) {
-    if (Ponies[i].Id) PoniesRegister[Ponies[i].Id] = Ponies[i];
+    PoniesRegister[Ponies[i].Id] = Ponies[i];
 }
 
 var GlobalPonyType = getPonyType();
+addOptionsSelect();
 setupMorePonies();
 
 //--------------------------------------------------------------------------------------------------
@@ -334,9 +332,9 @@ function attachEvents(pony, eventObject) {
     return pony;
 }
 
-function Spacer(name) {
-    this.id = false;
-    this.Name = name;
+function Spacer(name, pony) {
+    pony.section = name;
+    return pony;
 }
 
 function DummyPony(name) {
@@ -561,34 +559,21 @@ Particle.prototype = {
 }
 
 function setupMorePonies() {
-    var interactiveP = $('input[name="show_interactive_pony"]');
-    if (interactiveP.length > 0) {
-        interactiveP = interactiveP.parent().parent().parent().parent();
-        var InteractivePonyType = '<select name="interactive_pony_type">';
-        var opt = false;
-        for (var i = 0; i < Ponies.length; i++) {
-            if (Ponies[i].Id) {
-                InteractivePonyType += '<option value="' + Ponies[i].Name + '">' + Ponies[i].Name + '</option>';
-            } else {
-                if (opt) {
-                    InteractivePonyType += '</optgroup>';
-                }
-                InteractivePonyType += '<optgroup label="' + Ponies[i].Name + '">';
-                opt = true;
-            }
-        }
-        InteractivePonyType += '</select>';
-        InteractivePonyType = $(InteractivePonyType);
-        var row = $('<tr><td class="label">Interactive Pony Type</td><td><div id="ponyTypeDiv" /></td></tr>');
-        row.find('#ponyTypeDiv').append(InteractivePonyType);
-        interactiveP.after(row);
-        
-        InteractivePonyType.val(GlobalPonyType);
-        InteractivePonyType.change(function() {
-            setPonyType(this.value);
-        });
-    }
+    var register = [];
     
+    InteractivePony.prototype.NextId = function() {
+        return register.length;
+    }
+    InteractivePony.prototype.Register = function() {
+        this.uniqueId = this.id = this.NextId() + 1;
+        register.push(this);
+    }
+    InteractivePony.prototype.Unregister = function() {
+        register.splice(this.id - 1, 1);
+        for (var i = 0; i < register.length; i++) {
+            register[i].id = i + 1;
+        }
+    }
     InteractivePony.prototype.ponyType = function () {
         return PoniesRegister[GlobalPonyType];
     };
@@ -628,12 +613,10 @@ function setupMorePonies() {
         var pone = this.ponyType();
         pone.cssImages(this.dom_element, this.facing);
         var access = pone.getAccess(this.dom_element, this.facing, this.base_url, a);
-        
         this.dom_element.find('img.interactive_pony_accessory').attr('src', access);
         this.dom_element.find('img.interactive_pony_accessory').css('display', access == '' ? 'none' : '');
         this.sprite != a && (this.sprite = a, this.dom_element.find('img.interactive_pony').attr('src', pone.getSprite(this.dom_element, this.facing, this.base_url, a)))
     };
-    InteractivePony.prototype.NextId = 0;
     InteractivePony.prototype.__Render = InteractivePony.prototype.Render;
     InteractivePony.prototype.Render = function() {
         if (this.dom_element.find('img.interactive_pony_accessory').length == 0) {
@@ -657,24 +640,19 @@ function setupMorePonies() {
     };
     InteractivePony.prototype.FindSecret = function(e) {
         var key = e.originalEvent.interactivePony_secret;
-        if (key) {
-            if (key.indexOf(this.id) != -1) {
-                return true;
-            }
-        }
-        return false;
+        return key && key.indexOf(this.uniqueId) != -1;
     }
     InteractivePony.prototype.AddSecret = function(e) {
         var key = e.originalEvent.interactivePony_secret;
         if (key) {
-            key += ',' + this.id;
+            key += ',' + this.uniqueId;
         } else {
-            key = '' + this.id;
+            key = '' + this.uniqueId;
         }
         e.originalEvent.interactivePony_secret = key;
     }
     InteractivePony.prototype.InitEvents = function() {
-        this.id = ++ InteractivePony.prototype.NextId;
+        this.Register();
         var me = this;
         $('.user_toolbar').mousemove(function (b) {
             if (!me.FindSecret(b)) {
@@ -702,6 +680,7 @@ function setupMorePonies() {
     InteractivePony.prototype.__UpdateMouse = InteractivePony.prototype.UpdateMouse;
     InteractivePony.prototype.UpdateMouse = function(x, y, el) {
         x -= 80 * (this.id ? this.id : 0);
+        x += 40 * (this.NextId());
         this.__UpdateMouse(x, y, el);
     }
     InteractivePony.prototype.__Update = InteractivePony.prototype.Update;
@@ -719,19 +698,23 @@ function setupMorePonies() {
         
         $(window).unbind('konami');
         $(window).bind('konami', function() {
-            var a = new InteractivePony();
-            a.InitEvents();
-            a.dom_element.find('div.speech').fadeOut();
-            var type = Math.floor(Math.random() * Ponies.length);
-            a.ponyType = function () {
-                return Ponies[type];
-            };
-            markTemp(setInterval(function () {
-                if (window_focused) {
-                    a.Update(0.016);
-                    a.Render();
-                }
-            }, 16), a);
+            try {
+                var a = new InteractivePony();
+                a.InitEvents();
+                a.dom_element.find('div.speech').fadeOut();
+                var type = Math.floor(Math.random() * (Ponies.length - 1));
+                a.ponyType = function () {
+                    return Ponies[type];
+                };
+                markTemp(setInterval(function () {
+                    try {
+                        if (window_focused) {
+                            a.Update(0.016);
+                            a.Render();
+                        }
+                    } catch (e) {alert(e)}
+                }, 16), a);
+            } catch (e) {alert(e)}
         });
     });
     
@@ -780,12 +763,35 @@ function setupMorePonies() {
                 this.dom_element.css('transition', 'opacity 0.5s linear');
                 this.dom_element.css('opacity', '0');
                 clearInterval(ticker);
+                var me = this;
                 setTimeout(function() {
-                    this.dom_element.remove();
+                    me.Unregister();
+                    me.dom_element.remove();
                 }, 500);
             }
             render.apply(this, arguments);
         }
+    }
+}
+
+function addOptionsSelect() {
+    var interactiveP = $('input[name="show_interactive_pony"]');
+    if (interactiveP.length) {
+        interactiveP.parent().closest('tr').after('<tr><td class="label">Interactive Pony Type</td><td><div id="ponyTypeDiv" /></td></tr>');
+        var InteractivePonyType = '<select name="interactive_pony_type">';
+        for (var i = 0; i < Ponies.length; i++) {
+            if (Ponies[i].section) {
+                InteractivePonyType += (i ? '</optgroup>' : '') + '<optgroup label="' + Ponies[i].section + '">';
+            }
+            InteractivePonyType += '<option value="' + Ponies[i].Name + '">' + Ponies[i].Name + '</option>';
+        }
+        InteractivePonyType += '</select>';
+        InteractivePonyType = $(InteractivePonyType);
+        $('#ponyTypeDiv').append(InteractivePonyType);
+        InteractivePonyType.val(GlobalPonyType);
+        InteractivePonyType.change(function() {
+            setPonyType(this.value);
+        });
     }
 }
 
