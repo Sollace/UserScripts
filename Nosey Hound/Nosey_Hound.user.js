@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6
+// @version     1.6.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -140,8 +140,10 @@ try {
         }
         Dog.prototype.Sniff = function(type, pop) {
             var closed = false;
-            pop.onclose(function() {closed = true;});
-            pop = pop.content;
+            if (pop.onclose) {
+                pop.onclose(function() {closed = true;});
+                pop = pop.content;
+            }
             pop.addClass('dog');
             pop.html('<div style="width:100%;height:100%;text-align:center;line-height:300px;" ><i style="font-size:50px;" class="fa fa-spinner fa-spin" /></div>');
             
@@ -155,12 +157,12 @@ try {
                         try {
                             me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml + '</ul>'))
                         } catch (e) {
-                            pop.html(e + '');
+                            me.printError(pop, e);
                         }
                     }
                 },
                 error: function(e) {
-                    if (!closed) pop.html('<b>' + e.statusText + '</b><br />' + e.responseText);
+                    if (!closed) me.printError(pop, '<b>' + e.statusText + '</b><br />' + e.responseText);
                 }
             });
         }
@@ -193,7 +195,6 @@ try {
                     }
                 }
             }
-            this.oldFollowers.push({'id':'//static.fimfiction.net/images/none', 'name':'testUser'})
             for (var i = 0; i < this.oldFollowers.length; i++) {
                 if (this.oldFollowers[i].id.indexOf('/') == -1) {
                     if (isPresent(followers, this.oldFollowers[i]) == null) {
@@ -213,6 +214,37 @@ try {
             pop.empty();
             followerMapping.registerChild(pop.parent().attr('data-item'), followers);
             $('#nosey_follower_searcher').trigger('input');
+        }
+        Dog.prototype.printError = function(pop, e) {
+            pop.html('');
+            var tabs = $('<div class="tabs">');
+            pop.append(tabs);
+            tabs.append('<div data_tab="0" class="button selected">Error</div>');
+            var result = '<div data_id="0" class="tab shown selected">';
+            result += '<div class="main">' + e + '</div>';
+            result += '<div class="main">The data for this user may have been damaged. You can clear the follower or history data below and try again.</div>';
+            result += clearButton(this.userId) + emptyHistoryButton(this.userId) + '</div>';
+            if (e.stack) {
+                tabs.append('<div data_tab="1" class="button">Stacktrace</div>');
+                result += '<div data_id="1" class="tab shown">' + e.stack + '</div>';
+            }
+            result += '</div>';
+            pop.append(result);
+            
+            $('.button', tabs).click(function() {
+                var id = $(this).attr('data_tab');
+                $('.tab', pop).each(function() {
+                    if ($(this).attr('data_id') == id) {
+                        $(this).addClass('selected');
+                    } else {
+                        $(this).removeClass('selected');
+                    }
+                });
+                $('.button', tabs).each(function() {
+                    $(this).removeClass('selected');
+                });
+                $(this).addClass('selected');
+            });
         }
         Dog.prototype.printFollowers = function(firstTime, pop, gained, lost, named) {
             $('#infocard').parent().append($('#infocard'));
@@ -381,9 +413,16 @@ try {
             }
             $('a.snuffer').parents('.info-card-container').hide();
         });
+        $(document).on('click', 'button.eforget', function() {
+            if (confirm($(this), 'Done')) {
+                clearFollowers($(this).attr('data-id'));
+            }
+        });
         $(document).on('click','button.forget', function() {
             if (confirm($(this), 'Forgot this User')) {
-                clearFollowers($(this).attr('data-id'));
+                var id = $(this).attr('data-id');
+                clearFollowers(id);
+                clearChanges(id);
             }
         });
         $(document).on('click','button.hforget', function() {
@@ -421,7 +460,7 @@ try {
             return false;
         }
         
-        $(document).on('mouseleave','button.forget, button.hforget', function() {
+        $(document).on('mouseleave','button.forget, button.hforget, button.eforget', function() {
             if ($(this).attr('data-check') != '2') {
                 $(this).attr('data-check','0').text($(this).attr('data-text'));
             }
@@ -468,6 +507,10 @@ try {
             });
         });
         
+        function clearButton(id) {
+            return '<div class="main"><button data-id="' + id + '" data-text="Clear follower data" class="eforget styled_button">Clear follower data</button></div>';
+        }
+        
         function forgetButton(id) {
             return '<div class="main"><button data-id="' + id + '" data-text="Forget this User" class="forget styled_button">Forget this User</button></div>';
         }
@@ -489,6 +532,9 @@ try {
         
         function clearFollowers(id) {
             GM_deleteValue('followers_' + id);
+        }
+        
+        function clearChanges(id) {
             GM_deleteValue('changes_' + id);
         }
         
@@ -599,7 +645,7 @@ try {
     background: linear-gradient(to bottom, #ddd 0%, #ccc 100%);}\
 .dog .tabs {\
     width: 100%;\
-    height: 30px;\
+    height: 100%;\
     position: relative;\
     border-bottom: solid 1px rgba(0,0,0,0.6);}\
 .dog .tab {\
