@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.4.5
+// @version     2.4.6
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -24,6 +24,11 @@ var resources = {
 
 var mainCss = '\
 /* Global */\
+\
+.yt-uix-checkbox-on-off label  {\
+  background-color: rgba(90, 90, 90, 0.7) !important;}\
+.yt-uix-checkbox-on-off input[type="checkbox"]:checked + label {\
+  background-color: #F12B24 !important;}\
 \
 #progress {\
     background: #e0f !important;}\
@@ -76,7 +81,7 @@ var mainCss = '\
 #pl-header .yt-uix-playlistlike:not(.yt-uix-button-toggled):before,\
 .play-all-icon-btn:before,\
 .yt-uix-button-icon-footer-language,\
-.yt-uix-button-icon-questionmark,\
+.yt-uix-button-icon-questionmark, .options-renderer-question-mark,\
 .yt-uix-button-icon-sprite_send_message,\
 .add-to-widget .private-icon, .yt-uix-button-icon-privacy-private, .add-to-widget .public-icon,\
 #watch-like:before, .like-button-renderer-like-button::before,\
@@ -202,7 +207,7 @@ var mainCss = '\
 #footer .yt-uix-button-icon-footer-language {\
     opacity: 0.3;\
     background-position: -145px -5px !important;}\
-.yt-uix-button-icon-questionmark {\
+.yt-uix-button-icon-questionmark, .options-renderer-question-mark {\
   opacity: 0.3;\
   background-position: -125px -5px !important;}\
 .play-all-icon-btn:before {\
