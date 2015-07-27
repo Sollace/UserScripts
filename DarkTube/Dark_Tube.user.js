@@ -1834,76 +1834,46 @@ button.yt-uix-button.ytcenter-uix-button-toggled:hover {\
 #watch7-content.watch-main-col > .yt-card {\
     background: #1B1B1B !important;}';
 
+var buttonStyling = '\
+#DT_settingspanel .yt-uix-button-primary {\
+  border-color: #167AC6;\
+  background: #167AC6 none repeat scroll 0% 0%;\
+  color: #FFF;}\
+#DT_settingspanel .yt-uix-button {\
+    height: 28px;\
+    border: 1px solid transparent;\
+    padding: 0px 10px;\
+    outline: 0px none;\
+    font-weight: 500;\
+    font-size: 11px;\
+    text-decoration: none;\
+    white-space: nowrap;\
+    word-wrap: normal;\
+    line-height: normal;\
+    vertical-align: middle;\
+    cursor: pointer;\
+    border-radius: 2px;\
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);}\
+#DT_settingspanel button {\
+    font: 12px Roboto,arial,sans-serif;}\
+#DT_settingspanel span {\
+    margin: 0px;\
+    padding: 0px;\
+    border: 0px none;\
+    font-size: 100%;\
+    background: transparent none repeat scroll 0% 0%;}'
+
 var video = getVideoSize();
 var theme = getTheme();
+var isErrorPage = isErrorUrl(document.location.href);
 run();
 
 function run() {
-    if (window.top == window) {
+    if (window.top == window || isErrorPage) {
         if (document.location.href.indexOf('youtube') != -1 && document.location.href.indexOf('youtube.com/embed') == -1) {
-            addCss("main", buttonStyle);
-            if (video) {
-                addCss("video", largePlayerCss);
-            }
-            
-            var options = document.createElement('DIV');
-            var themeSwitcher = createButton();
-            themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
-            themeSwitcher.onclick = function() {
-                updateState(theme == "Dark" ? 1 : 0);
-            };
-            var resizeMode = createButton();
-            resizeMode.innerHTML = "<span class='yt-uix-button-content' > Resize Video (" + (video ? "On" : "Off") + ")</span>";
-            resizeMode.onclick = function() {
-                updateVideo(!video);
-            };
-            options.appendChild(themeSwitcher);
-            options.appendChild(resizeMode);
-            
-            document.ready = function() {
-                var container = document.createElement('DIV');
-                container.id = "DT_settingspanel";
-                container.appendChild(options);
-                document.body.appendChild(container);
-            }
-
-            if (theme == "Dark") {
-                switchToDark();
-            } else {
-                setTheme("Light");
-            }
-
-            window.onready = function() {
-                $(window).focus(function() {
-                    var them = getTheme();
-                    if (them != theme) {
-                        updateState(them == "Dark" ? 0 : 1);
-                    }
-                    var vide = getVideoSize();
-                    if (vide != video) {
-                        updateVideo(vide);
-                    }
-                });
-            }
-
-            function updateState(mode) {
-                if (mode == 1) {
-                    switchToLight();
-                } else {
-                    switchToDark();
-                }
-                reloadComments();
-                themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
-            }
-            
-            function updateVideo(mode) {
-                if (mode) {
-                    addCss("video", largePlayerCss);
-                } else {
-                    removeCss("video");
-                }
-                setVideoSize(mode);
-                resizeMode.innerHTML = "<span class='yt-uix-button-content' > Resize Video (" + (mode ? "On" : "Off") + ")</span>";
+            applyFull(!isErrorPage);
+            if (!isErrorPage) {
+                addCss("buttons", buttonStyling);
             }
         }
     } else if (document.referrer.indexOf('youtube') != -1) {
@@ -1925,6 +1895,75 @@ function run() {
     }
 }
 
+function applyFull(addButtons) {
+    addCss("main", buttonStyle);
+    if (video) {
+        addCss("video", largePlayerCss);
+    }
+    
+    if (addButtons) {
+        var options = document.createElement('DIV');
+        var themeSwitcher = createButton();
+        themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
+        themeSwitcher.onclick = function() {
+            updateState(theme == "Dark" ? 1 : 0);
+        };
+        var resizeMode = createButton();
+        resizeMode.innerHTML = "<span class='yt-uix-button-content' > Resize Video (" + (video ? "On" : "Off") + ")</span>";
+        resizeMode.onclick = function() {
+            updateVideo(!video);
+        };
+        options.appendChild(themeSwitcher);
+        options.appendChild(resizeMode);
+    }
+    
+    document.ready = function() {
+        var container = document.createElement('DIV');
+        container.id = "DT_settingspanel";
+        container.appendChild(options);
+        document.body.appendChild(container);
+    }
+
+    if (theme == "Dark") {
+        switchToDark();
+    } else {
+        setTheme("Light");
+    }
+
+    window.onready = function() {
+        $(window).focus(function() {
+            var them = getTheme();
+            if (them != theme) {
+                updateState(them == "Dark" ? 0 : 1);
+            }
+            var vide = getVideoSize();
+            if (vide != video) {
+                updateVideo(vide);
+            }
+        });
+    }
+
+    function updateState(mode) {
+        if (mode == 1) {
+            switchToLight();
+        } else {
+            switchToDark();
+        }
+        reloadComments();
+        themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
+    }
+
+    function updateVideo(mode) {
+        if (mode) {
+            addCss("video", largePlayerCss);
+        } else {
+            removeCss("video");
+        }
+        setVideoSize(mode);
+        resizeMode.innerHTML = "<span class='yt-uix-button-content' > Resize Video (" + (mode ? "On" : "Off") + ")</span>";
+    }
+}
+
 function switchToDark() {
     addCss("theme", mainCss + subEmbedCss + nonIframeCommentsCss);
     setTheme("Dark");
@@ -1937,12 +1976,20 @@ function switchToLight() {
 
 function reloadComments() {
     try {
-        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id, #sb-target, #yt-comments-sb");
-        comments = comments.find("iframe").each(function () {
-            var split = this.src.split("?");
-            var oldsrc = split[0] + "?r=2&" + split[1];
-            this.src = oldsrc;
-        });
+        var comments = $("#comments-test-iframe, #gplus-signup-iframe-id, #sb-target, #yt-comments-sb, iframe[src*=error]");
+        if (comments.length) {
+            comments = comments.find("iframe").each(function () {
+                var split = this.src.split("?");
+                var oldsrc = split[0] + "?r=2&" + split[1];
+                this.src = oldsrc;
+            });
+        } else {
+            if (comments.tagName && comments.tagName == 'IFRAME') {
+                var split = comments.getAttribute('src').split("?");
+                var oldsrc = split[0] + "?r=2&" + split[1];
+                comments.setAttribute('src', oldsrc);
+            }
+        }
     } catch (e) {}
 }
 
@@ -1960,6 +2007,25 @@ function getTheme() {
 
 function setTheme(val) {
     GM_setValue("theme", theme = val);
+}
+
+function isErrorTopPage() {
+  var iframes = $('body iframe');
+  if (iframes.length) {
+    for (var i = 0; i < iframes; i++) {
+      if (isErrorUrl(iframes[i].getAttribute('src'))) {
+        return true;
+      }
+    }
+  }
+  if (iframes.getAttribute) {
+    return isErrorUrl(iframes.getAttribute('src'));
+  }
+  return false;
+}
+
+function isErrorUrl(url) {
+    return url.split('?')[0].split('/').reverse()[0] == 'error';
 }
 
 function createButton(mode) {

@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.3
+// @version     1.0.4
 // @grant       none
 // ==/UserScript==
 
@@ -237,13 +237,27 @@ function position(obj, x, y, buff) {
 }
 
 //==API FUNCTION==//
-function tryParseFloat(s,d) {
-    return (!s || isNaN(s)) ? d : parseFloat(s);
+function tryParseInt(s,d) {
+  if (!s) return d;
+  var result;
+  try {
+    result = parseFloat(s);
+  } catch (e) {
+    return d;
+  }
+  return isNaN(result) ? d : result;
 }
 
 //==API FUNCTION==//
 function tryParseInt(s,d) {
-    return (!s || isNaN(s)) ? d : parseInt(s);
+  if (!s) return d;
+  var result;
+  try {
+    result = parseInt(s);
+  } catch (e) {
+    return d;
+  }
+  return isNaN(result) ? d : result;
 }
 
 //==API FUNCTION==//
