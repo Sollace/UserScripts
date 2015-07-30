@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6.1
+// @version     1.6.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -344,7 +344,6 @@ try {
             return ((fol_per_story + fol_per_blog)/4)*(story_count*9 + blog_count) / 55;
         }
         Dog.prototype.history = function(gained, lost, named) {
-            this.oldFollowers
             this.followersRaw = [];
             var history = getHistory(this.userId);
             for (var i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
@@ -805,7 +804,7 @@ function Popup(holder, dark, cont) {
           el = $(el);
           this.content.append(el);
       }
-      return this.content = el;
+      return (this.content = el);
   }
   this.unscope = function(el) {
       this.content = this.unscoped;
