@@ -73,7 +73,7 @@ div.colour_pick {\
     this.HideError = function() {if (error) error.style.display = "none";};
   }
   FimFicSettings.OptionsBuilder.prototype = {
-    StartEndSection: function(title) {if (has_init) this.container.append('<tr><td class="section_header" colspan="2"><b>' + title + '</b></td></tr>');},
+    StartEndSection: function(title) {if (this.HasInit()) this.container.append('<tr><td class="section_header" colspan="2"><b>' + title + '</b></td></tr>');},
     getValue: function(id) {
       var fields = this.container.getElementsByTagName("input");
       var len = fields.length;
@@ -144,7 +144,7 @@ div.colour_pick {\
       sl.val(val);
       return sl;
     },
-    AddRaw: function(field) {if (has_init) tabl.append(field);},
+    AddRaw: function(field) {if (this.HasInit()) tabl.append(field);},
     AddEmailBox: function(id, name) {return addGenericInput(this, id, name, "text", "email");},
     AddNameBox: function(id, name) {return addGenericInput(this, id, name, "text", "name");},
     AddTextBox: function(id, name) {return addGenericInput(this, id, name, "text");},
