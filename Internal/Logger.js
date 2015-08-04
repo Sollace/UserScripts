@@ -1,10 +1,3 @@
-// ==UserScript==
-// @name        Logger
-// @author      Sollace
-// @namespace   sollace
-// @version     1
-// @grant       none
-// ==/UserScript==
 function Logger(name, l) {
   var test = null;
   var minLevel = 0;
@@ -78,7 +71,10 @@ function Logger(name, l) {
         } else {
           SOut(txt + '<br/>' + except, 2000);
         }
-        if (excep.stack) SOut(excep.stack, 2000);
+        if (excep.stack) {
+            var stack = '<br><b>' + decodeURIComponent(excep.stack).replace(/\n/g, '<br><b>').replace(/@/g, '</b> @<br> ');
+            SOut(stack, 2000);
+        }
         if (stopped) this.Pause();
       } catch (e) {
         alert('Error in displaying Severe: ' + e + '\n' + 'Message: ' + txt + '\n' + 'Severe: ' + excep);
