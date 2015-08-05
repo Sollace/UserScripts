@@ -2,7 +2,7 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2.2
+// @version     1.2.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -132,7 +132,7 @@ RunScript.build = function(functionText) {
       }
     };
     STs.prototype.avatarSelector = function(userId) {
-      return ".author > .avatar > img[src*='" + userId + "']";
+      return ".author > .avatar > img[src*='" + userId + "'], .author > .avatar > img[data-src*='" + userId + "']";
     }
     STs.prototype.registerUserTitle = function (user, title) {
       if (typeof user != 'number') return;

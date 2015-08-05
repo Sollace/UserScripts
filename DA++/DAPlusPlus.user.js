@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.3.3
+// @version     1.3.4
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -24,7 +24,6 @@ function move(ref, id) {
             return element.length;
         },
         move: function(button) {
-            console.log(ref);
             if (button !== undefined && ref !== null) {
                 button = el(button);
                 for (var i = 0; i < button.length; i++) {
@@ -110,8 +109,7 @@ function run() {
             deAd();
             ready = true;
         }
-    } catch (e) {
-    }
+    } catch (e) {}
 }
 
 function deAd() {
