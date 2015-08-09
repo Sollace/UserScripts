@@ -62,6 +62,39 @@ div.colour_pick {\
     cursor: pointer;\
     box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset;}", "settingsTab_colorPickerStyle");
   }
+  function addMakerStyle() {
+    makeStyle("\
+.color-selector div {\
+    position: relative;\
+    width: 100%;}\
+.color-selector input[type='text'] {\
+    padding-bottom: 20px !important;\
+    display: table-cell;}\
+.color-selector input[type='range'] {\
+    position: absolute;\
+    display: block;\
+    bottom: 0px;\
+    right: 0px;}\
+.color-selector .tooltip_popup_tooltip {\
+    width: 90px;}\
+.color-selector input[type='text']:focus + input[type='range'] {\
+    background-color: #FFECB2;\
+    border-color: rgba(0, 0, 0, 0.2);\
+    text-shadow: none;\
+    color: #4D4735;}\
+.color-selector .red input:focus {\
+    background-color: #fcc !important;}\
+.color-selector .red input[type='text']:focus + input[type='range'] {\
+    background-color: #fbb !important;}\
+.color-selector .green input:focus {\
+    background-color: #cfc !important;}\
+.color-selector .green input[type='text']:focus + input[type='range'] {\
+    background-color: #bfb !important;}\
+.color-selector .blue input:focus {\
+    background-color: #ccf !important;}\
+.color-selector .blue input[type='text']:focus + input[type='range'] {\
+    background-color: #bbf !important;}");
+  }
   FimFicSettings.OptionsBuilder = function OptionsBuilder(container, err) {
     this.container = $(container);
     
@@ -83,6 +116,40 @@ div.colour_pick {\
           return field.getAttribute("type") == "checkbox" ? field.checked : field.value;
         }
       }
+    },
+    AddColorSliders: function(id, name, alpha, func) {
+      if (!$('#settingsTab_colorMakerStyle').length) addMakerStyle();
+      var result = {};
+      var div = $('<div class="color-selector" />');
+      var colourHolder = $('<div class="red" />');
+      colourHolder.append(result.red = $('<input class="color" type="text" placeholder="Red" /><input value="128" type="range" max="255" />'));
+      div.append(colourHolder);
+      colourHolder = $('<div class="green" />');
+      colourHolder.append(result.green = $('<input class="color" type="text" placeholder="Green" /><input value="128" type="range" max="255" />'));
+      div.append(colourHolder);
+      colourHolder = $('<div class="blue" />');
+      colourHolder.append(result.blue = $('<input class="color" type="text" placeholder="Blue" /><input value="128" type="range" max="255" />'));
+      div.append(colourHolder);
+      if (alpha) {
+        colourHolder = $('<div class="alpha" />');
+        colourHolder.append(result.alpha = $('<input class="color" type="text" placeholder="Opacity" /><input value="0.5" type="range" max="1" step="0.01" />'));
+        div.append(colourHolder);
+      }
+      div.find('input').on('keydown mousedown', function() {
+        $(this).attr('data-changed', '1');
+      });
+      div.find('input').on('change mousemove keyup', function(e) {
+        var me = $(this);
+        if (me.attr('data-changed') == '1') {
+          me.parent().find('input').val(this.value);
+        }
+        if (me.attr('type') == 'text' && me.val() == '') {
+          me.parent().find('input').attr('data-changed', '0');
+        }
+        if (func) func(this, e);
+      });
+      this.AddOption(id, name, div);
+      return result;
     },
     AddColorPick: function(id, name, selected, func) {
       if (!$('#settingsTab_colorPickerStyle').length) addPickerStyle();
@@ -179,14 +246,14 @@ div.colour_pick {\
       this.AddOption(id, name, div);
       return input;
     },
-    AddOption: function(id, name, field) {
+    AddOption: function(id, name, content) {
       var row = $('<tr><td id="' + id + '" class="label">' + name + '</td></tr>');
       var data = $('<td />');
-      field = $(field);
-      data.append(field);
+      content = $(content);
+      data.append(content);
       row.append(data);
       this.container.append(row);
-      return field;
+      return content;
     },
     AddToolbar: function(id, buttonCount, span) {
       var row = $('<tr><td colspan="' + span + '" id="' + id + '" style="padding: 0px;" ><div class="notifications"><div class="type_selector" /></div></td></tr>');
@@ -206,10 +273,15 @@ div.colour_pick {\
       if (defaultIndex != null) rev.attr("data-revert-index", defaultIndex);
       return rev;
     },
-    AppendButton: function(control, label) {
-      var rev = $('<a class="styled_button styled_button_blue">' + label + '</a>');
-      $(control).parent().append(rev);
-      return rev;
+    AppendButton: function(control, content) {
+      var rev = $('<a class="styled_button styled_button_blue" />');
+      rev.append(content);
+      return this.AppendControl(control.parent(), rev);
+    },
+    AppendControl: function(holder, appended) {
+      appended = $(appended);
+      $(holder).append(appended);
+      return appended;
     },
     AddButton: function(id, name, label) {
       return this.AddOption(id, name, '<a inputID="' + id + '" class="styled_button styled_button_blue">"' + label + '</a>');
