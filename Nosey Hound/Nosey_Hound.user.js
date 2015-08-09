@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6.2
+// @version     1.6.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -384,25 +384,25 @@ try {
         }
         
         if ($('.user-page-header').length) {
-            var sniffer = $('<a href="javascript:void();">Sniff</a>');
+            var sniffer = $('<a>Sniff</a>');
             if ($('.bio_followers > h3').first().text().indexOf(name + ' follows') == 0) {
                 $('.bio_followers').prepend('<h3 style="border-bottom:none;"><b>' + $('.user_sub_info .fa-eye').next().text() + '</b> members follow ' + name + '</h3>');
             }
-            $('.bio_followers > h3').first().append(' - ');
-            $('.bio_followers > h3').first().append(sniffer);
-
-            sniffer.click(function() {
+            $('.bio_followers > h3').first().append(' - ').append(sniffer);
+            sniffer.click(function(e) {
                 (new Dog($('.user-page-header'))).sniffFollowers();
+                e.preventDefault();
             });
         }
         
         $('.user-card').each(function() {
-            $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer" href="javascript:void();"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
+            $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
         });
-        $('.user-page-header .tab-followers').after('<li class="tab nosey"><a class="sniffer" href="javascript:void();"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
+        $('.user-page-header .tab-followers').after('<li class="tab nosey"><a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
         
-        $(document).on('click','.sniffer', function() {
+        $(document).on('click','.sniffer', function(e) {
             (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();
+            e.preventDefault();
         });
         $(document).on('click', 'a.snuffer', function(e) {
             if ($('.dog .list a.unloaded.hover').length) {
@@ -411,6 +411,7 @@ try {
                 (new Dog($('a.snuffer:hover').first().parents('.user-card'))).sniffFollowers();
             }
             $('a.snuffer').parents('.info-card-container').hide();
+            e.preventDefault();
         });
         $(document).on('click', 'button.eforget', function() {
             if (confirm($(this), 'Done')) {
@@ -495,7 +496,7 @@ try {
             $('.info-card-container').each(function() {
                 var el = $(this).find('.top-info .button-group > .button-group').first();
                 if (!el.find('.snuffer').length) {
-                    var butt = $('<a class="snuffer styled_button button-icon-only styled_button_dark_grey" href="javascript:void()"><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>');
+                    var butt = $('<a class="snuffer styled_button button-icon-only styled_button_dark_grey"><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>');
                     butt.attr('data-user', event.user);
                     butt.attr('style', $(this).find('.top-info .button-group > .button-group a').attr('style'));
                     if ($(this).find('.top-info .button-group > .button-group a').hasClass('dark')) {
