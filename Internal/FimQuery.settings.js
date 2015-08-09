@@ -1,4 +1,4 @@
-// ==UserScript==
+// ==UserScript==
 // @name        FimQuery.Settings
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
@@ -276,7 +276,7 @@ div.colour_pick {\
     AppendButton: function(control, content) {
       var rev = $('<a class="styled_button styled_button_blue" />');
       rev.append(content);
-      return this.AppendControl(control.parent(), rev);
+      return this.AppendControl($(control).parent(), rev);
     },
     AppendControl: function(holder, appended) {
       appended = $(appended);
