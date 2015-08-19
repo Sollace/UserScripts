@@ -1,4 +1,4 @@
-// ==UserScript==
+// ==UserScript==
 // @name        FimQuery.Settings
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
