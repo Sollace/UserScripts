@@ -22,23 +22,13 @@ setItem: function(sKey,sValue,vEnd,sPath,sDomain,bSecure){if(!sKey || /^(?:expir
 removeItem: function(sKey,sPath,sDomain){if(!sKey || !this.hasItem(sKey))return false;document.cookie=encodeURIComponent(sKey)+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT"+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"");return true;},
 hasItem: function(sKey){return(new RegExp("(?:^|;\\s*)"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=")).test(document.cookie);}};
 //----------------------------------------------------------------------------------------------------
-function reverse(me){return me != null ? me.split("").reverse().join() : me;}
-function contains(me,it){return me != null ? me.indexOf(it)!=-1 : false;}
-function startsWith(me,it){return me != null ? me.indexOf(it)==0 : false;}
-function endsWith(me,it){return startsWith(reverse(me),reverse(it));}
 function pickOne(arr, rare){
     if(rare != null && rare != undefined && Math.random() == 0.5)return rare[Math.floor(Math.random()*rare.length)];
     return arr[Math.floor(Math.random()*arr.length)];}
-function pickNext(arr){return arr[Date.now() % arr.length];}
-function normalize(me){
-    if(me==null)return me;
-    var result='';var space = true;
-    for(var i=0;i<me.length;i++){result+=space?me[i].toUpperCase():me[i].toLowerCase();space=me[i]==' ';}
-    return result;}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    while (contains(input, '  ')) input = input.replace(/  /g, ' ');
+    while (input.indexOf('  ') != -1) input = input.replace(/  /g, ' ');
     var style = document.createElement('style');
     $(style).attr('type', 'text/css');
     $(style).append(input);
@@ -58,7 +48,7 @@ if (window.top != window) {
         document.body.innerHTML = document.body.innerHTML.replace(/\<embed /g, '<embed wmode="opaque" menu="false" ');
     }
 }
-if (startsWith(document.location.href, "http://www.fimfiction.net/") || startsWith(document.location.href, "https://www.fimfiction.net/"))
+if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || document.location.href.indexOf("https://www.fimfiction.net/") == 0)
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------SCRIPT START------------------------------------------------
 //--------------------------------------------------------------------------------------------------
