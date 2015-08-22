@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.4
+// @version     1.0.5
 // @grant       none
 // ==/UserScript==
 
@@ -49,7 +49,8 @@ function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
 //==API FUNCTION==//
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]');}
 
-document.addEventListener('ready', function() {
+document.addEventListener('DOMContentLoaded', function() {
+  alert('loaded');
     var id = getUserId();
     if (id != -1) {
         var possibleAvatars = $('img[src*="cdn-img.fimfiction.net/user/"][src*="-' + id + '-"]');
@@ -71,7 +72,8 @@ function getUserAvatar(size) {
 }
 
 function getDefaultAvatar(size) {
-    return staticFimFicDomain() + '/images/none_' + size + '.png';
+  if (size > 64) size = 64;
+  return staticFimFicDomain() + '/images/none_' + size + '.png';
 }
 
 //==API FUNCTION==//
