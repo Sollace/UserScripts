@@ -3,7 +3,7 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1
+// @version     1.0.2
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
@@ -67,6 +67,9 @@ div.colour_pick {\
 .color-selector div {\
     position: relative;\
     width: 100%;}\
+.color-selector input[type='range'] {\
+    height: 20px;\
+    -webkit-appearance: initial;}\
 .color-selector input[type='text'] {\
     padding-bottom: 20px !important;\
     display: table-cell;}\
@@ -93,7 +96,7 @@ div.colour_pick {\
 .color-selector .blue input:focus {\
     background-color: #ccf !important;}\
 .color-selector .blue input[type='text']:focus + input[type='range'] {\
-    background-color: #bbf !important;}");
+    background-color: #bbf !important;}", "settingsTab_colorMakerStyle");
   }
   FimFicSettings.OptionsBuilder = function OptionsBuilder(container, err) {
     this.container = $(container);
@@ -211,7 +214,7 @@ div.colour_pick {\
       sl.val(val);
       return sl;
     },
-    AddRaw: function(field) {if (this.HasInit()) tabl.append(field);},
+    AddRaw: function(field) {if (this.HasInit()) this.container.append(field);},
     AddEmailBox: function(id, name) {return addGenericInput(this, id, name, "text", "email");},
     AddNameBox: function(id, name) {return addGenericInput(this, id, name, "text", "name");},
     AddTextBox: function(id, name) {return addGenericInput(this, id, name, "text");},
