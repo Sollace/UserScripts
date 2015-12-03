@@ -6,7 +6,7 @@
 // @include     https://*.deviantart.*
 // @include     http://sta.sh*
 // @include     https://sta.sh*
-// @version     1.4
+// @version     1.4.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==

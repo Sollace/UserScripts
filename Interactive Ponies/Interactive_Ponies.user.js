@@ -7,7 +7,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.7
+// @version     1.7.1
 // @grant       none
 // ==/UserScript==
 /*\--------------------------------------------------------------------------------------------------

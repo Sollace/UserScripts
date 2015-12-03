@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.4.6
+// @version     2.4.7
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
