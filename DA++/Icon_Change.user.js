@@ -28,7 +28,7 @@ var startupFunction = (function() {
   }
 })();
 
-if (document.location.hostname.indexOf('.deviantart.') != -1) {
+if (document.location.hostname.match(/\.deviantart\.|sta\.sh/)) {
   document.addEventListener('DOMContentLoaded', startupFunction);
   document.onmousemove = function() {
     changeLogo(LOGO, FAVICON, HOLS);
@@ -81,7 +81,16 @@ function changeLogo() {
         target.remove();
       }
       var link = document.createElement('LINK');
-      link.setAttribute('href', FAVICON);
+      if (document.location.hostname.match(/sta\.sh/)) {
+        target = el('img.avatar');
+        if (target.length) {
+          link.setAttribute('href', target.first().attr('src'));
+        } else {
+          done = false;
+        }
+      } else {
+        link.setAttribute('href', FAVICON);
+      }
       link.setAttribute('rel', 'shortcut icon');
       link.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
       if (head.children.length) {
@@ -166,7 +175,6 @@ function wrap(objects) {
     length: objects.length
   }
 }
-
 function isJQuery() {
   return window['$'] && $.prototype.html;
 }
