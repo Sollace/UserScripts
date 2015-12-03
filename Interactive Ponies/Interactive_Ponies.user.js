@@ -711,6 +711,8 @@ function setupMorePonies() {
     makeStyle('\
         .interactive_pony .speech_container {\
               pointer-events: none;}\
+        div.interactive_pony div.speech {\
+              font-size: 0.844em !important;}\
         .muffin {\
               z-index: 10;\
               pointer-events: none;\
