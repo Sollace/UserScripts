@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6.3
+// @version     1.6.4
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -606,9 +606,10 @@ try {
                 for (var i = 0; i < arr.length; i++) {
                     if (arr[i].name == follower.name) return arr[i];
                 }
-            }
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i].id == follower.id) return arr[i];
+            } else {
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i].id == follower.id) return arr[i];
+                }
             }
             return null;
         }
