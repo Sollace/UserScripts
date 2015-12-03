@@ -1697,7 +1697,10 @@ var buttonStyle = '\
   display: inline-block;\
   margin: 5px;}\
 #DT_settingspanel:hover {\
-  max-width: 100%;}';
+  max-width: 100%;}\
+\
+body[class*=ytcenter] #sb-wrapper .sb-card-arrow, #sb-wrapper .sb-card-body-arrow {\
+  right: 92px;}';
 
 mainCss += '\
 \
@@ -1972,16 +1975,31 @@ function createButton(mode) {
     return result;
 }
 
+var INTERMEDIATE_CSS = "* {transition: none !important;}";
+
 function removeCss(name) {
+    var transitionFix = makeStyle("transition_fix", INTERMEDIATE_CSS);
     $('style[name="darkYouTube_' + name + '"]').remove();
+    setTimeout(function() {
+        transitionFix.parentNode.removeChild(transitionFix);
+    }, 500);
 }
 
 function addCss(name, sheet) {
+    var transitionFix = makeStyle("transition_fix", INTERMEDIATE_CSS);
+    makeStyle(name, sheet);
+    setTimeout(function() {
+        transitionFix.parentNode.removeChild(transitionFix);
+    }, 500);
+}
+
+function makeStyle(name, sheet) {
     var result = document.createElement("style");
     result.setAttribute("type", "text/css");
     result.setAttribute("name", "darkYouTube_" + name);
     result.innerHTML = sheet;
     document.head.appendChild(result);
+    return result;
 }
 
 function RunScript(func, mustCall, params) {
