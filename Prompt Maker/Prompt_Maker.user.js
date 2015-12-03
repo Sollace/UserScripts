@@ -134,7 +134,8 @@ try {
             'Canterlot High'
         ],
         place_non_eq: [
-            'Earth', 'New York', 'London', 'California', 'The Moon','Africa','Britain','China','Japan','Australia'
+            'Earth', 'New York', 'London', 'California', 'The Moon','Africa','Britain','China','Japan','Australia',
+            'London', 'Yorkshire'
         ],
         conj_place: [
             '{conj_place_away}','{conj_place_to}'
@@ -156,30 +157,24 @@ try {
         ],
         enemy: ['{enemy_plural}', '{enemy_odd}', 'a horde of zombies'],
         enemy_plural: [
-            'Changelings',
-            '{enemy_odd}'
+            'Changelings','{enemy_odd}'
         ],
         enemy_odd: [
-            'Aliens',
-            'Humans',
-            'Timelords'
+            'Aliens','Humans','Timelords'
         ],
         creature_plural: [
-            '{creature_0}s','{creature_0}es'
+            '{creature_0}s','{creature_1}es'
         ],
         creature_singular: [
-            '{creature_0}','{creature_0}'
+            '{creature_0}','{creature_1}'
         ],
         creature_0: [
             'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm',
-            'Diamond Dog'
+            'Diamond Dog','Robin','Hornet','Bee','Hedghog'
         ],
         creature_1: [
-            'Orthros'
+            'Orthros','Fox','Draconequus'
         ],
-        fandom: ['a {fandom_singular}','{fandom_plural}'],
-        fandom_singular: ['Brony','Furry','Anti-Brony'],
-        fandom_plural: ['Bronies','Furries','Anti-Bronies'],
         power: [
             'The Element of {element}', 'the magic of {element}'
         ],
@@ -202,8 +197,9 @@ try {
             'bottle',
             'cloud',
             'rainbow',
+            'diamond',
             'baby',
-            'cow',
+            'cow', 'pig',
             'Alicorn Amulet',
             'Kitchen Sink',
             'MMMMM',
@@ -227,7 +223,8 @@ try {
         ],
         cheese: [
             'block of',
-            'slice of'
+            'slice of',
+            'wedge of'
         ],
         profession: ['{pfp}', '{pfp} {pfn}', '{pfn} {pfp}', '{pfnn} {pfp}'],
         pfp: [
@@ -270,30 +267,15 @@ try {
         done_by: ['eaten','taken','killed','murdered'],
         change: ['takes', 'meets', '{does_to}', 'turns into'],
         does_to: [
-            'defeats',
-            'kidnaps',
-            'makes sweet, sweet love to',
-            'loves',
-            'hates',
-            'marries',
-            'is',
-            'kills',
-            'is killed by',
-            'shrinks',
-            'cheats on'
+            'defeats','kidnaps','makes sweet, sweet love to','loves','hates',
+            'marries','is','kills','is killed by','shrinks','cheats on'
         ],
         name_does: [
-            'travels through space',
-            'travels through space and time',
-            'uses contraceptives',
-            'forgets to use contraceptives',
+            'travels through space','travels through space and time',
+            'uses contraceptives','forgets to use contraceptives',
             '{is_done}',
-            '{does_2} drugs',
-            'accidentally {does_3} drugs',
-            'reads {fanfic}',
-            'discovers {fanfic}',
-            'reacts to {fanfic}',
-            'reacts to {subject}'
+            '{does_2} drugs','accidentally {does_3} drugs',
+            'reads {fanfic}','discovers {fanfic}','reacts to {fanfic}','reacts to {subject}'
         ],
         does_with: ['forgets','eats','has','cooks','{is_done} on'],
         is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
@@ -302,22 +284,17 @@ try {
         does_2: ['gives up', 'cooks', '{does_3}'],
         does_3: ['takes', 'sells', 'buys', 'invents', 'gives {name}'],
         done_food: ['eat','buy','sell','cook'],
-        fanfic: [
-            'Cupcakes','My Little Dashie','Five Score Divided By Four','{name_pony}\'s expansive clop collection',
-            'a fanfic by {author}'
-        ],
-        author: [
-            'Kaidan','knighty','The Parasprite','RainbowBob','Vegie','Vengful Spirit','TwistedSpectrum','L'
-        ],
-        subject: [
-            'Politics','an unexpected power outage','an expected power outage','Equestrai Daily','Equestria After Dark',
-            'Bronies','{name_pony_young}\'s new cutiemark}'
-        ],
+        fanfic: ['Cupcakes','My Little Dashie','Five Score Divided By Four','{name_pony}\'s expansive clop collection','a fanfic by {author}'],
+        author: ['Kaidan','knighty','The Parasprite','RainbowBob','Vegie','Vengful Spirit','TwistedSpectrum','L','Sollace','Admiral Biscuit'],
+        subject: ['Politics','an unexpected power outage','an expected power outage','Equestrai Daily','Equestria After Dark','{fandom}','{name_pony_young}\'s new cutiemark}'],
+        fandom: ['a {fandom_singular}','{fandom_plural}'],
+        fandom_singular: ['Brony','Pegasister','Furry','Anti-Brony','Sonic Fan'],
+        fandom_plural: ['Bronies','Pegasisters','Furries','Anti-Bronies','Sonic Fans'],
         name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
         name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
         name_pony: [
             '{name_pony_first}', 'Princess {name_pony_first}',
-            'Bon Bon','Carrot Top','Sunset Shimmer','Shining Armour','Vinyl Scratch','Suri Polomare',
+            'Bon Bon','Carrot Top','Sunset Shimmer','Starlight Glimmer', 'Shining Armour','Vinyl Scratch','Suri Polomare',
             'Sweetie Belle','Rainbow Dash',
             'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie',
             'Dr. Hooves','Hayseed Turnip Truck','Aunt Orange','Uncle Orange','Goldie Delicious',
@@ -326,7 +303,8 @@ try {
             'Hoity Toity','Sapphire Shores','Fancy Pants','Daring Do','Prim Hemline','Mayor Mare','Hondo Flanks','Cookie Crumbles',
             'Jet Set','Upper Crust','Fleur Dis Lee','Filthy Rich','Cloud Chaser','Bulk Biceps','Lightning Dust','Ms. Peachbottom','Ms. Harshwhinny','Flash Sentry',
             'Coco Pommel','Silver Shill','Teddie Safari','Nurse Redheart','Doctor Horse','Dr. Hooves','Nurse Ponies',
-            'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Clover the Clever'
+            'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Prince Platinum','Clover the Clever',
+            'The Venerable Bowrang Dash', 'Sassy Saddles'
         ],
         name_pony_young: [
             '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','Cake Twins','Button Mash','Berry Pinch'
@@ -344,20 +322,21 @@ try {
             'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
         ],
         name_nonequestrian: [
-            'Bill Gates','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto','Autobots','Decepticons',
+            'Bill Gates','Steve Jobs','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto','Autobots','Decepticons',
             'Optimus Prime','Starscream','Soundwave','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris','Scarlet Johanson',
-            'Luke Skywalker','Darth Vader','Yoda','Lance Armstrong','Bruce Willace','Batman','Britney Spears'
+            'Luke Skywalker','Darth Vader','Yoda','Lance Armstrong','Bruce Willace','Batman','Britney Spears','Robin Williams'
         ],
-        name_pony_titled: ['Princess {name_pony_first}', '{name_pony_titled_evil}'],
+        name_pony_titled: ['Prince {name_pony_first}','Princess {name_pony_first}', '{name_pony_titled_evil}'],
         name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
         name_pony_1: ['{name_pony_first}','{name_pony_last}', '{name_pony_first_young}'],
         name_pony_first: [
             'Celestia','Luna','Cadance','Flim','Flam','Cheerilee','Gizmo',
             'Twilight','Applejack','Rarity','Fluttershy','Sombra','Joe',
-            'Trixie','Fluffle Puff','Alo','Lotus',
+            'Trixie','Fluffle Puff','Aloe','Lotus',
             'Big Mac','Spitfire','sauren','Fleetfoot',
             'Lyra', 'Derpy','Octavia','Roseluck','Thunderlane',
-            'Maud','Tenderhoof','Junebug','Flitter','Blossomforth'
+            'Maud','Tenderhoof','Junebug','Flitter','Blossomforth',
+            'Tumblrina','Diabetty'
         ],
         name_pony_first_young: [
             'Featherweight','Pipsqueak','Snips','Snails','Rumble','Dinky','Twist','Nyx','Scootaloo','Applebloom'
