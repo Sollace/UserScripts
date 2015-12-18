@@ -27,7 +27,6 @@ function move(ref, id) {
             if (button !== undefined && ref !== null) {
                 button = el(button);
                 for (var i = 0; i < button.length; i++) {
-                    console.log(button[i]);
                     if (button[i] != null) {
                         button[i].style.background = 'none';
                         ref.parentNode.insertBefore(button[i], ref.nextSibling);
