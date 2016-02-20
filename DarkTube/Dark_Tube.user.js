@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.4.7
+// @version     2.4.8
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -89,10 +89,10 @@ var mainCss = '\
 .ad-info-icon, .autoplay-info-icon, .yt-help-icon,\
 .c4-module-editor-delete::before,\
 .yt-uix-button-icon-opml-export {\
-    background-image: url(' + resources.highjacker + ') !important;}\
+    background: url(' + resources.highjacker + ') !important;}\
 \
 .dashboard-widget-handle {\
-    background-image: url(' + resources.videomanager + ') !important;}\
+    background: url(' + resources.videomanager + ') !important;}\
 \
 .hitchhiker-enabled #masthead-search .search-btn-component .yt-uix-button-content, .search-icon, #comments-search-btn .yt-uix-button-content {\
     background: no-repeat url(http://i.imgur.com/DDNZc3U.png) -173px -62px !important;}\
@@ -1603,19 +1603,25 @@ button[name="cancel"]:hover {\
   border-radius: 500px;}';
 
 var nonIframeCommentsCss = '\
-.all-comments, .all-comments * {\
+.comment-simplebox, .comment-replies-renderer-paginator, .comment-replies-renderer-paginator:hover,\
+#comment-section-renderer .yt-uix-load-more-loading {\
   background: none !important;}\
-.comment-footer .sprite_like,\
-.comment-footer .sprite_dislike {\
+#comment-section-renderer .comment-renderer-footer .sprite-like,\
+#comment-section-renderer .comment-renderer-footer .sprite-dislike{\
   background-image: url(' + resources.comment + ') !important;}\
-.comment-footer .sprite_like {\
+#comment-section-renderer .comment-renderer-footer .sprite-like {\
     background-position: -1px -14px !important;}\
-.comment-footer .sprite_dislike {\
+#comment-section-renderer .comment-renderer-footer .sprite-dislike {\
     background-position: -1px -161px !important;}\
-#yt-comments-sb-standin .callout-inner, #yt-comments-sb-standin .callout-outer {\
+.comment-simplebox-arrow .arrow-inner {\
+  border-top-color: #333 !important;\
+  border-right-color: #333 !important;}\
+.comment-simplebox-arrow .arrow-outer {\
   border-top-color: #303030 !important;\
   border-right-color: #303030 !important;}\
-#yt-comments-sb-standin .callout + .box {\
+.comment-simplebox-renderer {\
+  border-bottom-color: #303030 !important;}\
+.comment-simplebox-renderer-collapsed-content, .comment-simplebox .comment-simplebox-text {\
   color: #AAA !important;\
   background-color: #333 !important;\
   border: 1px solid #303030 !important;}\
