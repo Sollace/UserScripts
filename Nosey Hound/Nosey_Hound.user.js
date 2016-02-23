@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.6.4
+// @version     1.7
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -150,12 +150,11 @@ try {
             var me = this;
             $.ajax({
                 type: 'GET',
-                url: '/ajax/fetch_watchers.php',
-                data: {watching: this.userId},
+                url: '/ajax/users/' + this.userId + '/followers',
                 success: function(xml) {
                     if (!closed) {
                         try {
-                            me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml + '</ul>'))
+                            me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml.content + '</ul>'))
                         } catch (e) {
                             me.printError(pop, e);
                         }
