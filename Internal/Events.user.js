@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.4.5
+// @version     1.5
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,7 +70,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.43;
+  var ver = 1.5;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -99,19 +99,30 @@ RunScript.build = function(functionText) {
         'getEventName': function(url) {
           if (typeof(url) == 'string') {
             switch (url){
-              case '/ajax/fetch_comments.php': return {'eventName': 'pagechange'};
-              case '/ajax/edit_comment.php': return {'eventName': 'editcomment'};
-              case '/ajax/preview_comment.php': return {'eventName': 'previewcomment'};
-              case '/ajax/add_comment.php': return {'eventName': 'addcomment'};
-              case '/compose_private_message.php': return {'eventName':'composepm'};
-              case '/ajax/notifications/mark_read.php': return {'eventName':'note_markread'};
-              case '/ajax/private_messages/mark-all-read.php': return {'eventName':'pm_markread'};
+              case '/ajax/comments/preview': return {'eventName': 'previewcomment'};
+              case '/ajax/users/infocard': return {'eventName': 'infocard', 'user': /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')}
+              case '/ajax/notifications/mark-all-read': return {'eventName':'note_markread'};
+              case '/ajax/private-messages/mark-all-read': return {'eventName':'pm_markread'};
             }
-            if (url.indexOf('/ajax/get_module_edit.php?box=') == 0) {
-              return {'eventName': 'editmodule', 'box':url.split('&')[0].split('?')[1].split('=')[1]};
+            if (url.indexOf('/ajax/private-messages/new?receiver=') == 0) {
+              var split = url.split('?reciever=').reverse().split('&subject=');
+              var event = {'eventName': 'composepm', 'recipient': decodeURIComponent(split[0].split('&')[0])};
+              if (split.length > 1 && split[1]) event.subject = decodeURIComponent(split[1]);
             }
-            if (url.indexOf('/ajax/infocard_user.php') == 0) {
-              return {'eventName': 'infocard', 'user':url.split('&')[0].split('?name=')[1]};
+            if (url.indexOf('/ajax/comments/') == 0) {
+              var split = url.split('/');
+              if (split.length == 4) return {'eventName': 'editcomment'};
+             return {'eventName': 'pagechange'};
+            }
+            if (url.indexOf('/ajax/users/') == 0) {
+              var split = url.split('/').reverse();
+              if (split[0] == 'comments') return 'addcomment';
+            }
+            if (url.indexOf('/ajax/users/modules/') == 0) {
+              var split = url.split('/').reverse();
+              if (split[0] == 'edit') {
+                return {'eventName': 'editmodule', 'box':split[1]};
+              }
             }
             if (typeof eventRegister[url] !== 'undefined') {
               var result = eventRegister[url][i](url);
