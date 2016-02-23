@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.5
+// @version     1.5.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -111,7 +111,7 @@ RunScript.build = function(functionText) {
             }
             if (url.indexOf('/ajax/comments/') == 0) {
               var split = url.split('/');
-              if (split.length == 4) return {'eventName': 'editcomment'};
+              if (split.length == 5) return {'eventName': 'editcomment'};
              return {'eventName': 'pagechange'};
             }
             if (url.indexOf('/ajax/users/') == 0) {
