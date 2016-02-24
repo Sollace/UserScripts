@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.5.1
+// @version     1.5.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,13 +70,13 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.5;
+  var ver = 1.52;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
   if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
     var scriptBody = function(ver) {
-      var eventRegister = {};
+      var eventRegister = null;
       window.FimFicEvents = {
         'version': function() {
           return ver;
@@ -90,11 +90,16 @@ RunScript.build = function(functionText) {
         'trigger': function(name, event) {
           $(document).trigger(name, [event]);
         },
-        'subscribe': function(url, evFunc) {
-          if (typeof eventRegister[url] === 'undefined') {
-            eventRegister[url] = [];
+        'subscribe': function(evFunc) {
+          if (eventRegister) {
+            var old = eventRegister;
+            eventRegister = function(url) {
+              var e = evFunc(url);
+              return e || old(url);
+            };
+          } else {
+            eventRegister = evFunc;
           }
-          eventRegister[url].push(evFunc);
         },
         'getEventName': function(url) {
           if (typeof(url) == 'string') {
@@ -112,7 +117,7 @@ RunScript.build = function(functionText) {
             if (url.indexOf('/ajax/comments/') == 0) {
               var split = url.split('/');
               if (split.length == 5) return {'eventName': 'editcomment'};
-             return {'eventName': 'pagechange'};
+              return {'eventName': 'pagechange'};
             }
             if (url.indexOf('/ajax/users/') == 0) {
               var split = url.split('/').reverse();
@@ -124,12 +129,7 @@ RunScript.build = function(functionText) {
                 return {'eventName': 'editmodule', 'box':split[1]};
               }
             }
-            if (typeof eventRegister[url] !== 'undefined') {
-              var result = eventRegister[url][i](url);
-              if (typeof result == 'string') {
-                return {'eventName': result};
-              }
-            }
+            if (eventRegister) return eventRegister(url);
             return null;
           }
         },
@@ -165,8 +165,8 @@ RunScript.build = function(functionText) {
       'trigger': function(name, e) {
         RunScript.build('function() {FimFicEvents.trigger("' + name + '", ' + JSON.stringify(e) + ');}').run(true);
       },
-      'subscribe': function(url, func) {
-        RunScript.build('function() {FimFicEvents.subscribe("' + name + '", (' + func.toString() + '));}').run(true);
+      'subscribe': function(func) {
+        RunScript.build('function() {FimFicEvents.subscribe(' + func.toString() + ');}').run(true);
       },
       'getEventName': function(url) {
         return win.FimFicEvents.getEventName(url);
