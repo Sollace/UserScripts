@@ -2,7 +2,7 @@
 // @name        Special User Titles API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2.3
+// @version     1.2.4
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -124,8 +124,8 @@ RunScript.build = function(functionText) {
     STs.prototype.setSpecialTitle = function (userIds, title) {
       for (var i = 0; i < userIds.length; i++) {
         $(this.avatarSelector(userIds[i])).each(function (item) {
-          var prev = this.parentNode.previousSibling;
-          if (prev != null && prev != undefined && prev.innerHTML != title) {
+          var prev = $(this.parentNode.previousSibling);
+          if (prev.length && !prev.hasClass('author-badge')) {
             $(this.parentNode).before("<div class=\"author-badge\" >" + title + "</div>");
           }
         });
