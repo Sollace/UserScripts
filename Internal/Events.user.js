@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.5.2
+// @version     1.5.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,7 +70,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.52;
+  var ver = 1.53;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
