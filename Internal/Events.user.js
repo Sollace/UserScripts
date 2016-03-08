@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.5.3
+// @version     1.6
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,7 +70,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.53;
+  var ver = 1.6;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -101,6 +101,69 @@ RunScript.build = function(functionText) {
             eventRegister = evFunc;
           }
         },
+        'setLogging': function() {
+          this.logging = 1;
+        },
+        'PROXY': function(sender, func, args, m) {
+          var a = args[0];
+          if (typeof a === 'string') {
+            a = args[0] = {url: a};
+          }
+          var l = this.logging;
+          if (l) console.log('request: ' + a.url);
+          var event = this.getEventName(a.url);
+          if (event != null) {
+            if (l) console.log('event: ' + event.eventName);
+            event.url = a.url;
+            event.data = a.data;
+            var __success = a['success'] ? a.success : null;
+            a.success = function() {
+              try {
+                var result = undefined;
+                if (l) console.log('success (before): ' + arguments[0]);
+                event.result = arguments[0];
+                window.FimFicEvents.trigger('before' + event.eventName, event);
+                if (event.result) arguments[0] = event.result;
+                if (l) console.log('success (after): ' + arguments[0]);
+                if (__success) {
+                  result = __success.apply(this,arguments);
+                  if (l) console.log('success (result): ' + result);
+                }
+                event.result = arguments[0];
+                if (!m) window.FimFicEvents.trigger('after' + event.eventName, event);
+                return result;
+              } catch (e) {
+                console.log('success (error): version=' + this.version());
+                console.log('success (error): url=' + a.url);
+                console.log('success (error): event=' + (event ? event.eventName : 'undefined'));
+                console.log('success (error): ' + e);
+              }
+            };
+            if (m) {
+              var __complete = a['complete'] ? a.complete : null;
+              a.complete = function() {
+                var result = undefined;
+                try {
+                  if (l) console.log('complete (before): ' + arguments[0]);
+                  if (__complete) {
+                    result = __complete.apply(this,arguments);
+                    if (l) console.log('complete (result): ' + result);
+                  }
+                  event.result = arguments[0];
+                  window.FimFicEvents.trigger('after' + event.eventName, event);
+                  if (l) console.log('complete (after): ' + arguments[0]);
+                } catch (e) {
+                  console.log('complete (error): version=' + this.version());
+                  console.log('complete (error): url=' + a.url);
+                  console.log('complete (error): event=' + (event ? event.eventName : 'undefined'));
+                  console.log('complete (error): ' + e);
+                }
+                return result;
+              };
+            }
+          }
+          return func.apply(sender, args);
+        },
         'getEventName': function(url) {
           if (typeof(url) == 'string') {
             switch (url){
@@ -108,6 +171,10 @@ RunScript.build = function(functionText) {
               case '/ajax/users/infocard': return {'eventName': 'infocard', 'user': /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')}
               case '/ajax/notifications/mark-all-read': return {'eventName':'note_markread'};
               case '/ajax/private-messages/mark-all-read': return {'eventName':'pm_markread'};
+              case '/ajax/notifications/list/drop-down': return {'eventName': 'listnotes'};
+              case '/ajax/private-messages/list/drop-down': return {'eventName': 'listpms'};
+              case '/ajax/feed': return {'eventName': 'loadfeed'};
+              case '/ajax/emoticons/list': return {'eventName': 'listemoticons'};
             }
             if (url.indexOf('/ajax/private-messages/new?receiver=') == 0) {
               var split = url.split('?').reverse()[0];
@@ -132,19 +199,27 @@ RunScript.build = function(functionText) {
               }
             }
             if (eventRegister) return eventRegister(url);
-            return null;
           }
+          return null;
         },
         'toString': function() {
-          return '[object API] {\n  version() -> number\n  on(name, func($event, eventObject)) -> undefined\n  off(name, fun($event, eventObject)) -> undefined\n  trigger(name, eventObject)\n  getEventName(url) -> string\n  subscribe(func(url) -> eventObject) -> undefined\n}';
+          return '[object API] {\n  version() -> number\n  setLogging()\n  on(name, func($event, eventObject))\n  off(name, func($event, eventObject))\n  trigger(name, eventObject)\n  getEventName(url) -> string\n  setLogging()\n  subscribe(func(url) -> eventObject)\n}';
+        },
+        'toSource': function() {
+          return 'FimFicEvents';
         }
       };
       var toStringFunc = function toString() {
         return 'function ' + this.name + '() {\n  [native code]\n}';
       };
-      toStringFunc.toString = toStringFunc;
+      var toSourceFunc = function toSource() {
+        return '(' + this.toString() + ')';
+      }
+      toSourceFunc.toString = toStringFunc.toString = toStringFunc;
+      toSourceFunc.toSource = toStringFunc.toSource = toSourceFunc;
       for (var i in window.FimFicEvents) {
         window.FimFicEvents[i].toString = toStringFunc;
+        window.FimFicEvents[i].toSource = toSourceFunc;
       }
       window.FimFicEvents.version.toString = function() {
         return this();
@@ -176,7 +251,8 @@ RunScript.build = function(functionText) {
       'version': function() {
         return win.FimFicEvents.version();
       },
-      'toString': win.FimFicEvents.toString
+      'toString': win.FimFicEvents.toString,
+      'toSource': win.FimFicEvents.toSource
     }
     for (var i in window.FimFicEvents) {
       window.FimFicEvents[i].toString = RunScript.toString;
@@ -187,61 +263,19 @@ RunScript.build = function(functionText) {
   }
   if (startup) {
     var injected = function() {
-      var original = window.AjaxRequest;
-      window.AjaxRequest = function(a) {
-        var event = window.FimFicEvents.getEventName(a.url);
-        if (event != null) {
-          event.url = a.url;
-          event.data = a.data;
-          var __success = null;
-          if (a['success']) {
-            __success = a.success;
-          }
-          a.success = function() {
-            event.result = arguments[0];
-            window.FimFicEvents.trigger('before' + event.eventName, event);
-            arguments[0] = event.result;
-            if (__success != null) {
-              __success.apply(this,arguments);
-            }
-            event.result = arguments[0];
-            window.FimFicEvents.trigger('after' + event.eventName, event);
-          };
+      (function(original, __ajax) {
+        window.AjaxRequest = function(a) {
+          return window.FimFicEvents.PROXY(this, __ajax, arguments, false);
         }
-        return original.prototype.constructor.apply(this, [a]);
-      }
-      for (var i in original) {
-        window.AjaxRequest[i] = original[i];
-      }
-      window.$.ajax = (function() {
-        var __ajax = window.$.ajax;
+        for (var i in original) {
+          window.AjaxRequest[i] = original[i];
+        }
+      })(window.AjaxRequest, window.AjaxRequest.prototype.constructor);
+      window.$.ajax = (function(__ajax) {
         return function(param, n) {
-          var event = window.FimFicEvents.getEventName(param.url);
-          if (event != null) {
-            event.url = param.url;
-            event.data = param.data;
-            var __success = param.success;
-            param.success = function() {
-              event.result = arguments[0];
-              window.FimFicEvents.trigger('before' + event.eventName, event);
-              arguments[0] = event.result;
-              if (__success != null) {
-                __success.apply(this,arguments);
-              }
-            };
-            var __complete = param.complete;
-            param.complete = function() {
-              if (__complete != null) {
-                __complete.apply(this,arguments);
-              }
-              event.result = arguments[0];
-              window.FimFicEvents.trigger('after' + event.eventName, event);
-              arguments[0] = event.result;
-            };
-          }
-          return __ajax(param, n);
+          return window.FimFicEvents.PROXY(this, __ajax, arguments, true);
         };
-      })();
+      })(window.$.ajax);
     }
     RunScript(injected,true);
   }
