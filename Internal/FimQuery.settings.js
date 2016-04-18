@@ -3,7 +3,7 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.2
+// @version     1.0.3
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
@@ -292,17 +292,18 @@ div.colour_pick {\
     AddFinishButton: function(name, func) {
       var me = this;
       var field = $('<div />');
-      var link = $('<a class="styled_button form_cubmitter" href="javascript:void(0);"><img src="' + staticFimFicDomain() + '/images/icons/white/save.png"></img>Save</a>');
+      var link = $('<button class="styled_button"><i class="fa fa-save" />Save Settings</a>');
       field.append(link);
-      var img = $('<img class="submitting_spinner" style="vertical-align:middle;display:none;" src="' + staticFimFicDomain() + '/themes/poni2.0/images/loader_light_toolbar.gif"></img>');
+      var img = $('<span style="display:none"><i class="fa fa-spinner fa-spin" style="font-size: 25px;vertical-align: middle;padding: 10px;" /></span>');
       field.append(img);
+      function complete(fails) {
+        if (fails) me.showError(fails);
+        img.append('Saved!');
+        img.fadeOut();
+      }
       link.on('click', function() {
-        img.css('display', 'block');
-        var fails = func();
-        if (fails.length) {
-          me.showError(fails);
-        }
-        img.css('display', 'none');
+        img.css('display', 'inline');
+        func(complete);
       });
       return this.AddOption('captch', name, field);
     },
