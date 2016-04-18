@@ -12,20 +12,19 @@ var logger = new Logger('Prompt Maker',5)
 try {
     run({
         pattern: [
-            '{pattern_0}.',
+            '{pattern_0}',
             '{pattern_1}!',
             '{pattern_2}.',
             '{pattern_3}.'
         ],
         pattern_0: [
-            '{pattern_2} whilst [pattern_2]',
-            '{pattern_2} and {pattern_3}'
+            '{pattern_1}.',
+            'Button\s Mom has got it goin\' on.',
+            '{creature_plural} everywhere!',
+            '{pattern_2} whilst [pattern_2].',
+            '{pattern_2} and {pattern_3}.'
         ],
         pattern_1: [
-            'Nanananananananaanananananananananananaanananananananananananananan BATMARE',
-            'Button\s Mom has got it goin\' on',
-            '{name} everywhere',
-            '{creature_plural} everywhere',
             'a horde of {creature_plural} attack {place_or_name}',
             'a horde of {creature_plural} attack {name_nonequestrian}',
             '{name_equestrian} meets {fandom}',
@@ -55,8 +54,8 @@ try {
             '{name} {change} [name]',
             '{name} {object_phrase}',
             '{name} is {is}',
-            '{name} is a {profession}',
-            '{name} is a {race}',
+            '{name} {verbed_3} a {profession}',
+            '{name} {verbed_3} a {race}',
             '{name} is taken to {place_or_name}',
             '{name} tries to {done_food} {food}',
             '{name} {change} {name_or_race}',
@@ -66,6 +65,7 @@ try {
             '{name}\'s {bodypart_plural} are fake'
         ],
         verbed_2: ['discovers', 'is','breaks','steals','{done_food}','{i_present}'],
+        verbed_3: ['becomes','is','gets turned into'],
         verbed: ['taken over','destroyed'],
         is_or_was: ['is','was','gets'],
         place_or_name: ['{name_equestrian}','{place}'],
@@ -155,56 +155,80 @@ try {
         conj_place_away: [
             'leaves'
         ],
-        enemy: ['{enemy_plural}', '{enemy_odd}', 'a horde of zombies'],
+        enemy: ['{enemy_plural}', '{enemy_odd}'],
         enemy_plural: [
-            'Changelings','{enemy_odd}'
+            '{race_plural}','{enemy_odd}'
         ],
         enemy_odd: [
-            'Aliens','Humans','Timelords'
+            'Aliens','Humans','Timelords', 'a horde of zombies'
         ],
         creature_plural: [
-            '{creature_0}s','{creature_1}es'
+            '{creature_0}s','{creature_1}es','Pigasi','{race_plural}',
+            'Vampire {creature_0}s','Vampire {creature_1}es'
         ],
         creature_singular: [
-            '{creature_0}','{creature_1}'
+            '{creature_0}','{creature_1}','Pigasus','{race}',
+            'Vampire {creature_0}','Vampire {creature_1}'
         ],
         creature_0: [
-            'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm',
-            'Diamond Dog','Robin','Hornet','Bee','Hedghog'
+            'Chimera','Cockatrice','Hydra','Manticore','Cragadile','Sea serpent','Tatzlwurm','Minotaur',
+            'Quarray eel','Sea serpent','Star spider','Siren','Tantabus','Ursa Major','Ursa Minor','Twittermite',
+            'Diamond Dog','Robin','Hornet','Bee','Hedghog','Chimera','Centaur','Fruit Bat','Gargoyle','Jackalope'
         ],
         creature_1: [
-            'Orthros','Fox','Draconequus'
+            'Orthros','Fox','Draconequus','Cyclops','Orthros'
         ],
         power: [
             'The Element of {element}', 'the magic of {element}'
         ],
         element: [
             'Honesty', 'Love', 'Loyalty', 'Generosity', 'Kindness', 'Magic',
-            'Deceit', 'Hate', 'Dishonor', 'Selfishness', 'Pride','Murder'
+            'Deceit','Hate','Dishonor','Selfishness','Pride','Murder',
+            '... Lust','Chaos'
         ],
         object_phrase: [
             '{does_with} a {descriptor} {object}',
-            '{does_with} a {object}',
+            '{does_with} {object}',
             '{done_food}s {food}'
         ],
         descriptor: [
-            'big','giant','rotten','nasty','tall','poisoned','infected','supercharged'
+            'big','giant','rotten','nasty','tall','poisoned','infected','supercharged','disgusting','beautiful',
+            'majestic','short','tiny'
+        ],
+        is: [
+            'dead',
+            'kidnapped',
+            'bloated',
+            'pregnant',
+            'evil',
+            'undead',
+            'gay',
+            'a {a_object}',
+            'a kitchen sink',
+            'drunk',
+            'bored',
+            'extremely destructive',
+            'extremely stupid',
+            'stupid',
+            'stuffed'
         ],
         object: [
             'The Internet',
             'The 4th Wall',
-            'Tree of Harmony',
-            'bottle',
-            'cloud',
-            'rainbow',
-            'diamond',
-            'baby',
-            'cow', 'pig',
-            'Alicorn Amulet',
-            'Kitchen Sink',
+            'the Tree of Harmony',
+            'the Alicorn Amulet',
+            'the Kitchen Sink',
             'MMMMM',
             '{food_1} sandwich',
-            '{food_2} sandwich'
+            '{food_2} sandwich',
+            'a {a_object}',
+            'an {an_object}'
+        ],
+        a_object: [
+          'filly','rock','bottle','cloud','rainbow','diamond','baby','cow', 'pig'
+        ],
+        an_object: [
+            'icecream sundae'
         ],
         food: ['a {food_2}','{food_1}'],
         food_1: [
@@ -219,6 +243,9 @@ try {
             'berry',
             'cake',
             'apple',
+            'hay',
+            'milk',
+            'chocolate milk',
             '{cheese} cheese'
         ],
         cheese: [
@@ -239,16 +266,6 @@ try {
         repeated: ['again','for the {nth} time'],
         nth: ['first','last','(n)'],
         acted: ['places', 'bodies', 'families', 'jobs', 'brains', 'race'],
-        is: [
-            'dead',
-            'kidnapped',
-            'bloated',
-            'pregnant',
-            'evil',
-            'undead',
-            'gay',
-            'a filly'
-        ],
         i_present: [
             'invents', 'discovers', 'uses'
         ],
@@ -274,29 +291,38 @@ try {
             'travels through space','travels through space and time',
             'uses contraceptives','forgets to use contraceptives',
             '{is_done}',
-            '{does_2} drugs','accidentally {does_3} drugs',
-            'reads {fanfic}','discovers {fanfic}','reacts to {fanfic}','reacts to {subject}'
+            '{does_2} {drug}','accidentally {does_3} {drug}',
+            'reads {fanfic}','discovers {fanfic}','reacts to {fanfic}','reacts to {subject}',
+            '{does_with} a {cult}','accidentally {does_with} a {cult}'
         ],
-        does_with: ['forgets','eats','has','cooks','{is_done} on'],
+        cult: ['cult','fandom','creepy fan club','superhero league','villains league'],
+        drug: ['drugs','cocaine','acid','salt','apples'],
+        does_with: ['forms','forgets','eats','has','cooks','{is_done} on'],
         is_done: ['jumps','falls','chokes','dies','lies','skips','backflips','rolls','has sex','gets wasted'],
         does_object: ['fall off', 'break', 'swell up'],
         does_object_singular: ['falls off', 'breaks', 'swells up'],
         does_2: ['gives up', 'cooks', '{does_3}'],
         does_3: ['takes', 'sells', 'buys', 'invents', 'gives {name}'],
         done_food: ['eat','buy','sell','cook'],
-        fanfic: ['Cupcakes','My Little Dashie','Five Score Divided By Four','{name_pony}\'s expansive clop collection','a fanfic by {author}'],
-        author: ['Kaidan','knighty','The Parasprite','RainbowBob','Vegie','Vengful Spirit','TwistedSpectrum','L','Sollace','Admiral Biscuit'],
-        subject: ['Politics','an unexpected power outage','an expected power outage','Equestrai Daily','Equestria After Dark','{fandom}','{name_pony_young}\'s new cutiemark}'],
+        fanfic: [
+           'Cupcakes','My Little Dashie','Five Score Divided By Four','The Molestia Trilogy',
+           'Batsy Fluffentuft the Magnificent Becomes an Alicorn','Unicorn Horns Are Made of Heroin',
+           '{name_pony}\'s extensive clop collection','a fanfic by {author}',
+           'a fanfic about themself'
+        ],
+        author: ['Kaidan','knighty','The Parasprite','RainbowBob','Vegie','Vengful Spirit','TwistedSpectrum','L','Sollace','Admiral Biscuit','{name_equestrian}'],
+        subject: ['Politics','an unexpected power outage','an expected power outage','Equestrai Daily','Equestria After Dark','{fandom}','{name_pony_young}\'s new cutiemark'],
         fandom: ['a {fandom_singular}','{fandom_plural}'],
         fandom_singular: ['Brony','Pegasister','Furry','Anti-Brony','Sonic Fan'],
         fandom_plural: ['Bronies','Pegasisters','Furries','Anti-Bronies','Sonic Fans'],
-        name: ['Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
-        name_equestrian: ['{name_pony}', '{name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
+        name: ['{name_nonequestrian}', '{name_equestrian}', '{name_inanimate}'],
+        name_equestrian: ['{name_pony}', '{name_pony_young}','Filly {name_pony}', 'Adult {name_pony_young}', '{name_nonpony}','The Flim Flam Brothers'],
         name_pony: [
             '{name_pony_first}', 'Princess {name_pony_first}',
-            'Bon Bon','Carrot Top','Sunset Shimmer','Starlight Glimmer', 'Shining Armour','Vinyl Scratch','Suri Polomare',
+            'Bon Bon','Carrot Top','Sunset Shimmer','Starlight Glimmer','Shining Armour','Vinyl Scratch','Suri Polomare',
             'Sweetie Belle','Rainbow Dash',
-            'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie',
+            'Twilight Sparkle','Pinkie Pie','Blinkie Pie','Inky Pie','Maud Pie','Marble Pie','Limestone Pie',
+            'Igneous Rock',
             'Dr. Hooves','Hayseed Turnip Truck','Aunt Orange','Uncle Orange','Goldie Delicious',
             'Cherry Jubilee','Photo Finish','Button\'s Mom','Prince Blue Blood','Sunny Daze','Peachy Pie',
             'Granny Smith','Big Macintosh','Cheese Sandwich','Berry Punch','Night Light','Twilight Velvet',
@@ -304,13 +330,14 @@ try {
             'Jet Set','Upper Crust','Fleur Dis Lee','Filthy Rich','Cloud Chaser','Bulk Biceps','Lightning Dust','Ms. Peachbottom','Ms. Harshwhinny','Flash Sentry',
             'Coco Pommel','Silver Shill','Teddie Safari','Nurse Redheart','Doctor Horse','Dr. Hooves','Nurse Ponies',
             'Chancellor Puddinghead','Smart Cookie','Commander Hurricane','Private Pansy','Princess Platinum','Prince Platinum','Clover the Clever',
-            'The Venerable Bowrang Dash', 'Sassy Saddles'
+            'The Venerable Bowrang Dash','Sassy Saddles','Batsy Fluffentuft'
         ],
         name_pony_young: [
-            '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','Cake Twins','Button Mash','Berry Pinch'
+            '{name_pony_first_young}','Diamond Tiara','Silver Spoon','Babs Seed','Cake Twins','Button Mash','Berry Pinch','Pound Cake','Pumpkin Cake','Princess Flurry Heart'
         ],
         name_inanimate: [
-            'Bloomberg','Pinkie\'s imaginary friends','Tom','Mr. Smarty Pants'
+            'Bloomberg','Pinkie\'s imaginary friend','Tom','Mr. Smarty Pants',
+            'Maud\'s pet rock','Boulder','Diamond Tiara\'s tiara','Trixie\'s hat'
         ],
         name_pet: [
             'Angel Bunny','Winona','Opalescence','Gummy','Philomena','Owlowicious','Tank','Peewee','Tiberius','Cerberus'
@@ -322,16 +349,17 @@ try {
             'Adagio Dazzle','Aria Blaze','Sonata Dusk','The Mane-iac','Gilda','Diamond Dog','Ahuizotl','Garble','unnamed {race}','The Wonderbolts','Royal Guard'
         ],
         name_nonequestrian: [
-            'Bill Gates','Steve Jobs','an Alien','The Doctor','The Master','The President','The Servant','knighty','Sethisto','Autobots','Decepticons',
-            'Optimus Prime','Starscream','Soundwave','Iron Man','Batman','The HULK','The HUNK','Roger Moore','Chuck Norris','Scarlet Johanson',
-            'Luke Skywalker','Darth Vader','Yoda','Lance Armstrong','Bruce Willace','Batman','Britney Spears','Robin Williams'
+            'Bill Gates','Steve Jobs','an Alien','The Doctor','The President','knighty','Sethisto','Autobots','Decepticons',
+            'Optimus Prime','Iron Man','Batman','The HULK','Roger Moore','Chuck Norris','Scarlet Johanson',
+            'Luke Skywalker','Darth Vader','Yoda','Lance Armstrong','Bruce Willace','Batman','Britney Spears','Robin Williams',
+            'John De Lancy','M.A Larson'
         ],
         name_pony_titled: ['Prince {name_pony_first}','Princess {name_pony_first}', '{name_pony_titled_evil}'],
         name_pony_titled_evil: ['King {name_pony_first}', 'Nightmare {name_pony_1}'],
         name_pony_1: ['{name_pony_first}','{name_pony_last}', '{name_pony_first_young}'],
         name_pony_first: [
             'Celestia','Luna','Cadance','Flim','Flam','Cheerilee','Gizmo',
-            'Twilight','Applejack','Rarity','Fluttershy','Sombra','Joe',
+            'Twilight','Applejack','Tatzljack','Rarity','Fluttershy','Sombra','Joe',
             'Trixie','Fluffle Puff','Aloe','Lotus',
             'Big Mac','Spitfire','sauren','Fleetfoot',
             'Lyra', 'Derpy','Octavia','Roseluck','Thunderlane',
@@ -344,11 +372,13 @@ try {
         name_pony_last: ['Belle','Dash','Tiara','Spoon','Moon','Seed','Bon','Pie','Chrysalis'],
         race: [
             'Vampony','Zompony','Alicorn','Bat Pony','Human','Dragon','Changeling','Clone','Breezie',
-            'Parasprite','Pheonix','Timberwolf','Fruit Bat','Windigos'
+            'Centaur','Chimera','Cockatrice','Griffon',
+            'Bugbear','Parasprite','Pheonix','Timberwolf','Fruit Bat','Windigos'
         ],
         race_plural: [
-            'Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones',
-            'Parasprites','Pheonixes','Timberwolves','Fruit Bats','Windigo'
+            'Vamponies','Zomponies','Alicorns','Bat Ponies','Humans','Dragons','Changelings','clones','Breezies',
+            'Centaurs','Chimeras','Cockatrices','Griffons',
+            'Bugbears','Parasprites','Pheonixes','Timberwolves','Fruit Bats','Windigo'
         ]
     });
 } catch (e) {logger.SeverException('UnhandledException: {0}', e);}
