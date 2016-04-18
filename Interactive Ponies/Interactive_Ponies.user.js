@@ -64,7 +64,14 @@ var pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,
     { 3: "Oppan Pinkie Style;Pinkie Style;Eh~ Sexy Pony;Pinkie Pie Time;What does the Pony say? Chipi-chi-pow-chippy-cheep-chip-chip" });
 var Ponies = [
     Spacer('Mane Six', new DummyPony('Rainbow Dash')),
-    new SpecialPony('Twilight Sparkle', 'twi', 6, "Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!"),
+    offset(new SpecialPony('Twilight Sparkle', 'twi', 6,"Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!"), function(el, state) {
+        if (state == 'trot' && this.getState() == 1 || (state == 'stand' && this.getState() == 3)) {
+            el.css('margin-top', '-25px');
+        }
+        if ((state == 'trot'  || state == 'stand') && this.getState() > 3) {
+            el.css('margin-top', '-25px');
+        }
+    }),
     new SpecialPony('Princess Twilight', 'ptwi', 4, "Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!"),
     new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no"),
     new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*"),
@@ -464,7 +471,9 @@ var stateMap = {
     'stand_rainbow_right.gif': 'stand',
     'stand_rainbow_left.gif': 'stand',
     'fly_rainbow_right.gif': 'fly',
-    'fly_rainbow_left.gif': 'fly'
+    'fly_rainbow_left.gif': 'fly',
+    'trotcycle_rainbow_right.gif': 'trot',
+    'trotcycle_rainbow_left.gif': 'trot'
 };
 
 function Pony(name, key, sayings, args) {
