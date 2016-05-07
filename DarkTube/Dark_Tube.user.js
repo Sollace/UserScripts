@@ -1834,6 +1834,8 @@ var buttonStyling = '\
 
 var theme = getTheme();
 var isErrorPage = isErrorUrl(document.location.href);
+var isSettingsPage = isSettingsUrl(document.location.href);
+var themeSwitcher, themeNamer;
 run();
 
 function run() {
@@ -1863,26 +1865,74 @@ function run() {
     }
 }
 
+function htmlToDom(html) {
+    var dom = document.createElement('DIV');
+    dom.innerHTML = html;
+    html = dom.firstChild;
+    return html;
+}
+
+function addToSettings() {
+    if (isSettingsPage) {
+        var sections = document.getElementsByClassName('account-content');
+        if (sections && sections.length) {
+            section = sections[0].getElementsByClassName('account-section');
+            if (!(section && section.length)) {
+                section = htmlToDom('<div class="account-section"></div>');
+                sections[0].appendChild(section);
+            } else {
+                section = section[0];
+            }
+            var created = htmlToDom('\
+<div class="account-info-item">\
+    <span class="account-info-label">Current Theme</span>\
+    <div class="account-info account-user-info">\
+       <span class="theme">' + theme + '</span> (<a>Switch</a>)\
+    </div>\
+</div>');
+            section.appendChild(created);
+            themeNamer = created.getElementsByClassName('theme')[0];
+            created = created.getElementsByTagName('A')[0].onclick = function() {
+                updateState(theme == "Dark" ? 1 : 0);
+            };
+        }
+    }
+}
+
+function addToFooter() {
+    var footer = document.getElementById('google-help');
+    if (footer) {
+        var link = document.createElement('A');
+        link.setAttribute('class', 'yt-uix-button footer-history yt-uix-button-default yt-uix-button-size-default');
+        link.innerHTML = 'Toggle Theme';
+        link.onclick = function() {
+            updateState(theme == "Dark" ? 1 : 0);
+        };
+        footer.parentNode.insertBefore(link, footer);
+    }
+}
+
 function applyFull(addButtons) {
     addCss("main", buttonStyle);
     
     if (addButtons) {
         var options = document.createElement('DIV');
-        var themeSwitcher = createButton();
+        themeSwitcher = createButton();
         themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
         themeSwitcher.onclick = function() {
             updateState(theme == "Dark" ? 1 : 0);
         };
         options.appendChild(themeSwitcher);
+        document.ready = function() {
+            var container = document.createElement('DIV');
+            container.id = "DT_settingspanel";
+            container.appendChild(options);
+            document.body.appendChild(container);
+            addToSettings();
+            addToFooter();
+        }
     }
     
-    document.ready = function() {
-        var container = document.createElement('DIV');
-        container.id = "DT_settingspanel";
-        container.appendChild(options);
-        document.body.appendChild(container);
-    }
-
     if (theme == "Dark") {
         switchToDark();
     } else {
@@ -1897,16 +1947,17 @@ function applyFull(addButtons) {
             }
         });
     }
+}
 
-    function updateState(mode) {
-        if (mode == 1) {
-            switchToLight();
-        } else {
-            switchToDark();
-        }
-        reloadComments();
-        themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
+function updateState(mode) {
+    if (mode == 1) {
+        switchToLight();
+    } else {
+        switchToDark();
     }
+    reloadComments();
+    themeSwitcher.innerHTML = "<span class='yt-uix-button-content' > Switch Theme (" + theme + ")</span>";
+    if (themeNamer) themeNamer.innerHTML = theme;
 }
 
 function switchToDark() {
@@ -1967,6 +2018,10 @@ function isErrorTopPage() {
     return isErrorUrl(iframes.getAttribute('src'));
   }
   return false;
+}
+
+function isSettingsUrl(url) {
+    return url.split('?')[0].split('/').reverse()[0] == 'account';
 }
 
 function isErrorUrl(url) {
