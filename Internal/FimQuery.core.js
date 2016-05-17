@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.5
+// @version     1.0.6
 // @grant       none
 // ==/UserScript==
 
@@ -107,11 +107,9 @@ function getVendorPrefix() {
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
-    input = input.replace(/-\{0\}-/g, getVendorPrefix().css);
     var style = document.createElement('style');
-    style.setAttribute('type', 'text/css');
-    style.innerHTML = input;
+    style.type = 'text/css';
+    style.innerHTML = input.replace(/-\{0\}-/g, getVendorPrefix().css);
     if (id) style.id = id;
     document.head.appendChild(style);
 }
