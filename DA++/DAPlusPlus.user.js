@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.4
+// @version     1.4.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -13,7 +13,7 @@ function move(ref, id) {
     var element;
     if (typeof ref === 'string') {
         element = el(ref);
-        ref = element[0];
+        ref = element[0].previousSibling;
     } else if (move.isArray(ref)) {
         element = ref;
     } else {
@@ -65,15 +65,13 @@ move.isJQuery = function() {
 
 var ready = false;
 document.onmousemove = document.onready = run;
-setWhen(function() {
+var when = setWhen(function() {
     move('#oh-menu-shop', '#oh-loginbutton').move('#oh-menu-join').move('#oh-menu-split').move('.oh-mc-split').move('#oh-menu-deviant');
     var el = document.getElementById('gmi-MessageCenterDockAd');
     if (el != null) {
         el.parentNode.parentNode.removeChild(el.parentNode);
     }
-    if (!ready) {
-        run();
-    }
+    if (!ready) run();
 }, function() {
     return document.getElementById('oh-menu-shop') != null && (document.getElementById('oh-menu-split') != null || document.getElementById('oh-menu-loginButton')) || ready;
 });
@@ -114,6 +112,10 @@ if (document.location.href.indexOf('/notifications/') != -1) {
 }
 
 style += '\
+#oh-menu-deviant {\
+    border-left: none !important;}\
+#oh-menu-friends {\
+    border-left: 1px solid #38463B;}\
 #friendslink, #collectlink, #oh-menu-split .icon {\
     transition: color 0.5s ease;}\
 #friendslink:hover, #friendslink.active,\
@@ -135,6 +137,7 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 .tower-ad-header,\
 .sleekadfooter,\
 #gmi-MessageCenterDockAd,\
+#block-notice,\
 .mczone-you-know-what,\
 .sidebar-you-know-what, #sidebar-you-know-what,\
 .discoverytag_right_ad,\
@@ -146,6 +149,10 @@ style+= adSelector + ' {\
 move().style(style);
 
 function run() {
+    if (when) {
+        clearInterval(when);
+        when = false;
+    }
     try {
         if (move.isJQuery()) {
             deAd();
