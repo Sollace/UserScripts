@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.6
+// @version     1.6.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -190,7 +190,7 @@ RunScript.build = function(functionText) {
             }
             if (url.match(/^\/ajax\/(users|blog_posts|stories|group_thread)/g)) {
               var split = url.split('/').reverse();
-              if (split[0] == 'comments') return 'addcomment';
+              if (split[0] == 'comments') return {'eventName': 'addcomment'};
             }
             if (url.indexOf('/ajax/users/modules/') == 0) {
               var split = url.split('/').reverse();
