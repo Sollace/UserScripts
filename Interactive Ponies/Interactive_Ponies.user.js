@@ -253,6 +253,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }),
         sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", function(img) {
             switch (img) {
+                case 'sleep':
                 case 'stand': return /*stand*/ '//orig07.deviantart.net/29ff/f/2016/174/d/b/zephyr_breeze_idle_by_botchan_mlp-da7cajg.gif';
                 case 'dash':
                 case 'trot': return /*trot*/ '//orig04.deviantart.net/a010/f/2016/174/c/6/zephyr_breeze_trotting_by_botchan_mlp-da7calp.gif';
@@ -264,6 +265,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             switch (img) {
                 case 'stand': return /*stand*/'//orig00.deviantart.net/e908/f/2016/166/f/8/saffron_masala_idle_by_botchan_mlp-da6dlwo.gif';
                 case 'trot':
+                case 'sleep':
                 case 'dash': return /*trot*/'//orig11.deviantart.net/179e/f/2016/166/6/d/saffron_masala_trotting_by_botchan_mlp-da6dlyr.gif';
             }
         })),
@@ -271,6 +273,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             switch (img) {
                 case 'stand': return /*stand*/ '//orig02.deviantart.net/17f2/f/2016/173/3/d/coriander_cumin_idle_by_botchan_mlp-da7ak7v.gif';
                 case 'trot':
+                case 'sleep':
                 case 'dash': return /*trot*/ '//orig01.deviantart.net/22f0/f/2016/173/3/e/coriander_cumin_trotting_by_botchan_mlp-da7ak8k.gif';
             }
         })),
