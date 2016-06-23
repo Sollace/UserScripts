@@ -219,7 +219,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'dash': return buildRef(pon, img);
             }
         })),
-        new Pony('Starlight Glimmer', 'sg', "Stupid sticks...;That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Happy birthday to all the May ponies! And since no pony is more special than any other, happy birthday to all who don’t have a birthday in May;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", function(img) {
+        new Pony('Starlight Glimmer', 'sg', "That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", function(img) {
             switch (img) {
                 case 'sleep': return 'http://orig12.deviantart.net/9894/f/2016/129/0/5/starlight_glimmer_munching_popcorn_by_botchan_mlp-da1yivf.gif';
                 case 'stand': return 'http://orig00.deviantart.net/09be/f/2016/087/4/2/starlight_glimmer_idle_by_botchan_mlp-d9wrkr4.gif';
@@ -251,7 +251,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand': return /*stand*/'//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
             }
         }),
-        sleepless(new Pony('Zephyr Breeze', 'zb', "Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", function(img) {
+        sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", function(img) {
             switch (img) {
                 case 'stand': return /*stand*/ '//orig07.deviantart.net/29ff/f/2016/174/d/b/zephyr_breeze_idle_by_botchan_mlp-da7cajg.gif';
                 case 'dash':
@@ -259,7 +259,6 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'fly': return /*fly*/ '//orig15.deviantart.net/22ee/f/2016/174/a/a/zephyr_breeze_flying_by_botchan_mlp-da7f3fw.gif';
             }
         })),
-        //TODO: Masala quotes
         sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?",
                            function(img) {
             switch (img) {
@@ -268,7 +267,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'dash': return /*trot*/'//orig11.deviantart.net/179e/f/2016/166/6/d/saffron_masala_trotting_by_botchan_mlp-da6dlyr.gif';
             }
         })),
-        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', function() {
+        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', function(img) {
             switch (img) {
                 case 'stand': return /*stand*/ '//orig02.deviantart.net/17f2/f/2016/173/3/d/coriander_cumin_idle_by_botchan_mlp-da7ak7v.gif';
                 case 'trot':
