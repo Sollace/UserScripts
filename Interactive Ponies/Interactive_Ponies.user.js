@@ -61,8 +61,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         'fly_rainbow_right.gif': 'fly','fly_rainbow_left.gif': 'fly',
         'trotcycle_rainbow_right.gif': 'trot','trotcycle_rainbow_left.gif': 'trot'
     };
-    var pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more",
-                                    function(img, pon) {
+    var pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", function(img, pon) {
         switch (img) {
             case 'sleep4': 
             case 'sleep': return buildRef(pon, 'sleep');
@@ -85,8 +84,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
     }, { 3: "Oppan Pinkie Style;Pinkie Style;Eh~ Sexy Pony;Pinkie Pie Time;What does the Pony say? Chipi-chi-pow-chippy-cheep-chip-chip" });
     var Ponies = [
         Spacer('Mane Six', new DummyPony('Rainbow Dash')),
-        offset(new SpecialPony('Twilight Sparkle', 'twi', 6,"Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!",
-                               function(img,pon) {
+        offset(new SpecialPony('Twilight Sparkle', 'twi', 6,"Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img,pon) {
             switch (img) {
                 case 'sleep': return buildRef(pon, 'read');
                 case 'dash': return buildRef(pon, img);
@@ -106,8 +104,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 el.css('margin-top', '-25px');
             }
         }),
-        new SpecialPony('Princess Twilight', 'ptwi', 4, "Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!",
-                        function(img, pon) {
+        new SpecialPony('Princess Twilight', 'ptwi', 4, "Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img, pon) {
             switch (img) {
                 case 'sleep': return this.twi(img, pon);
                 case 'dash':
@@ -122,8 +119,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'trot4': return buildRef(pon, 'trot_d_w');
             }
         }),
-        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no",
-                 function(img, pon) {
+        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", function(img, pon) {
             switch (img) {
                 case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2012/215/a/1/applejack_sleeping_by_starsteppony-d59ovro.gif';
                 case 'dash': return /*dash*/'//fc01.deviantart.net/fs71/f/2013/111/d/a/applejack___galloping_by_rj_p-d62js4h.gif';
@@ -131,8 +127,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand': return buildRef(pon, img);
             }
         }),
-        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*",
-                        function(img, pon) {
+        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'dash':
@@ -141,8 +136,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'fly2': return buildRef(pon, 'fly');
             }
         }),
-        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*",
-                 function(img) {
+        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*", function(img) {
             switch(img) {
                 case 'stand': return /*stand*/'//fc04.deviantart.net/fs71/f/2014/100/3/3/farmpony_rarity_idle_by_botchan_mlp-d7dx8mn.gif';
                 case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2014/106/5/7/farmpony_rarity_scratching_her_head_by_botchan_mlp-d7ep6yl.gif';
@@ -151,8 +145,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             }
         }),
         isOnDay(31, 10) ?
-        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!",
-                                                                  function(img) {
+        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!", function(img) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//fc07.deviantart.net/fs71/f/2011/120/e/b/pinkamina_for_desktop_ponies_by_supersaiyanmikito-d3fagbu.gif';
@@ -183,8 +176,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 }
             }
         }) : pinkiePie,
-        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~",
-                                                                              function(img) {
+        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~", function(img) {
             switch (img) {
                 case 'sleep': return /*hang*/'http://orig11.deviantart.net/d520/f/2014/170/3/4/flutterbat_hanging_by_botchan_mlp-d7n1da6.gif';
                 case 'dash':
@@ -210,8 +202,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 if (Math.random() * 40 <= 5) this.Speak("*blushes*;Um, uh, oh my;...ow");
             }
         }),
-        Spacer('Secondary/Background Ponies', new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!",
-                                                       function(img, pon) {
+        Spacer('Secondary/Background Ponies', new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -260,12 +251,11 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'fly': return /*fly*/ '//orig15.deviantart.net/22ee/f/2016/174/a/a/zephyr_breeze_flying_by_botchan_mlp-da7f3fw.gif';
             }
         })),
-        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?",
-                           function(img) {
+        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?", function(img) {
             switch (img) {
+                case 'sleep':
                 case 'stand': return /*stand*/'//orig00.deviantart.net/e908/f/2016/166/f/8/saffron_masala_idle_by_botchan_mlp-da6dlwo.gif';
                 case 'trot':
-                case 'sleep':
                 case 'dash': return /*trot*/'//orig11.deviantart.net/179e/f/2016/166/6/d/saffron_masala_trotting_by_botchan_mlp-da6dlyr.gif';
             }
         })),
@@ -277,8 +267,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'dash': return /*trot*/ '//orig01.deviantart.net/22f0/f/2016/173/3/e/coriander_cumin_trotting_by_botchan_mlp-da7ak8k.gif';
             }
         })),
-        attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", 
-                                     function(img, pon) {
+        attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, img);
@@ -300,8 +289,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 }
             }
         }),
-        new Pony('Bon-Bon', 'bb', "Name's Drops, Agent, Sweetie Drops, but everypony around here just calls me Bon-Bon;I'm Bon-Bon. I make, uh, bon bons;Please tell me there's no bug bears here;Oh, Lyra~;Lyra!;I didn't put those in my bag;Is Fluttershy still here? We heard Fluttershy was here!;Go ahead, try one of your jokes out on me! I laugh at everything",
-                 function(img, pon) {
+        new Pony('Bon-Bon', 'bb', "Name's Drops, Agent, Sweetie Drops, but everypony around here just calls me Bon-Bon;I'm Bon-Bon. I make, uh, bon bons;Please tell me there's no bug bears here;Oh, Lyra~;Lyra!;I didn't put those in my bag;Is Fluttershy still here? We heard Fluttershy was here!;Go ahead, try one of your jokes out on me! I laugh at everything", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, img);
@@ -309,8 +297,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'trot': return buildRef(pon, 'trot');
             }
         }),
-        attachMemory(attachEvents(new SpecialPony('Derpy Hooves', 'duh', 3, "I messed up big time in those invitions Doc;Muffins!;I messed up everything for Cranky's wedding...;Hi;Muffins...;*waves*;Muffins?;I just don't know what went wrong;Muffin!;Hi, I'm Ditzy;I'm Derpy;Derp;Ooh bubbles;What you talkin' about;Heehee;Oh, you;Ponies feel bad cause of my eyes;*squee*;I'm on the weather team you know;Ima Derp, Derp, Derp...;I'm confused;Doctor?",
-                                                  function(img) {
+        attachMemory(attachEvents(new SpecialPony('Derpy Hooves', 'duh', 3, "I messed up big time in those invitions Doc;Muffins!;I messed up everything for Cranky's wedding...;Hi;Muffins...;*waves*;Muffins?;I just don't know what went wrong;Muffin!;Hi, I'm Ditzy;I'm Derpy;Derp;Ooh bubbles;What you talkin' about;Heehee;Oh, you;Ponies feel bad cause of my eyes;*squee*;I'm on the weather team you know;Ima Derp, Derp, Derp...;I'm confused;Doctor?", function(img) {
             switch (img) {
                 case 'sleep3':
                 case 'sleep': return /*sleep*/'//fc06.deviantart.net/fs71/f/2013/111/7/0/derpy_hooves___sleeping_by_rj_p-d62jl7t.gif';
@@ -379,8 +366,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 }
             }
         }), {'explode': false}),
-        new SpecialPony('Doctor Hooves', 'dr', 10, "Great Wickering Stallions!;Did you know there was a spell for time travel? I wish I'd known that...;I'll try my hardest not to die, honest;Not impossible. Just... a bit unlikely;I'm always alright;Timey wimey, spacey wacey;Briliant! You are briliant!;Fantastic!;Allons-y!;Don't mind me, off to save time and space;Trust me. I'm the Doctor;Eh, no thanks;Would you please leave me alone!",
-                        function(img, pon) {
+        new SpecialPony('Doctor Hooves', 'dr', 10, "Great Wickering Stallions!;Did you know there was a spell for time travel? I wish I'd known that...;I'll try my hardest not to die, honest;Not impossible. Just... a bit unlikely;I'm always alright;Timey wimey, spacey wacey;Briliant! You are briliant!;Fantastic!;Allons-y!;Don't mind me, off to save time and space;Trust me. I'm the Doctor;Eh, no thanks;Would you please leave me alone!", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'tand': return buildRef(pon, img);
@@ -391,8 +377,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'trot8': return /*trot_fez*/'//fc00.deviantart.net/fs70/f/2014/058/5/4/dr_hooves__fez_walk_by_comeha-d786hmv.gif';
             }
         }),
-        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals",
-                 function(img, pon) {
+        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -404,8 +389,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         //Soarin
         //Thunderlane
         //Fleetfoot
-        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..",
-                 function(img) {
+        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..", function(img) {
             switch (img) {
                 case 'stand':
                 case 'trot':
@@ -413,8 +397,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif';
             }
         }),
-        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining",
-                                          function(img) {
+        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", function(img) {
             switch (img) {
                 case 'sleep': return /*sleep*/'//orig02.deviantart.net/9ee0/f/2013/111/2/d/filly_rarity___sleeping_by_rj_p-d62kics.gif';
                 case 'stand': return /*stand*/'//orig13.deviantart.net/a968/f/2013/111/6/5/filly_rarity___standing_by_rj_p-d62keik.gif';
@@ -424,8 +407,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'trot': return /*trot*/'//orig03.deviantart.net/449b/f/2013/111/b/f/filly_rarity___trotting_by_rj_p-d62kfh7.gif';
             }
         })),
-        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!Hey!",
-                                    function(img, pon) {
+        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!Hey!", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -434,8 +416,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'fly': return buildRef(pon, img);
             }
         }), 0.3),
-        new SpecialPony('Apple Bloom', 'cmc1', 4, "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery.;Not the cupcakes!;Likely story.;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!",
-                        function(img, pon) {
+        new SpecialPony('Apple Bloom', 'cmc1', 4, "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery.;Not the cupcakes!;Likely story.;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!", function(img, pon) {
             switch (img) {
                 case 'stand': return buildRef(pon, img);
                 case 'trot2':
@@ -447,8 +428,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand4': return buildRef(pon, 'push_ups');
             }
         }),
-        new SpecialPony('Sweetie Belle', 'cmc2', 3, "I'm Sweeetiee Belle!;I wonder how that happened...;Stupid Horn!;Aww. That was such a sweet story;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.",
-                        function(img, pon) {
+        new SpecialPony('Sweetie Belle', 'cmc2', 3, "I'm Sweeetiee Belle!;I wonder how that happened...;Stupid Horn!;Aww. That was such a sweet story;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.", function(img, pon) {
             switch (img) {
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
@@ -462,9 +442,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }, {
             1: "Ughh! I'm so BORED!;Dumb fabric!",
             2: "I know this one!;Hammer!;You cannot run from me!;We could form our own secret society!;♪ We are the Cutie Mark Crusaders! ♫"}),
-        attachMemory(
-            isOnDay(1, 4) ? new Pony('Scootaloo', 'chicken', "I'm a..." + speechPause(10) + "chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Bukka bukka;Bukka bukka;Bukka bukka;Bukka bukka, scoot- SCOOTALOO!!!;Bukka...",
-                                     function(img, pon) {
+        attachMemory(isOnDay(1, 4) ? new Pony('Scootaloo', 'chicken', "I'm a..." + speechPause(10) + "chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Bukka bukka;Bukka bukka;Bukka bukka;Bukka bukka, scoot- SCOOTALOO!!!;Bukka...", function(img, pon) {
                 switch (img) {
                     case 'sleep':
                     case 'stand': return buildRef(pon, 'stand');
@@ -473,8 +451,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                     case 'fly': return buildRef(pon, img);
                 }
             })
-            : attachEvents(new Pony('Scootaloo', 'cmc3', "I swear, they make one more chicken joke I'm gonna- Pequawk! *blushes*;I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh;Bukka bukka;That is not how you call a chicken;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks;I'm liking this idea.;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!",
-                                    function(img, pon) {
+            : attachEvents(new Pony('Scootaloo', 'cmc3', "I swear, they make one more chicken joke I'm gonna- Pequawk! *blushes*;I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh;Bukka bukka;That is not how you call a chicken;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks;I'm liking this idea.;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!", function(img, pon) {
                 switch (img) {
                     case 'sleep':
                     case 'stand': return buildRef(pon, 'stand');
@@ -497,8 +474,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                     }
                 })('Hey!;Leave him alone!;What are you doing to Pip!?'.split(';'))
             }), {'special': false}),
-        new SpecialPony('Babs Seed', 'cmc4', 1, "Hey! That's not how you talk to my friends!;See ya later, Cutie Mark Crybabies!;Looks like somepony's pumpkin just got squashed!;*pooft*;Sup;Welcome to the Babs side 'a town;~bad seed, bad seed~ What? It's a catchy tune;Eh, I've seen better",
-                        function(img) {
+        new SpecialPony('Babs Seed', 'cmc4', 1, "Hey! That's not how you talk to my friends!;See ya later, Cutie Mark Crybabies!;Looks like somepony's pumpkin just got squashed!;*pooft*;Sup;Welcome to the Babs side 'a town;~bad seed, bad seed~ What? It's a catchy tune;Eh, I've seen better", function(img) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//fc01.deviantart.net/fs71/f/2014/081/f/8/babs_seed_idle_by_botchan_mlp-d7ba68n.gif';
@@ -510,8 +486,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'dash1': return /*trot_smug*/'//fc06.deviantart.net/fs71/f/2014/081/d/0/babs_seed_trotting__smug__by_botchan_mlp-d7ba6ch.gif';
             }
         }),
-        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate",
-                                                            function(img) {
+        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate", function(img) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//orig09.deviantart.net/bb27/f/2015/158/d/4/pipsqueak_idle_by_botchan_mlp-d8wftlv.gif';
@@ -561,8 +536,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 return null;
             }
         }),
-        offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^',
-                                  function(img) {
+        offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^', function(img) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/ '//orig01.deviantart.net/e24e/f/2016/091/7/7/flurry_heart_idle_by_botchan_mlp-d9x9ptq.gif';
@@ -572,8 +546,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         })), function(el, state) {
             if (state == 'stand' || state == 'sleep') el.css('margin-top', '-20px');
         }),
-        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P",
-                                        function(img) {
+        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P", function(img) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//fc08.deviantart.net/fs71/f/2014/157/1/0/fluffle_puff_phbbt_by_botchan_mlp-d7lcggr.gif';
