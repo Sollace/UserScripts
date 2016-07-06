@@ -5,6 +5,7 @@
 // @version     1.1.1
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
+// @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       none
 // ==/UserScript==
 
@@ -116,7 +117,8 @@ RunScript(function() {
         }
       }
       addGlobalStyle(sheet);
-      $('#format_colours').val(unsafeWindow.LocalStorageGet('format_colours_2', unsafeWindow.LocalStorageGet('format_colours', 'bow')));      unsafeWindow.UpdateColours();
+      $('#format_colours').val(unsafeWindow.LocalStorageGet('format_colours_2', unsafeWindow.LocalStorageGet('format_colours', 'bow')));
+      unsafeWindow.UpdateColours();
     }, add: function(category, name, style) {
       if (!data[category]) data[category] = {};
       data[category][name] = new ponyTheme(name, style);
