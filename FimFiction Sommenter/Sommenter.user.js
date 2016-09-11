@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.2.5
+// @version     2.3
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -88,20 +88,39 @@ body.pin_comment #add_comment_box {\
   margin: 0px;\
   bottom: 0px;\
   left: 0px;\
-  right: 0px;\
-  height: 90px;\
+  right: 98%;\
+  height: 60px;\
   border-radius: 0px;\
   z-index: 99999;}\
+@media (min-width: 1300px) {\
+  body.pin_comment #add_comment_box {\
+    right: calc(1300px + (100% - 1300px)/2);}}\
+body.pin_comment #add_comment_box::before {\
+  font-family: 'FontAwesome';\
+  font-size: 3em;\
+  position: absolute;\
+  top: 0;\
+  left: 0;\
+  display: block;\
+  content: '';\
+  height: 60px;\
+  width: 100%;\
+  text-align: center;\
+  line-height: 60px;}\
 body.pin_comment #add_comment_box:hover,\
 body.pin_comment.hold_comment #add_comment_box {\
+  right: 0;\
   height: 380px;}\
+body.pin_comment #add_comment_box:hover::before,\
+body.pin_comment.hold_comment #add_comment_box::before {\
+  display: none;}\
 body.pin_comment #add_comment_box textarea {\
   resize: none;}\
 body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) .format-toolbar {\
   display: none;}\
 body.pin_comment #add_comment_box,\
 body.pin_comment #add_comment_box textarea {\
-  transition: height 0.45s ease !important;}\
+  transition: height 0.45s ease, right 0.45s ease !important;}\
 body.pin_comment:not(.hold_comment) #add_comment_box:not(:hover) textarea {\
   min-height: 85px !important;\
   height: 85px !important;}\
