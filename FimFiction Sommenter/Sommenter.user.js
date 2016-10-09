@@ -12,9 +12,9 @@
 // ==/UserScript==
 
 var interactiveP = $('input[name="show_interactive_pony"]');
-if (interactiveP.length > 0) {
+if (interactiveP.length) {
   interactiveP = interactiveP.parent().parent().parent().parent();
-  var Option = $('<input type="checkbox" name="pin_comments">');
+  var Option = $('<input type="checkbox" name="pin_comments" />');
   var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
   row.find('.toggleable-switch').prepend(Option);
   interactiveP.before(row);
@@ -22,6 +22,14 @@ if (interactiveP.length > 0) {
   Option.click(function () {
     setPinComments(this.checked);
   });
+  Option = $('<input type="checkbox" name="compact" />');
+  row = $('<tr><td class="label">Minimise Comment Box to corner</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
+  row.find('.toggleable-switch').prepend(Option);
+  Option.attr('checked', getCompact());
+  Option.click(function() {
+    setCompact(this.checked);
+  });
+  interactiveP.before(row);
 }
 
 var commentBox = $("#add_comment_box .toolbar_buttons");
@@ -85,17 +93,20 @@ body.pin_comment .comments_pinner:before {\
   content: '';}\
 body.pin_comment #add_comment_box {\
   position: fixed;\
-  margin: 0px;\
-  bottom: 0px;\
-  left: 0px;\
-  right: 98%;\
-  height: 60px;\
+  margin: 0;\
+  bottom: 0;\
+  left: 0;\
+  right: 0;\
+  height: 90px;\
   border-radius: 0px;\
   z-index: 99999;}\
+body.pin_comment.hide_comment #add_comment_box {\
+  height: 60px;\
+  right: 98%;}\
 @media (min-width: 1300px) {\
-  body.pin_comment #add_comment_box {\
+  body.pin_comment.hide_comment #add_comment_box {\
     right: calc(1300px + (100% - 1300px)/2);}}\
-body.pin_comment #add_comment_box::before {\
+body.pin_comment.hide_comment #add_comment_box::before {\
   font-family: 'FontAwesome';\
   font-size: 3em;\
   position: absolute;\
@@ -160,10 +171,10 @@ body.pin_comment #add_comment_box:hover + #comment_preview {\
 
 function setupTogglePin(toolbar) {
   if ($('#add_comment_box_pin').length == 0) {
+    var bod = $('body');
     var tog = makeButton(toolbar, "Toggle Pin (Temporary)", "fa comments_pinner");
     $(tog).attr('id', 'add_comment_box_pin');
     $(tog).click(function () {
-      var bod = $('body');
       if (bod.hasClass('pin_comment')) {
         bod.removeClass('pin_comment');
       } else {
@@ -171,9 +182,8 @@ function setupTogglePin(toolbar) {
       }
     });
 
-    if (getPinComments()) {
-      $('body').addClass('pin_comment');
-    }
+    if (getPinComments()) bod.addClass('pin_comment');
+    if (getCompact()) bod.addClass('hide_comment');
   }
 }
 
@@ -188,6 +198,15 @@ function getPinComments() {
 
 function setPinComments(val) {
   GM_setValue('pin_comments', val ? 1 : 0);
+}
+
+//==API FUNCTION==//
+function getCompact() {
+  return GM_getValue('compact', 0) == 1;
+}
+
+function setCompact(val) {
+  GM_setValue('compact', val ? 1 : 0);
 }
 
 //--------------------------------------------------------------------------------------------------
