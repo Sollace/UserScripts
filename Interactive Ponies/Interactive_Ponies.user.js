@@ -8,14 +8,17 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @version     1.8.1
+// @version     1.8.2
 // @grant       none
 // ==/UserScript==
 
 /*---Fix for window_focused not being reset. Knighty pls.---*/
-$(document).on('focus', function() {
-  window.window_focused = true;
-});
+if (!window.__window_focused_fix) {
+    window.__window_focused_fix = true;
+    $(document).on('focus', function() {
+        window.window_focused = true;
+    });
+}
 
 /*\--------------------------------------------------------------------------------------------------
 |*|  Syntaxes:
