@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.6.1
+// @version     1.6.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -77,6 +77,21 @@ RunScript.build = function(functionText) {
   if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
     var scriptBody = function(ver) {
       var eventRegister = null;
+			var eventMap = {
+				'/ajax/comments/preview': 'previewcomment',
+				'/ajax/users/infocard': function(url) {
+					 return {
+						'eventName': 'infocard',
+						'user': /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')
+					};
+				},
+				'/ajax/notifications/mark-all-read': 'note_markread',
+				'/ajax/private-messages/mark-all-read': 'pm_markread',
+				'/ajax/notifications/list/drop-down': 'listnotes',
+				'/ajax/private-messages/list/drop-down': 'listpms',
+				'/ajax/feed': 'loadfeed',
+				'/ajax/emoticons/list': 'listemoticons'
+			};
       window.FimFicEvents = {
         'version': function() {
           return ver;
@@ -94,8 +109,7 @@ RunScript.build = function(functionText) {
           if (eventRegister) {
             var old = eventRegister;
             eventRegister = function(url) {
-              var e = evFunc(url);
-              return e || old(url);
+              return evFunc(url) || old(url);
             };
           } else {
             eventRegister = evFunc;
@@ -166,16 +180,12 @@ RunScript.build = function(functionText) {
         },
         'getEventName': function(url) {
           if (typeof(url) == 'string') {
-            switch (url){
-              case '/ajax/comments/preview': return {'eventName': 'previewcomment'};
-              case '/ajax/users/infocard': return {'eventName': 'infocard', 'user': /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')}
-              case '/ajax/notifications/mark-all-read': return {'eventName':'note_markread'};
-              case '/ajax/private-messages/mark-all-read': return {'eventName':'pm_markread'};
-              case '/ajax/notifications/list/drop-down': return {'eventName': 'listnotes'};
-              case '/ajax/private-messages/list/drop-down': return {'eventName': 'listpms'};
-              case '/ajax/feed': return {'eventName': 'loadfeed'};
-              case '/ajax/emoticons/list': return {'eventName': 'listemoticons'};
-            }
+						if (eventMap[url]) {
+							if (typeof(eventMap[url]) == 'string') {
+								return {'eventName': eventMap[url]};
+							}
+							return eventMap[url](url);
+						}
             if (url.indexOf('/ajax/private-messages/new?receiver=') == 0) {
               var split = url.split('?').reverse()[0];
               var event = {'eventName': 'composepm', 'recipient': '', 'subject': ''};
