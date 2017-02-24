@@ -8,7 +8,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @version     1.8.2
+// @version     1.9
 // @grant       none
 // ==/UserScript==
 
@@ -110,8 +110,8 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }),
         new SpecialPony('Princess Twilight', 'ptwi', 4, "Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img, pon) {
             switch (img) {
-                case 'sleep': return this.twi(img, pon);
-                case 'dash':
+                case 'sleep': return buildRef('twi', 'read');
+                case 'dash': return buildRef(pon, 'trot');
                 case 'fly':
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
@@ -134,9 +134,9 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", function(img, pon) {
             switch (img) {
                 case 'sleep':
-                case 'dash':
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
+                case 'dash': return buildRef(pon, 'trot');
                 case 'fly2': return buildRef(pon, 'fly');
             }
         }),
@@ -393,6 +393,97 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         //Soarin
         //Thunderlane
         //Fleetfoot
+        (function(pony) {
+            var Mode = Math.floor((Math.random() * 100) % 4);
+            pony.__getSprite = pony.getSprite;
+            pony.getSprite = function(elem, face, base, url) {
+                var other = this.getMemory('disguise');
+                if (other && this.cache.ready) return other.getSprite(elem, face, base, url);
+                return this.__getSprite(elem, face, base, url);
+            };
+            pony.__cssImages = pony.cssImages;
+            pony.cssImages = function(elem, face) {
+                var other = this.getMemory('disguise');
+                if (other) return other.cssImages(elem, face);
+                return this.__cssImages(elem, face);
+            }
+            pony.__bakeGif = pony.bakeGif;
+            pony.bakeGif = function(url, suffex, cache) {
+                return this.__bakeGif(url, suffex == '' ? Mode : suffex, cache);
+            };
+            pony.cacheSprites = function(other) {
+                if (other == this) return null;
+                this.cache.cache(other.bakeSprite('sleep'));
+                this.cache.cache(other.bakeSprite('dash'));
+                this.cache.cache(other.bakeSprite('stand'));
+                this.cache.cache(other.bakeSprite('trot'));
+                this.cache.cache(other.bakeSprite('fly'));
+                return other;
+            };
+            return pony;
+        })(attachCache(attachMemory(attachEvents(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", function(img, pon) {
+            switch (img) {
+                case 'sleep0':  
+                case 'stand0': return 'http://orig07.deviantart.net/f1f0/f/2017/045/a/4/changeling__1_idle_by_botchan_mlp-daz1acl.gif';
+                case 'dash0':
+                case 'trot0': return 'http://orig15.deviantart.net/a5f3/f/2017/045/2/b/changeling__1_trotting_by_botchan_mlp-daz1ad2.gif';
+                case 'fly0': return 'http://orig01.deviantart.net/753d/f/2017/045/6/9/changeling__1_flying_by_botchan_mlp-daz1ade.gif';
+                case 'sleep1':  
+                case 'stand1': return 'http://orig08.deviantart.net/9f1a/f/2017/045/6/7/changeling__3_idle_by_botchan_mlp-daz1bqo.gif';
+                case 'dash1':
+                case 'trot1': return 'http://orig06.deviantart.net/f9e6/f/2017/045/c/7/changeling__3_trotting_by_botchan_mlp-daz1br4.gif';
+                case 'fly1': return 'http://orig10.deviantart.net/3a37/f/2017/045/d/6/changeling__3_flying_by_botchan_mlp-daz1brj.gif';
+                case 'sleep2':  
+                case 'stand2': return 'http://orig05.deviantart.net/b056/f/2017/045/e/9/changeling__4_idle_by_botchan_mlp-daz1c2t.gif';
+                case 'dash2':
+                case 'trot2': return 'http://orig00.deviantart.net/3487/f/2017/045/d/4/changeling__4_trotting_by_botchan_mlp-daz1c3c.gif';
+                case 'fly2': return 'http://orig13.deviantart.net/bb70/f/2017/045/c/f/changeling__4_flying_by_botchan_mlp-daz1c3p.gif';
+                case 'sleep3':  
+                case 'stand3': return 'http://orig07.deviantart.net/ff8a/f/2017/045/3/b/changeling__6_idle_by_botchan_mlp-daz1csz.gif';
+                case 'dash3':
+                case 'trot3': return 'http://orig13.deviantart.net/3fd0/f/2017/045/8/5/changeling__6_trotting_by_botchan_mlp-daz1ctt.gif';
+                case 'fly3': return 'http://orig10.deviantart.net/996b/f/2017/045/2/3/changeling__6_flying_by_botchan_mlp-daz1cuh.gif';
+            }
+        }), {
+            'mouseover': function() {
+                if (!this.ponyType().cache.ready) return;
+                this.ponyType().setMemory('disguise', this.ponyType().cacheSprites(pickOne(Ponies)));
+            },
+            'tick': function() {
+                if (!this.ponyType().cache.ready) return;
+                var disguise = this.ponyType().getMemory('disguise');
+                var ticks_disguised = this.ponyType().getMemory('ticks_to_change');
+                if (ticks_disguised-- <= 0) {
+                    if (disguise) {
+                        this.ponyType().setMemory('disguise', null);
+                        ticks_disguised = 900;
+                    } else {
+                        if (Math.random() * 1000 <= 5) {
+                            this.ponyType().setMemory('disguise', this.ponyType().cacheSprites(pickOne(Ponies)));
+                            console.log('Changed!');
+                        }
+                        ticks_disguised = 400;
+                    }
+                }
+                this.ponyType().setMemory('ticks_to_change', ticks_disguised);
+            },
+            'say': function() {
+                if (Math.random() * 30 < 10) {
+                    var other = this.ponyType().getMemory('disguise');
+                    if (other) {
+                        if (Math.random() * 2 < 1) {
+                            var says = "Do you like /{n}/?;Hi, I'm... /{n}/!;You do like /{n}/, don't you?".split(';');
+                            return pickOne(says).replace('{n}', other.Name);
+                        }
+                        return '~' + other.getSay(a) + '~';
+                    }
+                }
+                return null;
+            }
+        }), {
+            disguise: null,
+            ticks_to_change: 900
+        }))),
         new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..", function(img) {
             switch (img) {
                 case 'stand':
@@ -562,6 +653,42 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }))
     ];
 
+    var CustomPony = {
+        "name": "Rainbow Dash",
+        "sayings": dash_sayings,
+        "sprites": {
+            "sleep": "https://static.fimfiction.net/images/interactive_pony/dash/cloud_sleep_right.gif",
+            "stand": "https://static.fimfiction.net/images/interactive_pony/dash/stand_rainbow_right.gif",
+            "trot": "https://static.fimfiction.net/images/interactive_pony/dash/trotcycle_rainbow_right.gif",
+            "dash": "https://static.fimfiction.net/images/interactive_pony/dash/dashing_right.gif",
+            "fly": "https://static.fimfiction.net/images/interactive_pony/dash/fly_rainbow_right.gif"
+        }
+    };
+    try {
+        if (localStorage['custom_pony']) {
+            CustomPony = JSON.parse(localStorage['custom_pony']);
+        }
+    } catch (e) {}
+    
+    Ponies.push((function(pony) {
+        pony.getSay = function() {
+            return CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...";
+        };
+        pony.bakeGif = function(url, suffex, cache) {
+            return this.bakeSprite(stateMap[url] + suffex);
+        };
+        pony.bakeSprite = function(img) {
+            return CustomPony.sprites[img];
+        }
+        pony.args = function() {
+            return CustomPony;
+        }
+        pony.Name = CustomPony.name;
+        return pony;
+    })(new Pony('Custom', 'custom', '', function(img) {
+        return CustomPony.sprites[img];
+    })));
+    
     var PoniesRegister = {};
     for (var i = 0; i < Ponies.length; i++) {
         PoniesRegister[Ponies[i].Id] = Ponies[i];
@@ -625,6 +752,35 @@ function extendOriginalSays(pony, ratio) {
         if (Math.random() < ratio) return s.call(this, a);
         return a;
     };
+    return pony;
+}
+
+function attachCache(pony) {
+    var record = {};
+    var loading = 0;
+    pony.cache = {
+        ready: true,
+        cache: function(img) {
+            if (record[img] == undefined) {
+                record[img] = false;
+                this.ready = false;
+                loading++;
+                var image = $('<img src="' + img + '" style="display:none;" />');
+                image.on('load', function() {
+                    image.remove();
+                    record[img] = true;
+                    loading--;
+                    pony.cache.ready = loading <= 0;
+                });
+                image.on('error', function() {
+                   image.remove();
+                    loading--;
+                    pony.cache.ready = loading <= 0;
+                });
+            }
+            return img;
+        }
+    }
     return pony;
 }
 
@@ -697,13 +853,16 @@ function SpecialPony(name, key, level, sayings, giffactory, args) {
         var result = null;
         for (var looked = Active; looked > 0; looked--) {
             if (!Specials[looked]) Specials[looked] = {};
-            result = parent.bakeGif(Specials[looked], url, looked);
+            result = parent.bakeGif(url, looked, Specials[looked]);
             if (result) return result;
-            result = parent.bakeGif(Specials[looked], url.replace('fly', 'trotcycle'), looked);
+            result = parent.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
             if (result) return result;
         }
         return parent.getSprite(elem, face, base, url);
     };
+    this.bakeSprite = function(img) {
+        return parent.bakeSprite(img);
+    }
     this.getAccess = function(elem, face, base, url) {
         next_active_timer = (next_active_timer + 1) % 11;
         if (next_active_timer == 0) Active = Math.floor(Math.random() * (level + 1));
@@ -711,31 +870,25 @@ function SpecialPony(name, key, level, sayings, giffactory, args) {
         var result = null;
         for (var looked = Active; looked > 0; looked--) {
             if (!SpecialAccess[looked]) SpecialAccess[looked] = {};
-            result = parent.bakeGif(SpecialAccess[looked], url, '_ac' + looked);
+            result = parent.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
             if (result) return result;
-            result = parent.bakeGif(SpecialAccess[looked], url.replace('fly', 'trotcycle'), '_ac' + looked);
+            result = parent.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
             if (result) return result;
         }
         return parent.getAccess(elem, face, base, url);
     };
-    this.cssImages = function(elem, face, url) {
-        parent.cssImages(elem, face, url);
-        for (var looked = Active + 1; looked > 0; looked--) {
-            var effect = args['effect' + looked];
-            if (effect != undefined) {
-                $(effect[0]).css(effect[1], effect[2]);
-                elem.attr('data_target', effect[0]);
-                elem.attr('data_label', effect[1]);
-            }
-        }
+    this.cssImages = function(elem, face) {
+        parent.internal__cssImages(elem, face);
+        args = parent.args();
         if (args.effect && (args.effect.level == undefined || args.effect.level == Active)) {
-            (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
-            elem.attr('data_target', args.effect.target);
-            elem.attr('data_label', args.effect.label);
-        } else {
-            var anim_target = elem.attr('data_target');
-            if (anim_target != null && anim_target != '') {
-                (anim_target === 'self' ? elem : elem.find(anim_target)).css(elem.attr('data_label'), '');
+            if (args.effect.css) {
+                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.css);
+                elem.attr('data-target', args.effect.target);
+                elem.attr('data-label', Object.keys(args.effect.css).join(';'));
+            } else {
+                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
+                elem.attr('data-target', args.effect.target);
+                elem.attr('data-label', args.effect.label);
             }
         }
     };
@@ -751,20 +904,26 @@ function Pony(name, key, sayings, giffactory, args) {
     this.Grounded = !giffactory('fly', key);
     this.getSay = function(a) {return pickOne(sayings);}
     this.getSprite = function(elem, face, base, url) {
-        return this.bakeGif(Images, this.resolveUrl(face, url), '');
+        return this.bakeGif(this.resolveUrl(face, url), '', Images);
     };
     this.getAccess = function(elem, face, base, url) {
-        return this.bakeGif(Accessories, this.resolveUrl(face, url), '_ac');
+        return this.bakeGif(this.resolveUrl(face, url), '_ac', Accessories);
     };
     this.resolveUrl = function(face, url) {
         if (this.Grounded) url = url.replace('fly', 'trotcycle');
         return face == 'left' ? url.replace('left', 'right') : url;
     };
-    this.bakeGif = function(cache, url, suffex) {
-        if (cache[url] === undefined) cache[url] = giffactory(stateMap[url] + suffex, key) || null;
+    this.bakeGif = function(url, suffex, cache) {
+        if (cache[url] === undefined) cache[url] = this.bakeSprite(stateMap[url] + suffex, key);
         return cache[url];
     };
-    this.cssImages = function(elem, face) {
+    this.bakeSprite = function(img) {
+        return giffactory(img, key) || null;
+    }
+    this.args = function() {
+      return args;
+    };
+    this.internal__cssImages = function(elem, face) {
         if (face == 'left') {
             elem.find('img.interactive_pony').css('transform', 'scaleX(-1)');
             elem.find('img.interactive_pony_accessory').css({'transform': 'scaleX(-1)','left': '-30px','right': ''});
@@ -772,14 +931,25 @@ function Pony(name, key, sayings, giffactory, args) {
             elem.find('img.interactive_pony').css('transform', '');
             elem.find('img.interactive_pony_accessory').css({'transform': '','left': '','right': '-30px'});
         }
+    };
+    this.cssImages = function(elem, face) {
+        this.internal__cssImages(elem, face);
+        args = this.args();
+        var anim_target = elem.attr('data-target');
+        if (anim_target != null && anim_target != '') {
+            anim_target = (anim_target === 'self' ? elem : elem.find(anim_target));
+            var anim_label = elem.attr('data-label').split(';');
+            for (var i = anim_label.length; i--;) anim_target.css(anim_label[i], '');
+        }
         if (args.effect) {
-            (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
-            elem.attr('data_target', args.effect.target);
-            elem.attr('data_label', args.effect.label);
-        } else {
-            var anim_target = elem.attr('data_target');
-            if (anim_target != null && anim_target != '') {
-                (anim_target === 'self' ? elem : elem.find(anim_target)).css(elem.attr('data_label'), '');
+            if (args.effect.css) {
+                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.css);
+                elem.attr('data-target', args.effect.target);
+                elem.attr('data-label', Object.keys(args.effect.css).join(';'));
+            } else {
+                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
+                elem.attr('data-target', args.effect.target);
+                elem.attr('data-label', args.effect.label);
             }
         }
     };
@@ -1082,13 +1252,17 @@ function setupMorePonies() {
 function addOptionsSelect() {
     var interactiveP = $('input[name="show_interactive_pony"]');
     if (interactiveP.length) {
-        interactiveP.parent().closest('tr').after('<tr><td class="label">Interactive Pony Type</td><td><div id="ponyTypeDiv" /></td></tr>');
+        interactiveP.parent().closest('tr').after('<tr><td class="label">Interactive Pony Type</td><td><div id="ponyTypeDiv" /></td></tr><tr id="custom_pony_field" style="' + (GlobalPonyType != 'Custom' ? 'display:none' : '') + '"><td class="label">Custom interactive Pony</td><td><div id="pony_customDiv" /></td></tr>');
         var InteractivePonyType = '<select name="interactive_pony_type">';
         for (var i = 0; i < Ponies.length; i++) {
             if (Ponies[i].section) {
                 InteractivePonyType += (i ? '</optgroup>' : '') + '<optgroup label="' + Ponies[i].section + '">';
             }
-            InteractivePonyType += '<option value="' + Ponies[i].Name + '">' + Ponies[i].Name + '</option>';
+            if (Ponies[i].Id == 'Custom') {
+                InteractivePonyType += '<option id="custom_option" value="Custom">Custom (' + Ponies[i].Name + ')</option>';
+            } else {
+                InteractivePonyType += '<option value="' + Ponies[i].Name + '">' + Ponies[i].Name + '</option>';
+            }
         }
         InteractivePonyType += '</select>';
         InteractivePonyType = $(InteractivePonyType);
@@ -1096,6 +1270,23 @@ function addOptionsSelect() {
         InteractivePonyType.val(GlobalPonyType);
         InteractivePonyType.change(function() {
             setPonyType(this.value);
+            if (this.value == 'Custom') {
+                $('#custom_pony_field').css('display', '');
+            } else {
+                $('#custom_pony_field').css('display', 'none');
+            }
+        });
+        $('option#custom_option').text('Custom (' + CustomPony.name + ')');
+        var pony_custom = $('<textarea style="resize:vertical;min-height:500px;">');
+        pony_custom.val(JSON.stringify(CustomPony, null, 4));
+        $('#pony_customDiv').append(pony_custom);
+        pony_custom.on('change keyup', function() {
+            try {
+                CustomPony = JSON.parse(localStorage['custom_pony'] = this.value);
+                PoniesRegister.Custom.Name = CustomPony.name;
+                $('option#custom_option').text('Custom (' + CustomPony.name + ')');
+            } catch (e) {}
+            GlobalInteractivePony.ponySwitched();
         });
     }
 }
