@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.6.1
+// @version     2.6.2
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -39,6 +39,8 @@ var mainCss = '\
     background-color: rgba(90, 90, 90, 0.7) !important;}\
 .yt-uix-checkbox-on-off input[type="checkbox"]:checked + label {\
     background-color: #F12B24 !important;}\
+.yt-uix-checkbox-on-off .toggle {\
+    background: #1b1b1b !important;}\
 \
 #progress {\
     background: #e0f !important;}\
