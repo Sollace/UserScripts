@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.6
+// @version     2.6.1
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -97,9 +97,9 @@ var mainCss = '\
 .yt-uix-button-icon-settings-material,\
 .yt-uix-button-icon-material-upload,\
 .c4-editor-move-down::before, .c4-editor-move-up::before,\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-highlights::before,\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-none::before,\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-all::before,\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-highlights::before,\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-none::before,\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-all::before,\
 .watch-secondary-actions .addto-button:before, .action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before,\
 .action-panel-trigger-share:before,\
 #action-panel-overflow-button:before, .action-panel-trigger-overflow:before,\
@@ -320,11 +320,11 @@ var mainCss = '\
     background-position: 0px 0px !important;}\
 .dashboard-widget-handle {\
     background-position: -16px -302px !important;}\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-highlights::before {\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-highlights::before {\
     background-position: -95px -23px !important;}\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-none::before {\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-none::before {\
     background-position: -112px -23px !important;}\
-.yt-uix-subscription-preferences-button.yt-uix-subscription-preferences-bell.yt-uix-subscription-notifications-all::before {\
+.yt-uix-subscription-preferences-button.yt-uix-subscription-notifications-all::before {\
     background-position: -129px -23px !important;}\
 .yt-uix-button-icon-icon-account-settings {\
     opacity: 0.6;\
