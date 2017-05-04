@@ -7,7 +7,7 @@
 // @include     https://apis.google.com/*
 // @include     https://plus.google.com/*
 // @run-at      document-start
-// @version     2.6.2
+// @version     2.7
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
@@ -31,44 +31,79 @@ var resources = {
         'http://i.imgur.com/7MKyXvO.png'
     ]
 };
-
-var mainCss = '\
-/* Global */\
+var icons_css = {
+    default: '\
+#yt-masthead #logo-container .logo, #masthead-logo, #footer-container #footer-logo, .footer-container .footer-logo, .footer-logo-icon, .yt-uix-button-icon-appbar-guide {\
+  background: url(' + resources.hitchhiker + ') !important;}\
+@media only screen and (min-width: 0px) and (max-width: 498px), only screen and (min-width: 499px) and (max-width: 704px) {\
+  .exp-responsive #yt-masthead #logo-container {\
+    background: url(' + resources.hitchhiker + ') !important;\
+    background-repeat: no-repeat !important;\
+    background-position: -4px -998px !important;}}\
 \
-.yt-uix-checkbox-on-off label  {\
-    background-color: rgba(90, 90, 90, 0.7) !important;}\
-.yt-uix-checkbox-on-off input[type="checkbox"]:checked + label {\
-    background-color: #F12B24 !important;}\
-.yt-uix-checkbox-on-off .toggle {\
-    background: #1b1b1b !important;}\
+#yt-masthead #logo-container .logo, #masthead-logo {\
+    background-repeat: no-repeat !important;\
+    background-position: 0px -1414px !important;}\
+#footer-container #footer-logo, .footer-container .footer-logo, .footer-logo-icon {\
+    background-position: 0px -1414px !important;}\
+#masthead-positioner:hover .yt-uix-button-icon-appbar-guide,\
+.yt-uix-button-icon-appbar-guide {\
+    background-position: 0px -249px !important;}\
 \
-#progress {\
-    background: #e0f !important;}\
+.yt-uix-button-icon-dismissal,\
+.yt-uix-button-icon-material-upload,\
+.search-icon, #masthead-search .search-btn-component .yt-uix-button-content, .vm-search-btn .yt-uix-button-content,\
+#channel-header-vm-link .header-action-icon, .header-action-icon.vm-icon,\
+#creator-sidebar .creator-sidebar-section h3 a > .studio-icon,\
+.dashboard-widget-handle,\
+.pl-header-title-icon,\
+.yt-uix-button-icon-view-list, .yt-uix-button-icon-view-module,\
+.yt-help-icon, .autoplay-bar .autoplay-info-icon,\
+.vm-list-view .vm-video-metric .yt-sprite,\
+.yt-ui-menu-item.has-icon::before,\
+.yt-uix-button-has-icon::before,\
+.yt-uix-button-default::before,\
+.yt-uix-button-default .yt-uix-button-icon {\
+  filter: invert(1) !important;}\
+.creator-bar-item .yt-uix-button-icon {\
+  filter: invert(1) !important;\
+  opacity: 0.6;}\
+.yt-uix-button-icon-view-list, .yt-uix-button-icon-view-module,\
+.c4-editor-edit::before,\
+.yt-uix-button-icon-footer-language {\
+  opacity: 0.5 !important;}',
+    comments_default: '\
+#comment-section-renderer .comment-renderer-footer .sprite-like::before,\
+#comment-section-renderer .comment-renderer-footer .sprite-dislike::before {\
+  filter: invert(1) !important;}\
 \
-.yt-uix-button-arrow {\
-    border-top-color: #B8B8B8 !important;}\
-.yt-uix-inlineedit-form, .yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit,\
-.yt-lockup-notifications-container, .yt-lockup-tile {\
-    border-color: #303030 !important;}\
-\
-#creator-page-content.yt-card, .yt-card {\
-    border-color: #303030 !important;\
-    background: #1B1B1B !important;}\
-.yt-dialog-title {\
-    color: #aaa !important;}\
-.yt-dialog-footer {\
-    border-color: #303030 !important;\
-    background: none !important;}\
-.video-list .video-list-item .stat {\
-    color: #666;}\
-\
-/*Overlays*/\
-.yt-uix-inlineedit-loading-overlay, .yt-dialog-working-overlay, #dashboard-no-videos-overlay {\
-    background-color: rgba(20,20,20,0.89) !important;\
-    border: #303030 !important;}\
-\
-/*Icon/Texture replacement*/\
-#yt-masthead #logo-container .logo, #masthead-logo, #footer-container #footer-logo, .footer-container .footer-logo, .footer-logo-icon, .yt-uix-button-icon-appbar-guide,\
+.addto-watch-later-button-success::before,\
+#comment-section-renderer .sprite-like[aria-checked="true"]::before,\
+#comment-section-renderer .sprite-dislike[aria-checked="true"]::before,\
+.yt-uix-button-subscribe-branded::before {\
+    filter: invert(0) !important;}',
+    yt_center_default: '\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
+    filter: invert(1) !important;}\
+body[class*=ytcenter] #watch-like.yt-uix-button-toggled:before,\
+body[class*=ytcenter] #watch-like.yt-uix-button-toggled:after,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:before,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:after,\
+body[class*=ytcenter] .like-button-renderer-like-button.yt-uix-button-toggled::before,\
+body[class*=ytcenter] .like-button-renderer-like-button.yt-uix-button-toggled::after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button.yt-uix-button-toggled::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button.yt-uix-button-toggled::after {\
+  filter: none !important;}',
+    legacy: '#yt-masthead #logo-container .logo, #masthead-logo, #footer-container #footer-logo, .footer-container .footer-logo, .footer-logo-icon, .yt-uix-button-icon-appbar-guide,\
 .pl-header-privacy-only-me, .pl-header-privacy-everyone,\
 .feed-author-bubble, .yt-uix-button-icon-bell,\
 .yt-uix-button-icon-dismissal,\
@@ -89,6 +124,11 @@ var mainCss = '\
 .live-chat-widget .overflow-menu-button::before,\
 .live-chat-widget .post-button::before {\
     background: url(' + resources.hitchhiker + ') !important;}\
+@media only screen and (min-width: 0px) and (max-width: 498px), only screen and (min-width: 499px) and (max-width: 704px) {\
+  .exp-responsive #yt-masthead #logo-container {\
+    background: url(' + resources.hitchhiker + ') !important;\
+    background-repeat: no-repeat !important;\
+    background-position: -4px -998px !important;}}\
 \
 .live-chat-overflow-menu .chat-popout-menu::before,\
 .live-chat-widget .live-comments-emoji-picker-open::before,\
@@ -270,11 +310,11 @@ var mainCss = '\
     opacity: 0.5;\
     background-position: -4px -25px !important;}\
 .watch-secondary-actions .addto-button:before, .action-panel-trigger-addto:before, .action-panel-trigger-none-addto:before {\
-    background-position: 0px -4px !important;}\
+    background-position: -2px -3px !important;}\
 .action-panel-trigger-share:before {\
-    background-position: -60px -4px !important;}\
+    background-position: -58px -2px !important;}\
 #action-panel-overflow-button:before, .action-panel-trigger-overflow:before {\
-    background-position: -35px -4px !important;}\
+    background-position: -34px -3px !important;}\
 .playlist-status {\
     background-position: -79px -4px !important;}\
 .add-to-widget .contains-all-selected-videos .playlist-status, .add-to-widget .to-be-added .playlist-status {\
@@ -345,7 +385,88 @@ var mainCss = '\
 .live-chat-widget .overflow-menu-button::before {\
     background-position: -26px -60px;}\
 .live-chat-widget .post-button::before {\
-    background-position: -48px -59px;}\
+    background-position: -48px -59px;}',
+    comments_legacy: '\
+#comment-section-renderer .comment-renderer-footer .sprite-like::before,\
+#comment-section-renderer .comment-renderer-footer .sprite-dislike::before {\
+  background-image: url(' + resources.comment + ') !important;}\
+#comment-section-renderer .comment-renderer-footer .sprite-like::before {\
+    background-position: -1px -14px !important;}\
+#comment-section-renderer .comment-renderer-footer .sprite-dislike::before {\
+    background-position: -1px -161px !important;}',
+    yt_center_legacy: '\
+body[class*=ytcenter] #watch-like.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-like-button.yt-uix-button-toggled:not(:hover)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button.yt-uix-button-toggled:not(:hover)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
+    background-image: url(' + resources.highjacker + ') !important;}\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after {\
+    background-position: -2px -39px !important;}\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
+body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
+    background-position: -46px -40px !important;}\
+body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled) .yt-uix-button-content,\
+body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-content,\
+body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-content {\
+    color: #fff !important;}'
+};
+
+var mainCss = '\
+/* Global */\
+\
+' + expand(['::selection', '::-moz-selection', '::-webkit-selection'], ' {\
+  background: #555;\
+  color: #99b;\
+}') + '\
+\
+.yt-uix-checkbox-on-off label  {\
+    background-color: rgba(90, 90, 90, 0.7) !important;}\
+.yt-uix-checkbox-on-off input[type="checkbox"]:checked + label {\
+    background-color: #F12B24 !important;}\
+.yt-uix-checkbox-on-off .toggle {\
+    background: #1b1b1b !important;}\
+\
+#progress {\
+    background: #e0f !important;}\
+\
+.yt-uix-button-arrow {\
+    border-top-color: #B8B8B8 !important;}\
+.yt-uix-inlineedit-form, .yt-uix-tabs, .yt-picker-hr, .yt-picker-header, .safety-submit,\
+.yt-lockup-notifications-container, .yt-lockup-tile {\
+    border-color: #303030 !important;}\
+\
+#creator-page-content.yt-card, .yt-card {\
+    border-color: #303030 !important;\
+    background: #1B1B1B !important;}\
+.yt-dialog-title {\
+    color: #aaa !important;}\
+.yt-dialog-footer {\
+    border-color: #303030 !important;\
+    background: none !important;}\
+.video-list .video-list-item .stat {\
+    color: #666;}\
+\
+/*Overlays*/\
+.yt-uix-inlineedit-loading-overlay, .yt-dialog-working-overlay, #dashboard-no-videos-overlay {\
+    background-color: rgba(20,20,20,0.89) !important;\
+    border: #303030 !important;}\
+\
+/*Icon/Texture replacement*/\
+' + icons_css.default + '\
 \
 /*Developer Page*/\
 #page #yt-microsite {\
@@ -443,7 +564,7 @@ body #masthead-expanded-container {\
 .browse-list-item-container:hover .compact-shelf .yt-uix-shelfslider-prev, .compact-shelf:hover .yt-uix-shelfslider-prev,\
 .browse-list-item-container:hover .compact-shelf .yt-uix-shelfslider-next, .compact-shelf:hover .yt-uix-shelfslider-next {\
     border-color: #303030!important;}\
-.qualified-channel-title.ellipsized .qualified-channel-title-text {\
+.qualified-channel-title.ellipsized .qualified-channel-title-text, .question-shelf-heading h4 {\
     color: #aaa !important;}\
 .branded-page-related-channels, .branded-page-related-channels h2, .branded-page-related-channels h2 a {\
     color: #777 !important;}\
@@ -451,8 +572,14 @@ body #masthead-expanded-container {\
     border-right-color: #303030 !important;\
     border-bottom-color: #303030 !important;\
     border-left-color: #303030 !important;}\
-.branded-page-related-channels {\
+.branded-page-related-channels, .yt-ui-ellipsis {\
     background-color: #1b1b1b !important;}\
+#player-playlist .playlist-videos-list .yt-ui-ellipsis {\
+    background-color: #222 !important;}\
+#player-playlist .playlist-videos-list li:hover .yt-ui-ellipsis {\
+    background-color: #525252 !important;}\
+#player-playlist :not(.watch-queue-nav) .playlist-videos-list li.currently-playing .yt-ui-ellipsis {\
+    background-color: #3a3a3a !important;}\
 .branded-page-v2-primary-col > .yt-card, .pl-suggestions-section {\
     background: #1b1b1b !important;}\
 .pl-suggestions-section .section-description,\
@@ -497,8 +624,6 @@ body #masthead-expanded-container {\
     color: #aaa !important;}\
 .yt-lockup .yt-lockup-meta a, .yt-lockup .yt-lockup-description a {\
     color: #999 !important;}\
-#player, .yt-ui-ellipsis, .yt-uix-expander-ellipsis {\
-    background: none !important;}\
 .yt-ui-menu-content, #yt-uix-videoactionmenu-menu, .add-to-widget .playlists, .comments .mod-list {\
     background: #222 !important;\
     border-color: #444343 !important;}\
@@ -514,7 +639,7 @@ body #masthead-expanded-container {\
     float: inherit !important;}\
 .watch-branded-banner .player-branded-banner {\
     height: 0px !important;}\
-.action-panel-content, .watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-discussion, #watch7-sidebar-contents {\
+.watch-action-panels, #watch-discussion, #watch-header, #watch7-sidebar-discussion, #watch7-sidebar-contents {\
     background: #1b1b1b !important;}\
 .watch-action-buttons {\
     border-color: #444343 !important;}\
@@ -555,8 +680,10 @@ body #masthead-expanded-container {\
         background: #313131 !important;}\
     .branded-page-v2-body #channel-feed-post-form {\
         border-bottom-color: #303030 !important;}\
-    #watch-description.yt-uix-expander-collapsed #watch-description-content, #watch-description-clip, .yt-card .yt-uix-button-expander:hover {\
+    #watch-description.yt-uix-expander-collapsed #watch-description-content, #watch-description-clip, .yt-card .yt-uix-button-expander:hover, #action-panel-details a {\
         color: #aaa !important;}\
+    #action-panel-details:hover a {\
+       color: #167ac6 !important;}\
     #watch-response {\
         background: #1b1b1b !important;}\
     #watch-response-content {\
@@ -716,7 +843,7 @@ body #masthead-expanded-container {\
         border-color: #303030 !important;}\
     /* Channel Editing */\
     .channel-header, .channel-header .secondary-header-contents,\
-    .channel-header > div[class=""], .channel-header > .primary-header-contents {\
+    .channel-header > div[class=""] {\
         background-color: #1B1B1B !important;\
         border-bottom-color: #303030 !important;}\
     .channel-header > div[class=""] .branded-page-header-title a,\
@@ -765,7 +892,7 @@ body #masthead-expanded-container {\
     #creator-sidebar .creator-sidebar-section.selected > a.selected, #creator-sidebar .creator-sidebar-item.selected > a {\
         color: #fff !important;}\
     #creator-sidebar .creator-sidebar-section.selected,\
-    .creator-sidebar-section {\
+    .creator-sidebar-section, #creator-sidebar-separator {\
         border-color: #303030 !important;}\
 .creator-sidebar-section .creator-sidebar-item:not(.selected) a:hover, .creator-sidebar-section.selected .creator-sidebar-section-link, .creator-sidebar-section-link:hover {\
         background: #222 !important;}\
@@ -897,10 +1024,12 @@ body #masthead-expanded-container {\
     .ad-formats-overlay .form-area, .preview-area .ad-format-preview {\
         color: #888 !important;}\
     	/* List View */\
-    .vm-list-view .vm-video-list li {\
+    .vm-list-view .vm-video-list .vm-video-item {\
         background: #1b1b1b !important;}\
-    .vm-list-view .vm-video-item-content {\
-        border-bottom-color: #303030 !important;}\
+    .vm-list-view .vm-video-item-content-horizontal-divider {\
+        background-color: #303030 !important;}\
+    .vm-list-view .vm-video-side-view-count a {\
+        color: #aaa !important;}\
     .vm-list-view .vm-video-metrics {\
         background: #1b1b1b !important;\
         border-left-color: #303030 !important;}\
@@ -1078,7 +1207,6 @@ body #masthead-expanded-container {\
         color: #aaa !important;}\
     /* Watch Sidebar */\
     #watch7-sidebar .watch-sidebar-section {\
-        background: #1b1b1b !important;\
         border-color: #1b1b1b !important;}\
     .watch-branded #watch7-sidebar {\
         background: transparent !important;}\
@@ -1458,8 +1586,12 @@ body #masthead-expanded-container {\
   background-color: #2b2b2b !important;}\
 #sf-popupMenu .sf-menu-item:not(:hover) {\
   color: #aaa !important;}\
-.sf-quick-dl-btn {\
-  opacity: 0.5;}';
+#savefrom__yt_btn .sf-quick-dl-btn {\
+  border: 1px solid #007137 !important;\
+  background-color: #007b3c !important;\
+  opacity: 1;}\
+#savefrom__yt_btn .sf-quick-dl-btn:hover {\
+    background-color: #00682b !important;}';
 
 var noticesCss = '\
 .NEgqud, .Qgb, .shb, .khb, .gr, .iI, .eswd .sm, .o-Ie-Tk-c, .hhb, .vKFgJc, .bxpCne, .tubEcf {\
@@ -1562,13 +1694,7 @@ var nonIframeCommentsCss = '\
 #comment-section-renderer .comment-renderer-footer .sprite-like,\
 #comment-section-renderer .comment-renderer-footer .sprite-dislike {\
   background: none !important;}\
-#comment-section-renderer .comment-renderer-footer .sprite-like::before,\
-#comment-section-renderer .comment-renderer-footer .sprite-dislike::before {\
-  background-image: url(' + resources.comment + ') !important;}\
-#comment-section-renderer .comment-renderer-footer .sprite-like::before {\
-    background-position: -1px -14px !important;}\
-#comment-section-renderer .comment-renderer-footer .sprite-dislike::before {\
-    background-position: -1px -161px !important;}\
+' + icons_css.comments_default + '\
 .comment-simplebox-arrow .arrow-inner {\
   border-top-color: #333 !important;\
   border-right-color: #333 !important;}\
@@ -1659,36 +1785,8 @@ var buttonStyle = '\
 body[class*=ytcenter] #sb-wrapper .sb-card-arrow, #sb-wrapper .sb-card-body-arrow {\
   right: 92px;}';
 
+mainCss += icons_css.yt_center_default;
 mainCss += '\
-\
-body[class*=ytcenter] #watch-like.yt-uix-button-toggled:not(:hover):before,\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
-body[class*=ytcenter] .like-button-renderer-like-button.yt-uix-button-toggled:not(:hover)::before,\
-body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
-body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after,\
-body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
-body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled:not(:hover):before,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
-body[class*=ytcenter] .like-button-renderer-dislike-button.yt-uix-button-toggled:not(:hover)::before,\
-body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
-body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
-    background-image: url(' + resources.highjacker + ') !important;}\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled):after,\
-body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::before,\
-body[class*=ytcenter] .like-button-renderer-like-button:not(.yt-uix-button-toggled)::after {\
-    background-position: -2px -39px !important;}\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):before,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled):after,\
-body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::before,\
-body[class*=ytcenter] .like-button-renderer-dislike-button:not(.yt-uix-button-toggled)::after {\
-    background-position: -46px -40px !important;}\
-body[class*=ytcenter] #watch-like:not(.yt-uix-button-toggled) .yt-uix-button-content,\
-body[class*=ytcenter] #watch-dislike:not(.yt-uix-button-toggled) .yt-uix-button-content,\
-body[class*=ytcenter] #watch-dislike.yt-uix-button-toggled .yt-uix-button-content {\
-    color: #fff !important;}\
 \
 .element-focus, .element-focus-btn-wrapper, .ytcenter-dialog-fg, .ytcenter-list {\
     background: #1B1B1B !important;}\
@@ -2038,7 +2136,12 @@ function createButton(mode) {
     return result;
 }
 
-var INTERMEDIATE_CSS = "* {transition: none !important;}";
+function expand(prefixes, rule) {
+    prefixes.push('');
+    return prefixes.join(' ' + rule + '\n');
+}
+
+var INTERMEDIATE_CSS = "* {transition: filter linear 0.4s, background-color linear 0.4s, color linear 0.4s, border linear 0.4s, box-shadow linear 0.4s !important;}";
 
 function removeCss(name) {
     var transitionFix = makeStyle("transition_fix", INTERMEDIATE_CSS);
