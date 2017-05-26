@@ -8,14 +8,14 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @version     1.9
+// @version     1.9.1
 // @grant       none
 // ==/UserScript==
 
 /*---Fix for window_focused not being reset. Knighty pls.---*/
 if (!window.__window_focused_fix) {
     window.__window_focused_fix = true;
-    $(document).on('focus', function() {
+    $(window).on('focus', function() {
         window.window_focused = true;
     });
 }
@@ -1286,7 +1286,7 @@ function addOptionsSelect() {
                 PoniesRegister.Custom.Name = CustomPony.name;
                 $('option#custom_option').text('Custom (' + CustomPony.name + ')');
             } catch (e) {}
-            GlobalInteractivePony.ponySwitched();
+            if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
         });
     }
 }
