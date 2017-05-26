@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.7
+// @version     1.8
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,42 +70,52 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.6;
+  var ver = 1.8;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
   if (typeof (win.FimFicEvents) === 'undefined' || win.FimFicEvents.version() < ver) {
     var scriptBody = function(ver) {
       var eventRegister = null;
-			var eventMap = {
-				'/ajax/comments/preview': 'previewcomment',
-				'/ajax/users/infocard': function(url) {
-					 return {
-						'eventName': 'infocard',
-						'user': /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')
-					};
-				},
-				'/ajax/notifications/mark-all-read': 'note_markread',
-				'/ajax/private-messages/mark-all-read': 'pm_markread',
-				'/ajax/notifications/list/drop-down': 'listnotes',
-				'/ajax/private-messages/list/drop-down': 'listpms',
-				'/ajax/feed': 'loadfeed',
-				'/ajax/emoticons/list': 'listemoticons'
-			};
+      var eventMap = {
+        '/ajax/comments/preview': 'previewcomment',
+        '/ajax/users/infocard': function(url) {
+           return {
+            eventName: 'infocard',
+            user: /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')
+          };
+        },
+        '/ajax/notifications/mark-all-read': 'note_markread',
+        '/ajax/private-messages/mark-all-read': 'pm_markread',
+        '/ajax/notifications/list/drop-down': 'listnotes',
+        '/ajax/private-messages/list/drop-down': 'listpms',
+        '/ajax/feed': 'loadfeed',
+        '/ajax/emoticons/list': 'listemoticons',
+        '/ajax/toolbar/stories': function() {
+          return {
+            eventName: 'toolbar', type: 'stories'
+          }
+        },
+        '/ajax/toolbar/blog-posts': function() {
+          return {
+            eventName: 'toolbar', type: 'blogs'
+          }
+        }
+      };
       window.FimFicEvents = {
-        'version': function() {
+        version: function() {
           return ver;
         },
-        'on': function(name, func) {
+        on: function(name, func) {
           $(document).on(name,func);
         },
-        'off': function(name, event) {
+        off: function(name, event) {
           $(document).off(name,event);
         },
-        'trigger': function(name, event) {
+        trigger: function(name, event) {
           $(document).trigger(name, [event]);
         },
-        'subscribe': function(evFunc) {
+        subscribe: function(evFunc) {
           if (eventRegister) {
             var old = eventRegister;
             eventRegister = function(url) {
@@ -115,80 +125,83 @@ RunScript.build = function(functionText) {
             eventRegister = evFunc;
           }
         },
-        'setLogging': function() {
+        setLogging: function() {
           this.logging = 1;
         },
-        'PROXY': function(sender, func, args, m) {
+        PROXY: function(sender, func, args, m) {
           var a = args[0];
           if (typeof a === 'string') {
             a = args[0] = {url: a};
           }
-          var l = this.logging;
-          if (l) console.log('request: ' + a.url);
-          var event = this.getEventName(a.url);
-          if (event != null) {
-            if (l) console.log('event: ' + event.eventName);
-            event.url = a.url;
-            event.data = a.data;
-            var __success = a['success'] ? a.success : null;
-            a.success = function() {
-              try {
-                var result = undefined;
-                if (l) console.log('success (before): ' + arguments[0]);
-                event.result = arguments[0];
-                window.FimFicEvents.trigger('before' + event.eventName, event);
-                if (event.result) arguments[0] = event.result;
-                if (l) console.log('success (after): ' + arguments[0]);
-                if (__success) {
-                  result = __success.apply(this,arguments);
-                  if (l) console.log('success (result): ' + result);
-                }
-                event.result = arguments[0];
-                if (!m) window.FimFicEvents.trigger('after' + event.eventName, event);
-                return result;
-              } catch (e) {
-                console.log('success (error): version=' + this.version());
-                console.log('success (error): url=' + a.url);
-                console.log('success (error): event=' + (event ? event.eventName : 'undefined'));
-                console.log('success (error): ' + e);
-              }
-            };
-            if (m) {
-              var __complete = a['complete'] ? a.complete : null;
-              a.complete = function() {
-                var result = undefined;
+          if (!a.__fimficevents__) {
+            var l = this.logging;
+            if (l) console.log('request: ' + a.url);
+            var event = this.getEventName(a.url);
+            if (event != null) {
+              a.__fimficevents__ = this;
+              if (l) console.log('event: ' + event.eventName);
+              event.url = a.url;
+              event.data = a.data;
+              var __success = a['success'] ? a.success : null;
+              a.success = function() {
                 try {
-                  if (l) console.log('complete (before): ' + arguments[0]);
-                  if (__complete) {
-                    result = __complete.apply(this,arguments);
-                    if (l) console.log('complete (result): ' + result);
+                  var result = undefined;
+                  if (l) console.log('success (before): ' + arguments[0]);
+                  event.result = arguments[0];
+                  window.FimFicEvents.trigger('before' + event.eventName, event);
+                  if (event.result) arguments[0] = event.result;
+                  if (l) console.log('success (after): ' + arguments[0]);
+                  if (__success) {
+                    result = __success.apply(this,arguments);
+                    if (l) console.log('success (result): ' + result);
                   }
                   event.result = arguments[0];
-                  window.FimFicEvents.trigger('after' + event.eventName, event);
-                  if (l) console.log('complete (after): ' + arguments[0]);
+                  if (!m) window.FimFicEvents.trigger('after' + event.eventName, event);
+                  return result;
                 } catch (e) {
-                  console.log('complete (error): version=' + this.version());
-                  console.log('complete (error): url=' + a.url);
-                  console.log('complete (error): event=' + (event ? event.eventName : 'undefined'));
-                  console.log('complete (error): ' + e);
+                  console.log('success (error): version=' + this.version());
+                  console.log('success (error): url=' + a.url);
+                  console.log('success (error): event=' + (event ? event.eventName : 'undefined'));
+                  console.log('success (error): ' + e);
                 }
-                return result;
               };
+              if (m) {
+                var __complete = a['complete'] ? a.complete : null;
+                a.complete = function() {
+                  var result = undefined;
+                  try {
+                    if (l) console.log('complete (before): ' + arguments[0]);
+                    if (__complete) {
+                      result = __complete.apply(this,arguments);
+                      if (l) console.log('complete (result): ' + result);
+                    }
+                    event.result = arguments[0];
+                    window.FimFicEvents.trigger('after' + event.eventName, event);
+                    if (l) console.log('complete (after): ' + arguments[0]);
+                  } catch (e) {
+                    console.log('complete (error): version=' + this.version());
+                    console.log('complete (error): url=' + a.url);
+                    console.log('complete (error): event=' + (event ? event.eventName : 'undefined'));
+                    console.log('complete (error): ' + e);
+                  }
+                  return result;
+                };
+              }
             }
           }
           return func.apply(sender, args);
         },
-        'getEventName': function(url) {
+        getEventName: function(url) {
           if (typeof(url) == 'string') {
-						if (eventMap[url]) {
-							if (typeof(eventMap[url]) == 'string') {
-								return {'eventName': eventMap[url]};
-							}
-							return eventMap[url](url);
-						}
+            if (eventMap[url]) {
+              if (typeof(eventMap[url]) == 'string') {
+                return {eventName: eventMap[url]};
+              }
+              return eventMap[url](url);
+            }
             if (url.indexOf('/ajax/private-messages/new?receiver=') == 0) {
               var split = url.split('?').reverse()[0];
-              var event = {'eventName': 'composepm', 'recipient': '', 'subject': ''};
+              var event = {eventName: 'composepm', recipient: '', subject: ''};
               if (split.indexOf('receiver=') != -1) event.recipient = split.split('receiver=').reverse()[0].split('&')[0];
               if (split.indexOf('subject=') != -1) event.subject = split.split('subject=').reverse()[0].split('&')[0];
               return event;
@@ -196,7 +209,7 @@ RunScript.build = function(functionText) {
             if (url.indexOf('/ajax/comments/') == 0) {
               var split = url.split('/');
               if (split.length == 5) return {'eventName': 'editcomment'};
-              return {'eventName': 'pagechange'};
+              return {eventName: 'pagechange'};
             }
             if (url.match(/^\/ajax\/(users|blog_posts|stories|group_thread)/g)) {
               var split = url.split('/').reverse();
@@ -205,17 +218,19 @@ RunScript.build = function(functionText) {
             if (url.indexOf('/ajax/users/modules/') == 0) {
               var split = url.split('/').reverse();
               if (split[0] == 'edit') {
-                return {'eventName': 'editmodule', 'box':split[1]};
+                return {eventName: 'editmodule', box: split[1]};
+              } else if (split[1] == 'modules') {
+                return {eventName: 'savemodule', box: split[0]};
               }
             }
             if (eventRegister) return eventRegister(url);
           }
           return null;
         },
-        'toString': function() {
+        toString: function() {
           return '[object API] {\n  version() -> number\n  setLogging()\n  on(name, func($event, eventObject))\n  off(name, func($event, eventObject))\n  trigger(name, eventObject)\n  getEventName(url) -> string\n  setLogging()\n  subscribe(func(url) -> eventObject)\n}';
         },
-        'toSource': function() {
+        toSource: function() {
           return 'FimFicEvents';
         }
       };
@@ -243,26 +258,26 @@ RunScript.build = function(functionText) {
   }
   if (window != win) {
     window.FimFicEvents = {
-      'on': function(name, func) {
+      on: function(name, func) {
         RunScript.build('function() {FimFicEvents.on("' + name + '", (' + func.toString() + '));}').run(true);
       },
-      'off': function(name, event) {
+      off: function(name, event) {
         RunScript.build('function() {FimFicEvents.off("' + name + '", ' + JSON.stringify(event) + ');}').run(true);
       },
-      'trigger': function(name, e) {
+      trigger: function(name, e) {
         RunScript.build('function() {FimFicEvents.trigger("' + name + '", ' + JSON.stringify(e) + ');}').run(true);
       },
-      'subscribe': function(func) {
+      subscribe: function(func) {
         RunScript.build('function() {FimFicEvents.subscribe(' + func.toString() + ');}').run(true);
       },
-      'getEventName': function(url) {
+      getEventName: function(url) {
         return win.FimFicEvents.getEventName(url);
       },
-      'version': function() {
+      version: function() {
         return win.FimFicEvents.version();
       },
-      'toString': win.FimFicEvents.toString,
-      'toSource': win.FimFicEvents.toSource
+      toString: win.FimFicEvents.toString,
+      toSource: win.FimFicEvents.toSource
     }
     for (var i in window.FimFicEvents) {
       window.FimFicEvents[i].toString = RunScript.toString;
