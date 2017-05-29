@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.5
+// @version     1.5.1
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -56,13 +56,13 @@ function move(ref, id) {
 }
 move.typeOf = function(obj) {
     return Object.prototype.toString.call(obj).replace('[object ','').replace(']','');
-}
+};
 move.isArray = function(arr) {
     return this.typeOf(arr) == 'Array';
-}
+};
 move.isJQuery = function() {
     return !!window['$'];
-}
+};
 
 var ready = false;
 document.onmousemove = document.onready = run;
@@ -178,7 +178,6 @@ function deAd() {
         $(this).parents('.gruz-sidebar').remove();
     });
     $('.withad').removeClass('withad');
-    $(document).resize();
 }
 
 function doExtra() {
