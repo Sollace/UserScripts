@@ -4,7 +4,7 @@
 // @icon        https://raw.githubusercontent.com/Sollace/UserScripts/master/DA++/logo.png
 // @include     http://*.deviantart.*
 // @include     https://*.deviantart.*
-// @version     1.4.1
+// @version     1.5
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -32,6 +32,7 @@ function move(ref, id) {
                         ref.parentNode.insertBefore(button[i], ref.nextSibling);
                     }
                 }
+                if (button.length == 0) console.log('error: button not found?');
             }
             return this;
         },
@@ -97,7 +98,10 @@ var style = '\
 #navbar-menu .navbar-menu-inner{sticky} .navbar-menu-item:hover {\
     border-bottom: 4px solid #fff;}\
 #navbar-menu .navbar-menu-inner .navbar-menu-separator {\
-    display: none;}';
+    display: none;}\
+/*Fork DeviantART*/\
+.plus-new-tab.not-subbed, .plus-new-tab.not-subbed > b {\
+    opacity: 1 !important;}\}';
 
 if (document.location.href.indexOf('/notifications/') != -1) {
     style = style.replace(/{sticky}/g, '');
@@ -141,7 +145,8 @@ div[gmi-typeid="50"], div[gmi-name="ad_zone"],\
 .mczone-you-know-what,\
 .sidebar-you-know-what, #sidebar-you-know-what,\
 .discoverytag_right_ad,\
-.discovery-top-ad';
+.discovery-top-ad,\
+.ad-container';
 
 style+= adSelector + ' {\
     display: none;}';
@@ -156,6 +161,7 @@ function run() {
     try {
         if (move.isJQuery()) {
             deAd();
+            doExtra();
             ready = true;
         }
     } catch (e) {}
@@ -171,18 +177,33 @@ function deAd() {
     $('.gruze-sidebar iframe').each(function() {
         $(this).parents('.gruz-sidebar').remove();
     });
+    $('.withad').removeClass('withad');
+    $(document).resize();
 }
 
-function el(select) {
-    if (document['querySelectorAll']) {
-        return document.querySelectorAll(select);
+function doExtra() {
+    window.deviantART.deviant.subbed = true;
+    window.deviantART.deviant.ads = false;
+    window.deviantART.adblock = false;
+    PubSub.publish('SubmitTabbar.add_new_tab');
+    $('li.submit-tab.active .submit-tab-close').click();
+}
+
+function each(e, f) {
+    for (var i = 0; i < e.length; i++) f(e[i]);
+}
+
+function el(select, d) {
+    d = d || document;
+    if (d['querySelectorAll']) {
+        return d.querySelectorAll(select);
     }
     if (select.indexOf('#') == 0) {
-        return [document.getElementById(select.replace('#', ''))];
+        return [d.getElementById(select.replace('#', ''))];
     } else if (select.indexOf('.') == 0) {
-        return document.getElementsByClassName(select.replace('.',''));
+        return d.getElementsByClassName(select.replace('.',''));
     }
-    return document.getElementsByTagName(select);
+    return d.getElementsByTagName(select);
 }
 
 function setWhen(func, check) {
