@@ -8,7 +8,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @version     1.9.1
+// @version     2
 // @grant       none
 // ==/UserScript==
 
@@ -16,7 +16,9 @@
 if (!window.__window_focused_fix) {
     window.__window_focused_fix = true;
     $(window).on('focus', function() {
-        window.window_focused = true;
+      window.window_focused = true;
+    }).on('blur', function() {
+      window.window_focused = false;
     });
 }
 
@@ -335,9 +337,9 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             },
             'tick': function() {
                 if ($('.muffin').length) {
-                    if (!this.container.hasClass('muffin')) {
+                    if (!this.dom().container.hasClass('muffin')) {
                         this.pastState = {
-                            'container': this.container,
+                            'container': this.dom().container,
                             'target_x': this.target_x
                         }
                         var c = $('.muffin').first();
@@ -345,10 +347,10 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                         this.UpdateMouse(offset.left + c.width()/2, offset.top + c.height()/2, c);
                     }
                     var difX = this.target_x - this.x;
-                    var difY = (this.container.offset().top + this.container.height()/2) - this.y;
-                    if (Math.sqrt(difX*difX + difY*difY) < this.dom_element.height()/3 + 10) {
-                        this.container.remove();
-                        this.container = this.pastState.container;
+                    var difY = (this.dom().container.offset().top + this.dom().container.height()/2) - this.y;
+                    if (Math.sqrt(difX*difX + difY*difY) < this.dom().height()/3 + 10) {
+                        this.dom().container.remove();
+                        this.dom().container = this.pastState.dom().container;
                         this.target_x = this.pastState.target_x;
                         this.pastState = null;
                     }
@@ -364,7 +366,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                             new Particle('<div class="muffin" />', this.x, this.y, (Math.random() * 50) - 25, (Math.random() * 50) - 25);
                         }
                         this.x = this.y = 0;
-                        this.dom_element.find('div.speech').fadeOut();
+                        this.dom().find('div.speech').fadeOut();
                         this.Say('');
                     }
                 }
@@ -610,7 +612,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                             if (anger > 6) {
                                 anger = -1;
                                 var a = new InteractivePony();
-                                a.dom_element.find('div.speech').fadeOut();
+                                a.dom().find('div.speech').fadeOut();
                                 a.ponyType = function () {
                                     return PoniesRegister['Scootaloo'];
                                 };
@@ -1035,10 +1037,17 @@ function setupMorePonies() {
     InteractivePony.prototype.ponyType = function () {
         return PoniesRegister[GlobalPonyType];
     };
+    InteractivePony.prototype.dom = function() {
+        if (!this.__dom) {
+            this.__dom = $(this.dom_element);
+            this.__dom.container = $(this.container);
+        }
+        return this.__dom;
+    };
     InteractivePony.prototype.ponySwitched = function() {
         var sprite = this.sprite;
         this.sprite = 'foobar';
-        this.dom_element.find('div.speech').fadeOut();
+        this.dom().find('div.speech').fadeOut();
         this.SetSprite(sprite);
     };
     InteractivePony.prototype.Trigger = function (e) {
@@ -1057,19 +1066,19 @@ function setupMorePonies() {
             this.text = (pone.Sleepless || !this.forceSleep && this.state != 'sleeping') ? pone.getSay(a) : 'zzz...';
         }
         this.next_text_timer = this.text_counter = 0;
-        if (this.text) this.dom_element.find('div.speech').fadeIn();
+        if (this.text) this.dom().find('div.speech').fadeIn();
     };
     InteractivePony.prototype.Speak = function (a) {
         this.text = pickOne(a.split(';'));
         this.next_text_timer = this.text_counter = 0;
-        if (this.text) this.dom_element.find('div.speech').fadeIn();
+        if (this.text) this.dom().find('div.speech').fadeIn();
     };
     InteractivePony.prototype.Clicked = function() {
         this.state = this.state == 'sleeping' ? 'default' : 'sleeping';
         this.forceSleep = this.state == 'sleeping';
         if (this.forceSleep) {
             this.SetSprite('cloud_sleep_right.gif');
-            this.dom_element.find('div.speech').fadeOut();
+            this.dom().find('div.speech').fadeOut();
         }
         this.Trigger('click');
     };
@@ -1077,13 +1086,13 @@ function setupMorePonies() {
         if (this.sprite != a) {
             this.sprite = a;
             var pone = this.ponyType();
-            pone.cssImages(this.dom_element, this.facing);
-            var access = pone.getAccess(this.dom_element, this.facing, this.base_url, a);
-            this.dom_element.find('img.interactive_pony_accessory').attr('src', access).css('display', access == '' ? 'none' : '');
-            this.dom_element.find('img.interactive_pony').attr('src', pone.getSprite(this.dom_element, this.facing, this.base_url, a));
-            this.dom_element.css('margin', '');
+            pone.cssImages(this.dom(), this.facing);
+            var access = pone.getAccess(this.dom(), this.facing, this.base_url, a);
+            this.dom().find('img.interactive_pony_accessory').attr('src', access).css('display', access == '' ? 'none' : '');
+            this.dom().find('img.interactive_pony').attr('src', pone.getSprite(this.dom(), this.facing, this.base_url, a));
+            this.dom().css('margin', '');
             if (pone.offset) {
-                pone.offset(this.dom_element, stateMap[a]);
+                pone.offset(this.dom(), stateMap[a]);
             }
         }
     };
@@ -1091,13 +1100,13 @@ function setupMorePonies() {
     InteractivePony.prototype.Render = function() {
         if (!this.accessory_element) {
             this.accessory_element = $('<img class="interactive_pony_accessory" style="position:absolute;bottom:0px;" />');
-            this.dom_element.find('img.interactive_pony').after(this.accessory_element);
-            this.dom_element.find('img.interactive_pony, img.interactive_pony_accessory').css({
+            this.dom().find('img.interactive_pony').after(this.accessory_element);
+            this.dom().find('img.interactive_pony, img.interactive_pony_accessory').css({
                 'user-select': 'none', 'pointer-events': 'none'
             });
             
             var me = this;
-            $(this.dom_element).on('mousedown mouseenter mouseleave mousemove mouseover mouseout mouseup dblclick hover', function (e) {
+            this.dom().on('mousedown mouseenter mouseleave mousemove mouseover mouseout mouseup dblclick hover', function (e) {
                 me.Trigger(e);
             });
             $('body').on('keydown keypress keyup', function (e) {
@@ -1113,7 +1122,7 @@ function setupMorePonies() {
         if (!this.forceSleep) {
             this.__Render();
         } else {
-            this.dom_element.find('div.speech').text(this.text.substr(0, parseInt(this.text_counter)));
+            this.dom().find('div.speech').text(this.text.substr(0, parseInt(this.text_counter)));
         }
     };
     InteractivePony.prototype.FindSecret = function(e) {
@@ -1174,7 +1183,7 @@ function setupMorePonies() {
             try {
                 var a = new InteractivePony();
                 a.InitEvents();
-                a.dom_element.find('div.speech').fadeOut();
+                a.dom().find('div.speech').fadeOut();
                 var type = Math.floor(Math.random() * (Ponies.length - 1));
                 a.ponyType = function () {
                     return Ponies[type];
@@ -1235,13 +1244,13 @@ function setupMorePonies() {
         var render = interactivePony.Render;
         interactivePony.Render = function() {
             if (timeout-- <= 0) {
-                this.dom_element.css('transition', 'opacity 0.5s linear');
-                this.dom_element.css('opacity', '0');
+                this.dom().css('transition', 'opacity 0.5s linear');
+                this.dom().css('opacity', '0');
                 clearInterval(ticker);
                 var me = this;
                 setTimeout(function() {
                     me.Unregister();
-                    me.dom_element.remove();
+                    me.dom().remove();
                 }, 500);
             }
             render.apply(this, arguments);
