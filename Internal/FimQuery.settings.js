@@ -3,7 +3,7 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.3
+// @version     1.1
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
@@ -356,29 +356,6 @@ div.colour_pick {\
       } else if (!tabs.length && FimFicSettings.SettingsTab.isCustomTabPage(page, registered)) {
         $('.content_box').after('<div class="user_cp" style="overflow:hidden; display:table; width:100%; margin-bottom:30px;"><div class="user-cp-content" /></div>').remove();
       }
-      if (!tabs.length && $('.user-cp-content').length) {
-        $('.content_box_header').remove();
-        tabs = $('<div class="tabs" >' +
-                 '<div class="sidebar-shadow">' + 
-                 '<div class="light-gradient" />' + 
-                 '<div class="dark-gradient" />' + 
-                 '</div>' + 
-                 '<a><img src="' + getDefaultAvatar() + '"></a>' +
-                 '<div class="tab-collection">' + 
-                 '<h1><i class="fa fa-fw fa-cog" /> <span>Account</span></h1>' + 
-                 '<ul>' +
-                 '<li class="tab' + (isSettingsPage ? ' tab_selected' : '') + '">' + 
-                 '<a  title="Local Settings" href="/index.php?view=local_settings">' + 
-                 '<i class="fa fa-cog" />' + 
-                 '<span>Local Settings</span>' + 
-                 '</a>' + 
-                 '</li>' + 
-                 '</ul>' + 
-                 '</div>' +
-                 '</div>');
-        $('.user_cp').append(tabs);
-        tabs = tabs.find('.tab-collection');
-      }
     }
     var tab = null;
     for (var i = 0, len = tabs.length; i < len; i++) {
@@ -392,21 +369,26 @@ div.colour_pick {\
       tab = $('<div class="tab-collection"><h1><i class="fa fa-fw fa-' + categoryIcon + '" /> <span>' + category + '</span></h1><ul /></div>');
       tabs.last().css('margin-bottom', '20px').after(tab);
     }
+    var reference = $('.user-cp-content');
+    
+    var canvas = $('<div class="user-cp-content generated"><div class="user-cp-content-box"><h1><i class="fa ' + img + '" />' + description + '</h1><form><div id="SettingsPage_Parent"><table class="properties"><colgroup><col><col></colgroup><tbody></tbody></table></div></form></div></div>');
+    var error = $('<div id="validation_error_message" class="validation_error" style="display:none;" ><div class="message" style="margin-bottom:10px;">There were errors with the settings you chose. Please correct the fields marked<img class="icon_16" style="vertical-align:-3px;" src="' + staticFimFicDomain() + '/images/icons/cross.png"></img>. Hover over to see the error.</div></div>');
+    canvas.find('form').append(error);
     if (tab) {
       for (var i = 0, len = registered.length; i < len; i++) {
         if (!$('li[pageName="' + registered[i][0] + '"]').length) {
-          tab.find('ul').append('<li class="tab" pageName=' + registered[i][0] + '><a href="' + (isIndexPage ? "/index.php?view=" : "/manage_user/") + registered[i][0] + '"><i class="' + registered[i][1] + '"></i><span>' + registered[i][2] + '</span></a></li>');
+          var linker = $('<li class="tab" pageName=' + registered[i][0] + '><a href="#"><i class="' + registered[i][1] + '"></i><span>' + registered[i][2] + '</span></a></li>');
+          tab.find('ul').append(linker);
+          linker.find('a').on('click', function() {
+            reference.css('display', 'none');
+            $('.user-cp-content.generated').detach();
+            reference.after(canvas);
+            $('.tab.tab_selected').removeClass('tab_selected');
+            linker.addClass('tab_selected');
+          });
         }
       }
-      if ((isIndexPage ? indexPage[1].split('&')[0] : page).split('#')[0] == name) {
-        var canvas = $('.user-cp-content').first();
-        canvas.append('<div class="user-cp-content-box"><h1><i class="fa ' + img + '" />' + description + '</h1><form><div id="SettingsPage_Parent"><table class="properties"><tbody></tbody></table></div></form></div>');
-        var context = canvas.find('form');
-        var error = $('<div id="validation_error_message" class="validation_error" style="display:none;" ><div class="message" style="margin-bottom:10px;">There were errors with the settings you chose. Please correct the fields marked<img class="icon_16" style="vertical-align:-3px;" src="' + staticFimFicDomain() + '/images/icons/cross.png"></img>. Hover over to see the error.</div></div>');
-        context.append(error);
-        return new FimFicSettings.OptionsBuilder(context.find('tbody'), error);
-      }
     }
-    return new FimFicSettings.OptionsBuilder(null);
+    return new FimFicSettings.OptionsBuilder(canvas.find('tbody'), error);
   }
 })();

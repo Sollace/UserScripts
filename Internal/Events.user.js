@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.8
+// @version     2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -70,7 +70,7 @@ RunScript.build = function(functionText) {
 };
 
 (function (win) {
-  var ver = 1.8;
+  var ver = 2;
   var startup =
       (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
       (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -79,12 +79,6 @@ RunScript.build = function(functionText) {
       var eventRegister = null;
       var eventMap = {
         '/ajax/comments/preview': 'previewcomment',
-        '/ajax/users/infocard': function(url) {
-           return {
-            eventName: 'infocard',
-            user: /^\/user\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')
-          };
-        },
         '/ajax/notifications/mark-all-read': 'note_markread',
         '/ajax/private-messages/mark-all-read': 'pm_markread',
         '/ajax/notifications/list/drop-down': 'listnotes',
@@ -107,13 +101,17 @@ RunScript.build = function(functionText) {
           return ver;
         },
         on: function(name, func) {
-          $(document).on(name,func);
+          name = name.split(' ');
+          for (var i = 0; i < name.length; i++) document.addEventListener(name[i], func);
         },
         off: function(name, event) {
-          $(document).off(name,event);
+          name = name.split(' ');
+          for (var i = 0; i < name.length; i++) document.removeEventListener(name[i], func);
         },
         trigger: function(name, event) {
-          $(document).trigger(name, [event]);
+          name = new CustomEvent(name);
+          name.event = event;
+          document.dispatchEvent(name);
         },
         subscribe: function(evFunc) {
           if (eventRegister) {
@@ -129,6 +127,7 @@ RunScript.build = function(functionText) {
           this.logging = 1;
         },
         PROXY: function(sender, func, args, m) {
+          var self = this;
           var a = args[0];
           if (typeof a === 'string') {
             a = args[0] = {url: a};
@@ -159,10 +158,11 @@ RunScript.build = function(functionText) {
                   if (!m) window.FimFicEvents.trigger('after' + event.eventName, event);
                   return result;
                 } catch (e) {
-                  console.log('success (error): version=' + this.version());
+                  console.log('success (error): version=' + self.version());
                   console.log('success (error): url=' + a.url);
                   console.log('success (error): event=' + (event ? event.eventName : 'undefined'));
-                  console.log('success (error): ' + e);
+                  console.log('success (error): ');
+                  console.log(e);
                 }
               };
               if (m) {
@@ -179,10 +179,11 @@ RunScript.build = function(functionText) {
                     window.FimFicEvents.trigger('after' + event.eventName, event);
                     if (l) console.log('complete (after): ' + arguments[0]);
                   } catch (e) {
-                    console.log('complete (error): version=' + this.version());
+                    console.log('complete (error): version=' + self.version());
                     console.log('complete (error): url=' + a.url);
                     console.log('complete (error): event=' + (event ? event.eventName : 'undefined'));
-                    console.log('complete (error): ' + e);
+                    console.log('success (error): ');
+                    console.log(e);
                   }
                   return result;
                 };
@@ -198,6 +199,13 @@ RunScript.build = function(functionText) {
                 return {eventName: eventMap[url]};
               }
               return eventMap[url](url);
+            }
+            if (url.indexOf('/ajax/users') == 0 && url.indexOf('/infocard') > -1) {
+              return {
+                eventName: 'infocard',
+                user_id: url.split('/users/')[1].split('/')[0],
+                user: /^\/user\/[0-9]+\/([^\/]*)$/.exec($('a:hover').attr('href'))[1].replace(/ /,'%20')
+              };
             }
             if (url.indexOf('/ajax/private-messages/new?receiver=') == 0) {
               var split = url.split('?').reverse()[0];
@@ -289,18 +297,14 @@ RunScript.build = function(functionText) {
   if (startup) {
     var injected = function() {
       (function(original, __ajax) {
-        window.AjaxRequest = function(a) {
+        window.AjaxRequest = function(c, d) {
           return window.FimFicEvents.PROXY(this, __ajax, arguments, false);
         }
         for (var i in original) {
           window.AjaxRequest[i] = original[i];
         }
+        window.AjaxRequest.prototype = original.prototype;
       })(window.AjaxRequest, window.AjaxRequest.prototype.constructor);
-      window.$.ajax = (function(__ajax) {
-        return function(param, n) {
-          return window.FimFicEvents.PROXY(this, __ajax, arguments, true);
-        };
-      })(window.$.ajax);
     }
     RunScript(injected,true);
   }

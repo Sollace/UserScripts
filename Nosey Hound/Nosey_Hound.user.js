@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     1.8
+// @version     2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -152,7 +152,7 @@ try {
             this.container = c;
             if (this.container.hasClass('user-page-header')) {
                 this.userName = this.container.find('h1.resize_text > a').last().text();
-                this.userId = this.container.find('ul.tabs li a').first().attr('href').split('&user=').reverse()[0].split('&')[0];
+                this.userId = this.container.find('ul.tabs li a').first().attr('href').split('/user/')[1].split('/')[0];
                 this.tabs = this.container.find('ul.tabs');
             } else {
                 this.userName = this.container.find('.card-content > h2 a').text();
@@ -160,17 +160,18 @@ try {
                 this.tabs = this.container.parent().find('.user-links');
             }
             this.myPage = this.userName == name;
-            this.oldFollowers = getFollowers(this.userId);
+            this.followers = getFollowers(this.userId);
             this.followersRaw = [];
         }
         Dog.prototype = {
             sniffFollowers: function() {
                 var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
-                pop.content.css({ 'min-width': '400px', 'min-height': '400px', width: '400px', height: '400px'});
+                pop.content.css({ 'min-width': '400px', 'min-height': '400px', width: '400px', height: '400px'}).parent().css('width', 'auto');
                 $('body').append($('#info-cards'));
                 this.Sniff(true, pop);
                 pop.content.after('<div class="resize-handle" />');
                 pop.position('center', 'center');
+                pop.show();
             },
             snubFollowers: function(link) {
                 var pop = $('<div></div>');
@@ -206,15 +207,14 @@ try {
             dosniff: function(pop,xml) {
                 var followers = [];
                 this.followersRaw = [];
+                this.oldFollowers = this.followers;
                 var me = this;
                 $('.user-avatar', xml).each(function() {
                     var name = $(this).parent().find('.name').clone();
                     name.find('*').remove();
                     var bgimg = $(this).css('background-image');
                     followers.push({
-                        id: bgimg.indexOf('images/') != -1 ?
-                        bgimg.split('images/').reverse()[0].split('_')[0] :
-                        bgimg.split('user/').reverse()[0].split('-')[2],
+                        id: bgimg.indexOf('images/') != -1 ? bgimg.split('images/').reverse()[0].split('_')[0] : bgimg.split('user/').reverse()[0].split('-')[2],
                         name: name.text()
                     });
                     me.followersRaw.push(name.text());
@@ -223,24 +223,22 @@ try {
                 var lost = [];
                 var named = [];
                 for (var i = followers.length; i--;) {
-                    var old = isPresent(this.oldFollowers, followers[i]);
-                    if (old == null) {
+                    var old = isPresent(this.followers, followers[i]);
+                    if (!old) {
                         gained.unshift(followers[i]);
-                    } else {
-                        if (old.id != 'none' && old.name != followers[i].name) {
-                            named.unshift({name: followers[i].name, oldName: old.name, id: followers[i].id});
-                        }
+                    } else if (old.id != 'none' && old.name != followers[i].name) {
+                        named.unshift({name: followers[i].name, oldName: old.name, id: followers[i].id});
                     }
                 }
-                for (var i = this.oldFollowers.length; i--;) {
-                    if (this.oldFollowers[i].id.indexOf('/') == -1) {
-                        if (isPresent(followers, this.oldFollowers[i]) == null) {
-                            lost.unshift(this.oldFollowers[i]);
+                for (var i = this.followers.length; i--;) {
+                    if (this.followers[i].id.indexOf('/') == -1) {
+                        if (isPresent(followers, this.followers[i]) == null) {
+                            lost.unshift(this.followers[i]);
                         }
                     }
                 }
                 pop.empty();
-                this.printFollowers(!setFollowers(this.userId, this.oldFollowers = followers), pop, gained, lost, named);
+                this.printFollowers(!setFollowers(this.userId, this.followers = followers), pop, gained, lost, named);
             },
             dosnuff: function(pop,xml) {
                 var followers = [];
@@ -328,24 +326,24 @@ try {
                 });
             },
             loaded: function() {
-                return '<div class="score fresh">' + this.oldFollowers.length + '</div><div class="main">' + (this.myPage ? 'Welcome! Your' : this.userName + '\'s') + ' followers have been successfully saved.</div>';
+                return '<div class="score fresh">' + this.followers.length + '</div><div class="main">' + (this.myPage ? 'Welcome! Your' : this.userName + '\'s') + ' followers have been successfully saved.</div>';
             },
             stats: function(g, l, G, L, N) {
                 var result = '';
-                var all = this.oldFollowers.length + g.length;
+                var all = this.followers.length + g.length;
                 var percentG = (all > 0 ? (g.length * 100 / all) : 0);
                 var percentL = (all > 0 ? (l.length * 100 / all) : 0);
-                var percentN = ((this.oldFollowers.length - l.length) > 0 ? (N * 100 / (this.oldFollowers.length - l.length)) : 0);
+                var percentN = ((this.followers.length - l.length) > 0 ? (N * 100 / (this.followers.length - l.length)) : 0);
                 result += '<div class="score bar neutral"><div class="glass" />';
                 result += '<div class="percentage g" style="width:' + percentG + '%;" >' + (percentG > 0 ? percentG.toFixed(2) + '%' : '') + '</div>';
                 result += '<div class="percentage l" style="width: ' + percentL + '%" >' + (percentL > 0 ? percentL.toFixed(2) + '%' : '') + '</div>';
                 result += '<div class="percentage n" style="width: ' + percentN + '%;margin-left:' + percentG + '%" >' + (percentN > 0 ? percentN.toFixed(2) + '%' : '') + '</div>';
                 result += '</div>';
-                result += '<div class="main"><b>Total: </b>' + this.oldFollowers.length.toLocaleString('en') + ' was ' + (all - g.length).toLocaleString('en') + '<br /><br />';
+                result += '<div class="main"><b>Total: </b>' + this.followers.length.toLocaleString('en') + ' was ' + (all - g.length).toLocaleString('en') + '<br /><br />';
                 result += '<b>Arrived:</b> ' + G + ' (' + percentG.toFixed(2) + '%)<br />';
                 result += '<b>Left:</b> ' + L + ' (' + percentL.toFixed(2) + '%)<br />';
-                result += '<b>Stayed:</b> ' + (this.oldFollowers.length - g.length).toLocaleString('en') + ' (' + (100 - percentG - percentL).toFixed(2) + '%)';
-                result += '<br /><b>Score: </b>' + this.popularity(g.length, l.length, this.oldFollowers.length);
+                result += '<b>Stayed:</b> ' + (this.followers.length - g.length).toLocaleString('en') + ' (' + (100 - percentG - percentL).toFixed(2) + '%)';
+                result += '<br /><b>Score: </b>' + this.popularity(g.length, l.length, this.followers.length);
                 return result + '</div>';
             },
             overview: function(g, l, n, G, L, N) {
@@ -353,7 +351,7 @@ try {
                 var diff = g.length - l.length;        
                 result += '<div class="score ' + (diff >= 0 ? (diff == 0 ? 'neutral">' : 'good">') : 'bad">') + named(diff) + '</div><div class="main">';
                 if (diff) {
-                    result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.oldFollowers.length + '</b> followers';
+                    result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.followers.length + '</b> followers';
                     result += (g.length ? ' of which' : '');
                     result += (diff > 0 ? ' only' : '') + (g.length > 0 ? ' <b>' + G + '</b>' : '<b>none</b>') + ' are new additions whilst ';
                     result += (l.length ? 'only <b>' + L : '<b>none') + '</b> of ' + (this.myPage ? 'your' : this.userName + '\'s') + ' old followers have left.';
@@ -384,36 +382,44 @@ try {
                 var fol_per_blog = blog_count > 0 ? fol_count/blog_count : 0;
                 return ((fol_per_story + fol_per_blog)/4)*(story_count*9 + blog_count) / 55;
             },
-            history: function(gained, lost, named) {
-                this.followersRaw = [];
+            processChanges: function(gained, lost, named) {
                 var history = getHistory(this.userId);
                 for (var i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
                     if (i < gained.length) {
                         for (var j = history.length; --j;) {
                             if (history[j].type == 'l' && history[j].id == gained[i].id) {
-                                named.push({name:gained[i].name,oldName:history[j].name,id:gained[i].id});
+                                named.push({name: gained[i].name, oldName: history[j].name, id: gained[i].id});
                                 break;
                             }
                         }
-                        history.push({type:'j', display: gained[i].name, name: gained[i].name});
+                        history.push({type:'j', display: gained[i].name, name: gained[i].name, id: gained[i].id});
                     }
                     if (i < lost.length) {
                         history.push({type:'l', display: lost[i].name, name: lost[i].name, id: lost[i].id});
                     }
                     if (i < named.length) {
-                        history.push({type:'n', display: named[i].name, name: named[i].name, old: named[i].oldName});
+                        history.push({type:'n', display: named[i].name, name: named[i].name, old: named[i].oldName, id: named[i].id});
                     }
                 }
+                return this.migrate(history, named);
+            },
+            migrate: function(history, named) {
                 for (var i = 0; i < history.length; i++) {
-                    if (history[i].type == 'n' && history[i].name === undefined) {
-                        history[i].name = history[i].display;
-                    }
-                    for (var j = 0; j < named.length; j++) {
-                        if (history[i].name == named[j].oldName) {
-                            history[i].name = named[j].name;
+                    if (typeof(history[i].id) === 'undefined') {
+                        history[i].id = idFor(history[i], history) || idFor(history[i], this.followers) || idFor(history[i], this.oldFollowers);
+                        if (history[i].id) {
+                            for (var k = 0; k < history.length; k++) {
+                                if (k != i && (history[k].name == history[i].name || history[k].display == history[i].display)) {
+                                    history[k].id = history[i].id;
+                                }
+                            }
                         }
                     }
                 }
+                return history;
+            },
+            history: function(gained, lost, named) {
+                var history = this.processChanges(gained, lost, named);
                 var finalHistory = [];
                 for (var i = 0; i < history.length; i++) {
                     if (i < history.length - 1) {
@@ -448,11 +454,11 @@ try {
         });
         $('.user-page-header .tab-followers').after('<li class="tab nosey"><a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
         
-        $(document).on('click','.sniffer', function(e) {
+        var bod = $('body');
+        bod.on('click','.sniffer', function(e) {
             (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();
             e.preventDefault();
-        });
-        $(document).on('click', 'a.snuffer', function(e) {
+        }).on('click', 'a.snuffer', function(e) {
             if ($('.dog .list a.unloaded.hover').length) {
                 (new Dog($('a.snuffer:hover').first().parents('.user-card'))).snubFollowers($('.dog a.hover').first());
             } else {
@@ -460,20 +466,17 @@ try {
             }
             $('a.snuffer').parents('.info-card-container').hide();
             e.preventDefault();
-        });
-        $(document).on('click', 'button.eforget', function() {
+        }).on('click', 'button.eforget', function() {
             if (confirm($(this), 'Done')) {
                 clearFollowers($(this).attr('data-id'));
             }
-        });
-        $(document).on('click','button.forget', function() {
+        }).on('click','button.forget', function() {
             if (confirm($(this), 'Forgot this User')) {
                 var id = $(this).attr('data-id');
                 clearFollowers(id);
                 clearChanges(id);
             }
-        });
-        $(document).on('click','button.hforget', function() {
+        }).on('click','button.hforget', function() {
             if (confirm($(this), 'Alrighty then...')) {
                 var id = $(this).attr('data-id');
                 var limit = $(this).attr('data-limit');
@@ -489,25 +492,22 @@ try {
                     setHistory(id, []);
                 }
             }
-        });        
-        $(document).on('mouseleave','button.forget, button.hforget, button.eforget', function() {
+        }).on('mouseleave','button.forget, button.hforget, button.eforget', function() {
             if ($(this).attr('data-check') != '2') {
                 $(this).attr('data-check','0').text($(this).attr('data-text'));
             }
-        });
-        $(document).on('mousedown','.resize-handle', function(e) {
+        }).on('mousedown','.resize-handle', function(e) {
+            e.preventDefault();
             var holder = $(this).parent().find('.drop-down-pop-up-content');
-            $(document).on('mousemove.resizeHandle', function(e) {
+            bod.on('mousemove.resizeHandle', function(e) {
                 var width = e.pageX - holder.offset().left;
                 var height = e.pageY - holder.offset().top;
                 holder.css('width', width + 'px');
                 holder.css('height', height + 'px');
+            }).one('mouseup', function() {
+                bod.off('mousemove.resizeHandle');
             });
-            $(document).one('mouseup', function() {
-                $(document).off('mousemove.resizeHandle');
-            });
-        });
-        $(document).on('click','.dog .open-pin', function(e) {
+        }).on('click','.dog .open-pin', function(e) {
             e.preventDefault();
             var a = $(this).parent().children('a').first();
             followerMapping.setOpened($(this).parent().attr('data-item'), !a.hasClass('opened'));
@@ -521,22 +521,17 @@ try {
                     $(this).parent().find('ol').html(followerMapping.childs($(this).parent().attr('data-item'), $('#nosey_follower_searcher').val().toUpperCase()));
                 }
             }
-        });
-        $(document).on('mouseenter', '.dog .list a', function() {
+        }).on('mouseenter', '.dog .list a', function() {
             $('.dog .list a.hover').removeClass('hover');
             var name = $(this).attr('data-user');
             $(this).addClass('hover');
         });
-        FimFicEvents.on('afterinfocard', function(e, event) {
-            $('.info-card-container').each(function() {
-                var el = $(this).find('.top-info .button-group > .button-group').first();
+        FimFicEvents.on('afterinfocard', function(e) {
+            $('.info-card-container .top-info .button-group > .button-group').each(function() {
+                var el = $(this);
                 if (!el.find('.snuffer').length) {
-                    var butt = $('<a class="snuffer styled_button button-icon-only styled_button_dark_grey"><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>');
-                    butt.attr('data-user', event.user);
-                    butt.attr('style', $(this).find('.top-info .button-group > .button-group a').attr('style'));
-                    if ($(this).find('.top-info .button-group > .button-group a').hasClass('dark')) {
-                        butt.addClass('dark');
-                    }
+                    var butt = $('<a class="snuffer button button-icon-only"><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>');
+                    butt.attr('data-user', e.user);
                     el.prepend(butt);
                 }
             });
@@ -660,6 +655,17 @@ try {
                 result += '<li><a target="_blank" data-id="' + arr[i].id + '" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].name.replace(/\+/g, ' ') + '</a></li>';
             }
             return result + '</ol></div>';
+        }
+        
+        function idFor(hist, followers) {
+            for (var i = 0; i < followers.length; i++) {
+                if (followers[i].id != 'none' && typeof(followers[i].id) !== 'undefined' && followers[i].id == hist.id) {
+                    return hist.id;
+                }
+                if ((hist.name == followers[i].name || hist.old == followers[i].name) && followers[i].id) {
+                    return followers[i].id;
+                }
+            }
         }
         
         function isPresent(arr, follower) {
@@ -863,8 +869,8 @@ border-color: transparent transparent #507E2C transparent;}\
     width: 10px;\
     display: inline-block;\
     position: absolute;\
-    bottom: 30px;\
-    right: 30px;\
+    bottom: 0;\
+    right: 0;\
     border-bottom: solid 2px;\
 border-right: solid 2px;}');
     })();
@@ -877,94 +883,91 @@ border-right: solid 2px;}');
 }
 
 //==API FUNCTION==//
-function Popup(holder, dark, cont) {
-  this.holder = holder;
-  this.dark = dark;
-  this.content = this.unscoped = cont;
-  this.position = function(x, y, buff) {
-    if (this.holder != null) position(this.holder, x, y, buff);
-  }
-  this.scope = function(el) {
-      if (typeof el == 'string') {
-          el = $(el);
-          this.content.append(el);
-      }
-      return (this.content = el);
-  }
-  this.unscope = function(el) {
-      this.content = this.unscoped;
-      if (typeof el !== 'undefined') this.scope(el);
-      return this.content;
-  }
-  this.find = function(el) {
-      return this.content.find(el);
-  }
-  this.onclose = function(func) {
-      if (typeof func === 'function') {
-          holder.on('close', func);
-      } else {
-          holder.trigger('close');
-      }
-  }
-  this.close = function() {
-      $(this.dark).fadeOut('fast', function () {
-          $(this).remove()
-      });
-      this.onclose();
-      this.holder.remove();
-  }
-  this.hide = function() {
-      this.holder.css('display','none');
-  }
+function Popup(native) {
+    this.native = native;
+    this.holder = $(native.element);
+    this.dark = $(native.dimmer);
+    this.content = this.unscoped = $(native.content);
+    this.position = function(x, y, buff) {
+        //if (this.holder != null) position(this.holder, x, y, buff);
+    };
+    this.scope = function(el) {
+        if (typeof el == 'string') {
+            el = $(el);
+            this.content.append(el);
+        }
+        return (this.content = el);
+    };
+    this.unscope = function(el) {
+        this.content = this.unscoped;
+        if (typeof el !== 'undefined') this.scope(el);
+        return this.content;
+    };
+    this.find = function(el) {
+        return this.content.find(el);
+    };
+    this.onclose = function(func) {
+        if (typeof func === 'function') {
+            this.holder.on('close', func);
+        } else {
+            this.holder.trigger('close');
+        }
+    };
+    this.close = function() {
+        this.native.close();
+    };
+    this.show = function() {
+        this.native.Show();
+    };
+    this.hide = function() {
+        this.holder.css('display','none');
+    };
 }
 
 //==API FUNCTION==//
 function makeGlobalPopup(title, fafaText, darken, close) {
+    var p = new Popup(makePopup(title, fafaText, darken, close));
+    p.holder.addClass('global_popup');
+    return p;
+}
+
+//==API FUNCTION==//
+function styleSheet(css) {
+  var style = document.createElement('style');
+  style.innerHTML = css;
+  style.type = 'text/css';
+  return style;
+}
+
+//==API FUNCTION==//
+function makePopup(title, fafaText, darken, close) {
     if (typeof (close) == 'undefined') close = true;
-    if (typeof (darken) == 'undefined') darken = 100;
-    var holder = $('<div style="position: fixed;z-index:2147483647;left:10px;top:10px" class="global_popup drop-down-pop-up-container" />');
-    $("body").append(holder);
-    
-    var dark = null;
-    if (darken) {
-        dark = $('<div class="dimmer" style="z-index:1001;" />');
-        if (typeof (darken) == 'number') dark.css('opacity', (darken / 100));
-        $('#dimmers').append(dark);
-    }
-    
-    var pop = $('<div class="drop-down-pop-up" style="width: auto" />');
-    holder.append(pop);
-    
-    var head = $('<h1 style="cursor:move">' + (fafaText ? '<a class="' + fafaText + '" />' : '') + title + '</h1>');
-    pop.append(head);
-    head.on('mousedown', function(e) {
-        var x = e.clientX - parseFloat(holder.css('left'));
-        var y = e.clientY - parseFloat(holder.css('top'));
-        $(document).on('mousemove.popup.global', function(e) {
-            position(holder, e.clientX - x, e.clientY - y);
-        });
-        $(document).one('mouseup', function(e) {
-            $(this).off('mousemove.popup.global');
-        });
-        e.preventDefault();
-    });
-    
-    var c = $('<a id="message_close_button" class="close_button" />');
-    head.append(c);
-    
-    var content = $('<div class="drop-down-pop-up-content" />');
-    pop.append(content);
-    
-    var result = new Popup(holder, dark, content);
-    $(c).click(function(e) {
-        if (close) {
-            result.close();
-        } else {
-           result.hide();
+    if (typeof (darken) == 'undefined') darken = true;
+    var pop = new unsafeWindow.PopUpMenu('','<i class="fa fa-' + fafaText + '" ></i>' + title);
+    pop.SetCloseOnHoverOut(false);
+    pop.SetFixed(true);
+    pop.SetContent('');
+    pop.SetSoftClose(!close);
+    if (!darken) pop.SetDimmerEnabled(false);
+    if (typeof darken == 'number') {
+        var show = pop.Show;
+        pop.Show = function() {
+            show.apply(this, arguments);
+            this.dimmer.css('opacity', (darken / 100));
         }
-    });
-    
-    return result;
+    }
+    pop.element.append(styleSheet("\
+.drop-down-pop-up-content input[type='text'], .drop-down-pop-up-content input[type='url'] {\
+    padding:8px;\
+    width:100%;\
+    border:1px solid rgb(204, 204, 204);\
+    background:none repeat scroll 0% 0% rgb(248,248,248);\
+    outline:medium none;\
+    color:rgb(51,51,51);\
+    box-shadow:0px 2px 4px rgba(0,0,0,0.1) inset;\
+    border-radius:3px;\
+    margin:5px 0px;}"));
+    return pop;
 }
 
 //==API FUNCTION==//

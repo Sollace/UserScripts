@@ -3,7 +3,7 @@
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.0.6
+// @version     1.1
 // @grant       none
 // ==/UserScript==
 
@@ -107,11 +107,17 @@ function getVendorPrefix() {
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerHTML = input.replace(/-\{0\}-/g, getVendorPrefix().css);
+    var style = styleSheet(input.replace(/-\{0\}-/g, getVendorPrefix().css));
     if (id) style.id = id;
     document.head.appendChild(style);
+}
+
+//==API FUNCTION==//
+function styleSheet(css) {
+  var style = document.createElement('style');
+  style.innerHTML = css;
+  style.type = 'text/css';
+  return style;
 }
 
 //==API FUNCTION==//
@@ -144,7 +150,7 @@ function addTooltip(message, field) {
 function makePopup(title, fafaText, darken, close) {
     if (typeof (close) == 'undefined') close = true;
     if (typeof (darken) == 'undefined') darken = true;
-    var pop = new PopUpMenu('','<i class="fa fa-' + fafaText + '" />' + title);
+    var pop = new PopUpMenu('','<i class="fa fa-' + fafaText + '" ></i>' + title);
     pop.SetCloseOnHoverOut(false);
     pop.SetFixed(true);
     pop.SetContent('');
@@ -154,10 +160,10 @@ function makePopup(title, fafaText, darken, close) {
         var show = pop.Show;
         pop.Show = function() {
             show.apply(this, arguments);
-            this.dimmer.css('opacity', (darken / 100));
+            this.dimmer.style.opacity = darken / 100;
         }
     }
-    pop.element.append("<style>\
+    pop.element.append(styleSheet("\
 .drop-down-pop-up-content input[type='text'], .drop-down-pop-up-content input[type='url'] {\
     padding:8px;\
     width:100%;\
@@ -167,13 +173,13 @@ function makePopup(title, fafaText, darken, close) {
     color:rgb(51,51,51);\
     box-shadow:0px 2px 4px rgba(0,0,0,0.1) inset;\
     border-radius:3px;\
-    margin:5px 0px;}</style>");
+    margin:5px 0px;}"));
     return pop;
 }
 
 //==API FUNCTION==//
 function makeButton(a, text, img){
-    var result = $('<li class="button-group"><button class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button></li>');
+    var result = $('<li class="button-group" data-priority="-1" data-order="200"><button type="button" class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button></li>');
     $(a).append(result);
     return result.find('button');
 }
