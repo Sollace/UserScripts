@@ -151,7 +151,7 @@ try {
         Dog = function(c) {
             this.container = c;
             if (this.container.hasClass('user-page-header')) {
-                this.userName = this.container.find('h1.resize_text > a').last().text();
+                this.userName = this.container.find('ul.mini-info-box + div h1 > a').last().text();
                 this.userId = this.container.find('ul.tabs li a').first().attr('href').split('/user/')[1].split('/')[0];
                 this.tabs = this.container.find('ul.tabs');
             } else {
@@ -1006,26 +1006,27 @@ function position(obj, x, y, buff) {
 
 //==API FUNCTION==//
 function isMyPage() {
-    var locationCheck = document.location.href.replace('http:','').replace('https:','').split('?')[0];
-    return (locationCheck == '//www.fimfiction.net/user/' + getUserNameEncoded()) || (locationCheck == '//www.fimfiction.net/user/' + getUserName().replace(/ /g, '+'));
+    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([0-9]+)\/.*/);
+    return match && match[1] && match[1] == (getUserId() + '');
 }
 
 //==API FUNCTION==//
-function getUserNameEncoded() { return encodeURIComponent(getUserName()); }
+function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
 
 //==API FUNCTION==//
-function getUserName() {return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/").reverse()[0] : 'Anon';}
+function getUserNameEncoded() { return encodeURIComponent(getUserNameUrlSafe()); }
+
+//==API FUNCTION==//
+function getUserName() {return getUserNameUrlSafe().replace(/\+/g,' ');}
 
 //==API FUNCTION==//
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]')[0];}
 
 //==API FUNCTION==//
-function getIsLoggedIn() {
-    try {
-        return !!unsafeWindow.logged_in_user;
-    } catch (e) { }
-    return false;
-}
+function getIsLoggedIn() {return !!unsafeWindow['logged_in_user'];}
+
+//==API FUNCTION==//
+function getUserId() {var w = unsafeWindow['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {

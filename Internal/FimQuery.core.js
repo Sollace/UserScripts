@@ -35,7 +35,7 @@ function getDomain(url) {return /:|^\/\//.test(url) ? url.match(/([^:\/]*)([:\/]
 function getSiteName(url) {return /:|^\/\//.test(url) ? url.match(/([^:\/]*)([:\/]*)(www.|)([^\/]*)/).reverse()[0] : url.split('/')[0];}
 
 //==API FUNCTION==//
-function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().attr("href").split("/").reverse()[0] : 'Anon'; }
+function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
 
 //==API FUNCTION==//
 function getUserNameEncoded() { return encodeURIComponent(getUserNameUrlSafe()); }
@@ -47,14 +47,14 @@ function getUserName() { return getUserNameUrlSafe().replace(/\+/g,' '); }
 function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
-function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]');}
+function getUserButton() {return document.querySelector('.user_toolbar a.button[href^="/user/"]');}
 
 document.addEventListener('DOMContentLoaded', function() {
     var id = getUserId();
     if (id != -1) {
-        var possibleAvatars = $('img[src*="cdn-img.fimfiction.net/user/"][src*="-' + id + '-"]');
-        if (possibleAvatars.length) {
-            localStorage['user_avatar'] = possibleAvatars.first().attr('src').split(id)[0] + id + '-';
+        var possibleAvatar = document.querySelector('img[src*="cdn-img.fimfiction.net/user/"][src*="-' + id + '-"]');
+        if (possibleAvatar) {
+            localStorage['user_avatar'] = possibleAvatar.getAttribute('src').split(id)[0] + id + '-';
         }
     }
 });
@@ -77,20 +77,14 @@ function getDefaultAvatar(size) {
 
 //==API FUNCTION==//
 function isMyBlogPage() {
-    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([^\/]*)\/blog(?:\/|)$/);
-    if (!match) return false;
-    match = match.reverse()[0];
-    var urlSafe = getUserNameUrlSafe();
-    return match == urlSafe || match == encodeURIComponent(urlSafe);
+    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([0-9]+)\/[^\/]*\/blog.*/);
+    return match && match[1] && match[1] == (getUserId() + '');
 }
 
 //==API FUNCTION==//
 function isMyPage() {
-    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([^\/]*)(?:\/|)$/);
-    if (!match) return false;
-    match = match.reverse()[0];
-    var urlSafe = getUserNameUrlSafe();
-    return match == urlSafe || match == encodeURIComponent(urlSafe);
+    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([0-9]+)\/.*/);
+    return match && match[1] && match[1] == (getUserId() + '');
 }
 
 var vendor = vendor || null;
@@ -242,7 +236,7 @@ function position(obj, x, y, buff) {
 }
 
 //==API FUNCTION==//
-function tryParseInt(s,d) {
+function tryParseFloat(s,d) {
   if (!s) return d;
   var result;
   try {
