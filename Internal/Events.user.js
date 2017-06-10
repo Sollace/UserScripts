@@ -2,40 +2,37 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.1
+// @version     2.2
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
+// @run-at       document-start
 // ==/UserScript==
 
 function RunScript(func, mustCall, params) {
-  if (!document.body) {
-    var _ready = document.onready;
-    document.onready = function() {
-      RunScript(func, mustCall, params);
-      if (typeof _ready === 'function') {
-        _ready.apply(this, arguments);
+  if (!document.body) RunScript.ready(func, mustCall, params);
+  var scr = document.createElement('SCRIPT');
+  if (mustCall) {
+    if (params) {
+      var pars = [];
+      for (var i = 2; i < arguments.length; i++) {
+        pars.push(arguments[i]);
       }
-    };
-  } else {
-    var scr = document.createElement('SCRIPT');
-    if (mustCall) {
-      if (params) {
-        var pars = [];
-        for (var i = 2; i < arguments.length; i++) {
-          pars.push(arguments[i]);
-        }
-        scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
-      } else {
-        scr.innerHTML = '(' + func.toString() + ')();';
-      }
+      scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
     } else {
-      scr.innerHTML = func.toString();
+      scr.innerHTML = '(' + func.toString() + ')();';
     }
-    document.body.appendChild(scr);
-    scr.parentNode.removeChild(scr);
+  } else {
+    scr.innerHTML = func.toString();
   }
+  document.body.appendChild(scr);
+  scr.parentNode.removeChild(scr);
 }
+RunScript.ready = function(func, mustCall, params) {
+  window.addEventListener('load', function() {
+    RunScript(func, mustCall, params);
+  });
+};
 RunScript.toString = (function() {
   var result = function toString() {
     return 'function ' + this.name + '() {\n  [native code]\n}';
@@ -71,7 +68,7 @@ RunScript.build = function(functionText) {
 
 try {
   (function (win) {
-    var ver = 2.1;
+    var ver = 2.2;
     var startup =
         (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
         (win == window || (typeof (window.FimFicEvents) === 'undefined'));
@@ -105,7 +102,7 @@ try {
             name = name.split(' ');
             for (var i = 0; i < name.length; i++) document.addEventListener(name[i], func);
           },
-          off: function(name, event) {
+          off: function(name, func) {
             name = name.split(' ');
             for (var i = 0; i < name.length; i++) document.removeEventListener(name[i], func);
           },
@@ -307,7 +304,11 @@ try {
           window.AjaxRequest.prototype = original.prototype;
         })(window.AjaxRequest, window.AjaxRequest.prototype.constructor);
       };
-      RunScript(injected,true);
+      if (!window.AjaxRequest) {
+        RunScript.ready(injected, true);
+      } else {
+        RunScript(injected,true);
+      }
     }
   })(typeof (unsafeWindow) !== 'undefined' && unsafeWindow != window ? unsafeWindow : window);
 } catch (e) {console.error(e);}
