@@ -3,8 +3,8 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2
-// @require     http://code.jquery.com/jquery-1.8.3.min.js
+// @version     2.1
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -140,7 +140,7 @@ var followerMapping = (function() {
             }
             return structured;
         }
-    }
+    };
 })();
 
 function urlSafe(me){return me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');}
@@ -162,7 +162,7 @@ try {
             this.myPage = this.userName == name;
             this.followers = getFollowers(this.userId);
             this.followersRaw = [];
-        }
+        };
         Dog.prototype = {
             sniffFollowers: function() {
                 var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
@@ -195,7 +195,7 @@ try {
                 requestFollowers(this.userId, function(xml) {
                     if (!closed) {
                         try {
-                            me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml.content + '</ul>'))
+                            me['do' + (type ? 'sniff' : 'snuff')](pop,$('<ul>' + xml.content + '</ul>'));
                         } catch (e) {
                             me.printError(pop, e);
                         }
@@ -348,7 +348,7 @@ try {
             },
             overview: function(g, l, n, G, L, N) {
                 var result = '';
-                var diff = g.length - l.length;        
+                var diff = g.length - l.length;
                 result += '<div class="score ' + (diff >= 0 ? (diff == 0 ? 'neutral">' : 'good">') : 'bad">') + named(diff) + '</div><div class="main">';
                 if (diff) {
                     result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.followers.length + '</b> followers';
@@ -436,7 +436,6 @@ try {
                 return '<div data_id="5" class="tab hidden">' + (finalHistory.length ? historyList(finalHistory) : 'No items to display') + '</div>';
             }
         };
-        
         if ($('.user-page-header').length) {
             var sniffer = $('<a>Sniff</a>');
             if ($('.bio_followers > h3').first().text().indexOf(name + ' follows') == 0) {
@@ -448,12 +447,12 @@ try {
                 e.preventDefault();
             });
         }
-        
+
         $('.user-card').each(function() {
             $(this).find('.drop-down > ul > .divider').before('<li><a class="sniffer"><i class="fa fa-fw fa-paw" /> Sniff Followers</a></li>');
         });
         $('.user-page-header .tab-followers').after('<li class="tab nosey"><a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" /></span>Sniff Followers</a></li>');
-        
+
         var bod = $('body');
         bod.on('click','.sniffer', function(e) {
             (new Dog($(this).parents('.user-card, .user-page-header'))).sniffFollowers();
@@ -536,7 +535,7 @@ try {
                 }
             });
         });
-        
+
         function confirm(button, finalMessage) {
             if (button.attr('data-check') != '2') {
                 if (button.attr('data-check') != '1') {
@@ -553,19 +552,19 @@ try {
             }
             return false;
         }
-        
+
         function clearButton(id) {
             return '<div class="main"><button data-id="' + id + '" data-text="Clear follower data" class="eforget styled_button">Clear follower data</button></div>';
         }
-        
+
         function forgetButton(id) {
             return '<div class="main"><button data-id="' + id + '" data-text="Forget this User" class="forget styled_button">Forget this User</button></div>';
         }
-        
+
         function emptyHistoryButton(id) {
             return '<div class="main"><button data-id="' + id + '" data-limit="30" data-text="Trim History" title="Deletes all but the last 30 items" class="hforget styled_button">Trim History</button><button data-id="' + id + '" data-text="Clear History" title="Deletes all history for this user" class="hforget styled_button">Clear History</button></div>';
         }
-        
+
         function requestFollowers(id, success, failure) {
             $.ajax({
                 type: 'GET',
@@ -574,35 +573,35 @@ try {
                 error: failure
             });
         }
-        
+
         function setFollowers(id, val) {
             var result = settingsMan.get('followers_' + id) != null;
             settingsMan.set('followers_' + id, JSON.stringify(val));
             return result;
         }
-        
+
         function getFollowers(id) {
             var result = settingsMan.get('followers_' + id);
             return result == null ? [] : JSON.parse(result);
         }
-        
+
         function clearFollowers(id) {
             settingsMan.delete('followers_' + id);
         }
-        
+
         function clearChanges(id) {
             settingsMan.delete('changes_' + id);
         }
-        
+
         function setHistory(id, items) {
             settingsMan.set('changes_' + id, JSON.stringify(items));
         }
-        
+
         function getHistory(id) {
             var result = settingsMan.get('changes_' + id);
             return result == null ? [] : JSON.parse(result);
         }
-        
+
         function listing(name, followers, node) {
             var id = followerMapping.registerList(name, followers);
             node = $(node);
@@ -612,14 +611,14 @@ try {
                 list.empty();
                 try {
                     list.html(followerMapping.structured(id).html(search.val().toUpperCase()));
-                } catch (e) {alert(e)}
+                } catch (e) { alert(e); }
             });
             node.append(search);
             node.append(list);
             list.html(followerMapping.structured(id).html(search.val().toUpperCase()));
             return node;
-        }        
-        
+        }
+
         function list(arr) {
             var result = '<div class="list"><ul>';
             for (var i = 0; i < arr.length; i++) {
@@ -627,13 +626,13 @@ try {
             }
             return result + '</ul></div>';
         }
-        
+
         function historyList(arr) {
             var result = '<div class="history list"><ul>';
             for (var i = arr.length - 1; i >= 0; i--) {
                 result += '<li data-index="' + i + '" class="history ' + arr[i].type;
                 if (arr[i].type == 'j' || arr[i].type == 'l') {
-                   result += '"><a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
+                    result += '"><a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
                 } else {
                     result += '">' + arr[i].old.replace(/\+/g, ' ') + ' ';
                 }
@@ -648,7 +647,7 @@ try {
             }
             return result + '</ul></div>';
         }
-        
+
         function linkList(arr) {
             var result = '<div class="list"><ol>';
             for (var i = 0; i < arr.length; i++) {
@@ -656,7 +655,7 @@ try {
             }
             return result + '</ol></div>';
         }
-        
+
         function idFor(hist, followers) {
             for (var i = 0; i < followers.length; i++) {
                 if (followers[i].id != 'none' && typeof(followers[i].id) !== 'undefined' && followers[i].id == hist.id) {
@@ -667,7 +666,7 @@ try {
                 }
             }
         }
-        
+
         function isPresent(arr, follower) {
             if (follower.id == 'none') {
                 for (var i = 0; i < arr.length; i++) {
@@ -851,7 +850,7 @@ a:hover + .open-pin:after, .open-pin:hover:after {\
     border-color: transparent transparent #609734 transparent;}\
 .opened + .open-pin:after {\
     margin-top: 5px;\
-border-color: transparent transparent #507E2C transparent;}\
+    border-color: transparent transparent #507E2C transparent;}\
 #info-cards > * {\
     z-index: 99999999999999999 !important;}\
 .global_popup input[type="text"], .global_popup input[type="url"] {\
@@ -872,7 +871,7 @@ border-color: transparent transparent #507E2C transparent;}\
     bottom: 0;\
     right: 0;\
     border-bottom: solid 2px;\
-border-right: solid 2px;}');
+    border-right: solid 2px;}');
     })();
 } catch (e) {
     try {
@@ -933,10 +932,10 @@ function makeGlobalPopup(title, fafaText, darken, close) {
 
 //==API FUNCTION==//
 function styleSheet(css) {
-  var style = document.createElement('style');
-  style.innerHTML = css;
-  style.type = 'text/css';
-  return style;
+    var style = document.createElement('style');
+    style.innerHTML = css;
+    style.type = 'text/css';
+    return style;
 }
 
 //==API FUNCTION==//
@@ -1023,10 +1022,10 @@ function getUserName() {return getUserNameUrlSafe().replace(/\+/g,' ');}
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]')[0];}
 
 //==API FUNCTION==//
-function getIsLoggedIn() {return !!unsafeWindow['logged_in_user'];}
+function getIsLoggedIn() {return !!(unsafeWindow || window)['logged_in_user'];}
 
 //==API FUNCTION==//
-function getUserId() {var w = unsafeWindow['logged_in_user'];return w ? w.id : -1;}
+function getUserId() {var w = (unsafeWindow || window)['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
@@ -1084,7 +1083,7 @@ function parseImperial(amount) {
                 amount -= this.step;
             }
         }
-    }
+    };
     while (measure.next()) measure.tick();
     return result;
 }
