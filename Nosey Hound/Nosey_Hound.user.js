@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.1
+// @version     2.2
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -942,7 +942,7 @@ function styleSheet(css) {
 function makePopup(title, fafaText, darken, close) {
     if (typeof (close) == 'undefined') close = true;
     if (typeof (darken) == 'undefined') darken = true;
-    var pop = new unsafeWindow.PopUpMenu('','<i class="fa fa-' + fafaText + '" ></i>' + title);
+    var pop = new win().PopUpMenu('','<i class="fa fa-' + fafaText + '" ></i>' + title);
     pop.SetCloseOnHoverOut(false);
     pop.SetFixed(true);
     pop.SetContent('');
@@ -1009,6 +1009,10 @@ function isMyPage() {
     return match && match[1] && match[1] == (getUserId() + '');
 }
 
+
+//==API FUNCTION==//
+function win() {return this['unsafeWindow'] || window['unsafeWindow'] || window;}
+
 //==API FUNCTION==//
 function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
 
@@ -1022,10 +1026,10 @@ function getUserName() {return getUserNameUrlSafe().replace(/\+/g,' ');}
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]')[0];}
 
 //==API FUNCTION==//
-function getIsLoggedIn() {return !!(this['unsafeWindow'] || window)['logged_in_user'];}
+function getIsLoggedIn() {return !!win()['logged_in_user'];}
 
 //==API FUNCTION==//
-function getUserId() {var w = (this['unsafeWindow'] || window)['logged_in_user'];return w ? w.id : -1;}
+function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
