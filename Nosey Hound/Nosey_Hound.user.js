@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2
+// @version     2.2.1
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
@@ -942,7 +942,7 @@ function styleSheet(css) {
 function makePopup(title, fafaText, darken, close) {
     if (typeof (close) == 'undefined') close = true;
     if (typeof (darken) == 'undefined') darken = true;
-    var pop = new win().PopUpMenu('','<i class="fa fa-' + fafaText + '" ></i>' + title);
+    var pop = new (win().PopUpMenu)('','<i class="fa fa-' + fafaText + '" ></i>' + title);
     pop.SetCloseOnHoverOut(false);
     pop.SetFixed(true);
     pop.SetContent('');
