@@ -4,7 +4,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     2.1
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
+// @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -1022,10 +1022,10 @@ function getUserName() {return getUserNameUrlSafe().replace(/\+/g,' ');}
 function getUserButton() {return $('.user_toolbar a.button[href^="/user/"]')[0];}
 
 //==API FUNCTION==//
-function getIsLoggedIn() {return !!(unsafeWindow || window)['logged_in_user'];}
+function getIsLoggedIn() {return !!(this['unsafeWindow'] || window)['logged_in_user'];}
 
 //==API FUNCTION==//
-function getUserId() {var w = (unsafeWindow || window)['logged_in_user'];return w ? w.id : -1;}
+function getUserId() {var w = (this['unsafeWindow'] || window)['logged_in_user'];return w ? w.id : -1;}
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
