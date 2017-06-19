@@ -99,12 +99,9 @@ div.colour_pick {\
     background-color: #bbf !important;}", "settingsTab_colorMakerStyle");
   }
   FimFicSettings.OptionsBuilder = function OptionsBuilder(container, err) {
-    this.container = $(container);
-    
-    var has_init = this.container.length;
     var error = err;
-    
-    this.HasInit = function() {return has_init;};
+    if (container) this.container = $(container);
+    this.HasInit = function() {return this.container && this.container.length;};
     this.ShowError = function() {if (error) error.style.display = "block";};
     this.HideError = function() {if (error) error.style.display = "none";};
   }
@@ -357,6 +354,9 @@ div.colour_pick {\
         $('.content_box').after('<div class="user_cp" style="overflow:hidden; display:table; width:100%; margin-bottom:30px;"><div class="user-cp-content" /></div>').remove();
       }
     }
+    
+    if (!tabs.length) return new FimFicSettings.OptionsBuilder();
+    
     var tab = null;
     for (var i = 0, len = tabs.length; i < len; i++) {
       var item = $(tabs[i]);
