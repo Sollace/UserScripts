@@ -326,7 +326,7 @@ div.colour_pick {\
     AppendButton: function(control, content) {
       var rev = document.createElement('A');
       rev.setAttribute('class', 'styled_button styled_button_blue');
-      control.appendChild(rev);
+      control.parentNode.appendChild(rev);
       rev.innerHTML = content;
       return rev;
     },

@@ -35,7 +35,7 @@ function getDomain(url) {return /:|^\/\//.test(url) ? url.match(/([^:\/]*)([:\/]
 function getSiteName(url) {return /:|^\/\//.test(url) ? url.match(/([^:\/]*)([:\/]*)(www.|)([^\/]*)/).reverse()[0] : url.split('/')[0];}
 
 //==API FUNCTION==//
-function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
+function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().href.split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
 
 //==API FUNCTION==//
 function getUserNameEncoded() { return encodeURIComponent(getUserNameUrlSafe()); }
@@ -116,13 +116,14 @@ function styleSheet(css) {
 
 //==API FUNCTION==//
 function makeToolTip(button) {
-    var popup = $('<div style="z-index:50;text-align:left;position:absolute;" />');
-    popup.append('<div class="tooltip" />');
-    $(button).append(popup);
-    popup.hover(function(e) { }, function(e) {
-        $(this).remove();
+    var popup = document.createElement('DIV');
+    popup.setAttribute('style', 'z-index:50;text-align:left;position:absolute;');
+    popup.innerHTML = '<div class="tooltip" />';
+    button.appendChild(popup);
+    popup.addEventListener('mouseleave', function(e) {
+        button.removeChild(popup);
     });
-    return popup.find('.tooltip');
+    return popup.firstChild;
 }
 
 //==API FUNCTION==//
@@ -180,16 +181,18 @@ function makeButton(a, text, img){
 
 //==API FUNCTION==//
 function addOption(list, title) {
-    var a = $('<li><a href="javascript:void()" >' + title + '</a></li>');
-    $(list).append(a);
-    return a.children().first();
+    var li = document.createElement('LI');
+    li.innerHTML = '<a href="javascript:void(0)" >' + title + '</a>';
+    list.appendChild(li);
+    return li.firstChild;
 }
 
 //==API FUNCTION==//
 function addDropList(list, title, func) {
-    var a = $('<li><a>' + title + '</a><div class="drop-down"><ul /></div></li>');
-    list.append(a);
-    func.apply(a.find('ul'));
+    var li = document.createElement('li');
+    li.innerHTML = '<a>' + title + '</a><div class="drop-down"><ul></ul></div>';
+    list.appendChild(li);
+    func.apply(li.lastChild.firstChild);
 }
 
 //==API FUNCTION==//
@@ -206,33 +209,47 @@ function getListItemWidth(list) {
 function setListItemWidth(list) {$(list).children().css('width', getListItemWidth(list) + 'px');}
 
 //==API FUNCTION==//
+function offset(element) {
+    if (!element || !element.getClientRects().length) {
+        return { top: 0, left: 0 };
+    }
+    var rect = element.getBoundingClientRect();
+    var doc = element.ownerDocument || document;
+    var win = doc.defaultView || win;
+    doc = doc.documentElement;
+    return {
+        top: rect.top + win.pageYOffset - doc.clientTop,
+        left: rect.left + win.pageXOffset - doc.clientLeft
+    };
+}
+
+//==API FUNCTION==//
 function position(obj, x, y, buff) {
-    if (typeof x == "string" && x.toLowerCase() == "center") x = ($(window).width() - $(obj).width()) / 2;
-    if (typeof y == "string" && y.toLowerCase() == "center") y = ($(window).height() - $(obj).height()) / 2;
+    if (typeof x == 'string' && x.toLowerCase() == 'center') x = (document.body.clientWidth - obj.clientWidth) / 2;
+    if (typeof y == 'string' && y.toLowerCase() == 'center') y = (document.body.clientHeight - obj.clientHeight) / 2;
     if (typeof x == 'object') {
         var parameters = x;
         var positioner = x.object != null ? x.object : x;
         buff = x.buffer != null ? x.buffer : y;
-
-        y = $(positioner).offset().top - $(window).scrollTop();
-        x = $(positioner).offset().left - $(window).scrollLeft();
-
+        var off = offset(positioner);
+        y = off.top - document.body.scrollTop;
+        x = off.left - document.body.scrollLeft;
         if (parameters.offX != null) x += parameters.offX;
         if (parameters.offY != null) y += parameters.offY;
     }
-
+    
     if (buff == null) buff = 0;
     if (x < buff) x = buff;
     if (y < buff) y = buff;
-
-    var maxX = $(window).width() - ($(obj).width() + buff);
+    
+    var maxX = document.body.clientWidth - (obj.clientWidth + buff);
     if (x > maxX) x = maxX;
-
-    var maxY = $(window).height() - ($(obj).height() + buff);
+    
+    var maxY = document.body.clientHeight - (obj.clientHeight + buff);
     if (y > maxY) y = maxY;
-
-    $(obj).css('top', y + "px");
-    $(obj).css('left', x + "px");
+    
+    obj.style.top = y + 'px';
+    obj.style.left = x + 'px';
 }
 
 //==API FUNCTION==//
@@ -295,14 +312,37 @@ function inbounds(el, buff) {
 
 //==API FUNCTION==//
 function getUserCommentThumb(size) {
-    var hold = $('<div class="author" style="line-height:1.1em;" />');
+    var hold = '';
     if (getIsLoggedIn()) {
-        hold.append('<a class="name" href="/user/' + getUserNameEncoded() + '">' + getUserName() + '</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + getUserAvatar(size) + '" /></div>');
+        hold += '\
+<a href="/user/' + getUserNameEncoded() + '" class="name ">' + getUserName() + '</a>\
+<img class="avatar loaded"\
+  data-src="' + getUserAvatar(size) + '"\
+  data-srcset="' + getUserAvatar(256) + ' 2x"\
+  data-lightbox=""\
+  data-fullsize="' + getUserAvatar(512) + '"\
+  src="' + getUserAvatar(size) + '"\
+  srcset="' + getUserAvatar(256) + ' 2x"\
+  width="' + size + '" height="' + size + '"></img>';
     } else {
-        hold.append('<a class="name">Anon</a><div class="avatar"><img style="margin:0px;" height="' + size + '" width="' + size + '" src="' + getDefaultAvatar() + '" /></div>');
+        hold += '\
+<a class="name">Anon</a>\
+<img class="avatar loaded"\
+  data-src="' + getDefaultAvatar() + '"\
+  data-srcset="' + getDefaultAvatar() + '"\
+  data-lightbox=""\
+  data-fullsize="' + getDefaultAvatar() + '"\
+  src="' + getDefaultAvatar() + '"\
+  srcset="' + getDefaultAvatar() + '"\
+  width="' + size + '" height="' + size + '"></img>';
     }
-    return $('<div class="comment" />').append(hold);
+    var result = document.createElement('DIV');
+    result.innerHTML = '<div class="author" style="line-height:1.1em;">' + hold + '</div>';
+    result.classList.add('comment');
+    return result;
 }
+
+
 
 //==API FUNCTION==//
 function fillBBCode(text) {
@@ -344,16 +384,14 @@ function getStoryNumber() {
         var chapter = storySuffex[1];
         return storyNumber + ':' + chapter;
     }
-    var story = $('.chapter_content_box').attr('id').split('_')[1];
+    var story = document.querySelector('.chapter_content_box').id.split('_')[1];
     return story + '_' + location.split('chapter/')[1].split('/')[0];
 }
 
 //==API FUNCTION==//
 function getStoryViewMode() {
-    if ($('#browse_form .right-menu-inner .button-group .drop-down-expander').length) {
-        return $('#browse_form .right-menu-inner .button-group .drop-down-expander').text().split(' ')[0].toLowerCase();
-    }
-    return '';
+    var mm = document.querySelector('#browse_form .right-menu-inner .button-group .drop-down-expander');
+    return mm ? mm.innerText.split(' ')[0].toLowerCase() : '';
 }
 
 //==API FUNCTION==//
