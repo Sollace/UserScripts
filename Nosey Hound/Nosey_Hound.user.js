@@ -40,6 +40,7 @@ var jSlim = {
     })(),
     on: function addScopedEventListener(node, selector, event, func, capture) {
         var k = function (ev) {
+            try {
             for (var target = ev.target; null != target && target != document; ) {
                 if (win().matchesSelector(target, selector)) {
                     if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) break;
@@ -48,6 +49,7 @@ var jSlim = {
                 if (node == k) break;
                 target = target.parentNode
             }
+            } catch (e) {console.error(e);}
         };
         node.addEventListener(event, k, !!capture);
         return k;
@@ -228,8 +230,7 @@ try {
         Dog = function(c) {
             this.container = c;
             if (this.container.classList.contains('user-page-header')) {
-                this.userName = this.container.querySelectorAll('ul.mini-info-box + div h1 > a');
-                this.userName = this.userName[this.userName.length - 1].innerText;
+                this.userName = this.container.querySelector('.info-container > h1 > a').innerText;
                 this.userId = this.container.querySelector('ul.tabs li a').href.split('/user/')[1].split('/')[0];
                 this.tabs = this.container.querySelector('ul.tabs');
             } else {
@@ -1094,12 +1095,8 @@ function offset(element) {
 
 //==API FUNCTION==//
 function position(obj, x, y, buff) {
-    if (typeof x == "string" && x.toLowerCase() == "center") {
-        x = (document.body.clientWidth - obj.clientWidth) / 2;
-    }
-    if (typeof y == "string" && y.toLowerCase() == "center") {
-        y = (document.body.clientHeight - obj.clientHeight) / 2;
-    }
+    if (typeof x == 'string' && x.toLowerCase() == 'center') x = (document.body.clientWidth - obj.clientWidth) / 2;
+    if (typeof y == 'string' && y.toLowerCase() == 'center') y = (document.body.clientHeight - obj.clientHeight) / 2;
     if (typeof x == 'object') {
         var parameters = x;
         var positioner = x.object != null ? x.object : x;
@@ -1110,19 +1107,19 @@ function position(obj, x, y, buff) {
         if (parameters.offX != null) x += parameters.offX;
         if (parameters.offY != null) y += parameters.offY;
     }
-
+    
     if (buff == null) buff = 0;
     if (x < buff) x = buff;
     if (y < buff) y = buff;
-
+    
     var maxX = document.body.clientWidth - (obj.clientWidth + buff);
     if (x > maxX) x = maxX;
     
     var maxY = document.body.clientHeight - (obj.clientHeight + buff);
     if (y > maxY) y = maxY;
     
-    obj.style.top = y + "px";
-    obj.style.left = x + "px";
+    obj.style.top = y + 'px';
+    obj.style.left = x + 'px';
 }
 
 //==API FUNCTION==//
