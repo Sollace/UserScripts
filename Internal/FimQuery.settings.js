@@ -9,7 +9,20 @@
 var FimFicSettings = {};
 (function() {
   function addGenericInput(me, id, name, type, clas) {
-    return me.AddOption(id, name, '<div><input' + (clas != null ? ' class="' + clas + '"' : '') + ' inputID="' + id + '" type="' + type + '" /></div>').find('input');
+    return me.AddOption(id, name, '<div><input' + (clas != null ? ' class="' + clas + '"' : '') + ' inputID="' + id + '" type="' + type + '"></input></div>').firstChild.firstChild;
+  }
+  function all(selector, func, d) {
+    return each((d || document).querySelectorAll(selector), func);
+  }
+  function each(arrLike, func, thisArg) {
+    return Array.prototype.forEach.call(arrLike, func, thisArg);
+  }
+  function evIndirect(tag, func) {
+    return function(e) {
+      if (e.target && e.target != document && e.target.tagName == tag) {
+        return func.call(e.target, e);
+      }
+    };
   }
   function addPresetStyle() {
     makeStyle("\
@@ -100,13 +113,15 @@ div.colour_pick {\
   }
   FimFicSettings.OptionsBuilder = function OptionsBuilder(container, err) {
     var error = err;
-    if (container) this.container = $(container);
-    this.HasInit = function() {return this.container && this.container.length;};
+    this.container = container;
+    this.HasInit = function() {return this.container;};
     this.ShowError = function() {if (error) error.style.display = "block";};
     this.HideError = function() {if (error) error.style.display = "none";};
   }
   FimFicSettings.OptionsBuilder.prototype = {
-    StartEndSection: function(title) {if (this.HasInit()) this.container.append('<tr><td class="section_header" colspan="2"><b>' + title + '</b></td></tr>');},
+    StartEndSection: function(title) {
+      this.AddRaw('<tr><td class="section_header" colspan="2"><b>' + title + '</b></td></tr>');
+    },
     getValue: function(id) {
       var fields = this.container.getElementsByTagName("input");
       var len = fields.length;
@@ -119,276 +134,344 @@ div.colour_pick {\
     },
     AddColorSliders: function(id, name, alpha, func) {
       if (!$('#settingsTab_colorMakerStyle').length) addMakerStyle();
-      var result = {};
-      var div = $('<div class="color-selector" />');
-      var colourHolder = $('<div class="red" />');
-      colourHolder.append(result.red = $('<input class="color" type="text" placeholder="Red" /><input value="128" type="range" max="255" />'));
-      div.append(colourHolder);
-      colourHolder = $('<div class="green" />');
-      colourHolder.append(result.green = $('<input class="color" type="text" placeholder="Green" /><input value="128" type="range" max="255" />'));
-      div.append(colourHolder);
-      colourHolder = $('<div class="blue" />');
-      colourHolder.append(result.blue = $('<input class="color" type="text" placeholder="Blue" /><input value="128" type="range" max="255" />'));
-      div.append(colourHolder);
-      if (alpha) {
-        colourHolder = $('<div class="alpha" />');
-        colourHolder.append(result.alpha = $('<input class="color" type="text" placeholder="Opacity" /><input value="0.5" type="range" max="1" step="0.01" />'));
-        div.append(colourHolder);
-      }
-      div.find('input').on('keydown mousedown', function() {
-        $(this).attr('data-changed', '1');
-      });
-      div.find('input').on('change mousemove keyup', function(e) {
-        var me = $(this);
-        if (me.attr('data-changed') == '1') {
-          me.parent().find('input').val(this.value);
+      return this.AddOption(id, name, function(container) {
+        var result = {};
+        container.innerHTML = '<div class="color-selector"></div>';
+        var div = container.firstChild;
+        
+        slider('Red');
+        slider('Green');
+        slider('Blue');
+        
+        if (alpha) {
+          var aa = slider('Alpha');
+          aa.value = 0.5;
+          aa.setAttribute('max', 1);
+          aa.setAttribute('step', 0.1);
+          aa.setAttribute('placeholder', 'Opacity');
         }
-        if (me.attr('type') == 'text' && me.val() == '') {
-          me.parent().find('input').attr('data-changed', '0');
+        
+        function slider(key) {
+          var lkey = key.toLowerCase();
+          var colourHolder = document.createElement('DIV');
+          colourHolder.classList.add(lkey);
+          colourHolder.dataser.key = lkey;
+          colourHolder.innerHTML = '<input class="color" type="text" placeholder="' + key + '"></input><input value="128" type="range" max="255"></input>';
+          result[lkey] = [ colourHolder.firstChild, colourHolder.lastChild ]
+          div.append(colourHolder);
+          return colourHolder.lastChild;
         }
-        if (func) func(this, e);
+        
+        var down = evIndirect('INPUT', function() {
+          this.dataset.changed = '1';
+        });
+        div.addEventListener('keydown', down);
+        div.addEventListener('mousedown', down);
+        var up = evIndirect('INPUT', function() {
+          var inputs = result[this.parentNode.dataset.key];
+          if (this.dataset.changed == '1') {
+            inputs[0].value = inputs[1].value = this.value;
+          }
+          if (this.getAttribute('type') == 'text' && this.value == '') {
+            inputs[0].dataset.changed = inputs[1].dataset.changed = '0';
+          }
+          if (func) func(this, e);
+        });
+        div.addEventListener('change', up);
+        div.addEventListener('keyup', up);
+        
+        return result;
       });
-      this.AddOption(id, name, div);
-      return result;
     },
     AddColorPick: function(id, name, selected, func) {
-      if (!$('#settingsTab_colorPickerStyle').length) addPickerStyle();
-      var div = $('<div />');
-      var input = $('<input style="width:100px;" data-type="colour" type="text" />');
-      div.append(input);
-      input.val(selected);
-      input.on('change', function(e) {
-        var childs = picker.children();
-        var i = childs.length;
-        while (i--) {
-          var c = $(childs[i]).attr("data-colour");
-          if (c != null) {
-            if (c == this.value) {
-              $(childs[i]).addClass('colour_pick_selected');
-            } else {
-              $(childs[i]).removeClass('colour_pick_selected');
+      if (!document.querySelector('#settingsTab_colorPickerStyle')) addPickerStyle();
+      return this.AddOption(id, name, function(container) {
+        var div = document.createElement('DIV');
+        container.appendChild(div);
+        div.innerHTML = '<input style="width:100px;" data-type="colour" type="text"></input>';
+        var input = div.firstChild;
+        input.value = selected;
+        input.addEventListener('change', function(e) {
+          var childs = picker.childNodes;
+          var i = childs.length;
+          while (i--) {
+            var c = childs[i].dataset.colour;
+            if (c != null) {
+              childs[i].classList.toggle('colour_pick_selected', c == this.value);
             }
           }
+          func(this, e);
+        });
+        
+        var colors = ["#d3926b","#d3b76b","#d3cf6b","#b4d36b","#88d36b","#6bd38d","#6bd3bc","#6bafd3","#6b81d3","#8b6bd3","#bc6bd3","#d36bab","#d36b77"];
+        var grayScale = ["#000","#111","#333","#555","#777","#999","#aaa","#ccc","#ddd","#eee"];
+        
+        for (var i = 0; i < colors.length; i++) {
+          colors[i] = '<div class="colour_pick' + (colors[i] == selected ? ' colour_pick_selected' : '') + '" data-colour="' + colors[i] + '" style="background-color:' + colors[i] + ';"></div>';
         }
-        func(this, e);
+        for (var i = 0; i < grayScale.length; i++) {
+          grayScale[i] = '<div class="colour_pick' + (grayScale[i] == selected ? ' colour_pick_selected' : '') + '" data-colour="' + grayScale[i] + '" style="background-color:' + grayScale[i] + ';"></div>';
+        }
+        var picker = document.createElement('DIV');
+        picker.classList.add('colour_picker_box');
+        picker.innerHTML = colors.join('') + '<br></br>' + grayScale.join('');
+        div.appendChild(picker);
+        picker.addEventListener('click', evIndirect('A', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          input.value = this.dataset.colour;
+          input.change();
+        }));
+        return input;
       });
-
-      var colors = ["#d3926b","#d3b76b","#d3cf6b","#b4d36b","#88d36b","#6bd38d","#6bd3bc","#6bafd3","#6b81d3","#8b6bd3","#bc6bd3","#d36bab","#d36b77"];
-      var grayScale = ["#000","#111","#333","#555","#777","#999","#aaa","#ccc","#ddd","#eee"];
-
-      for (var i = 0; i < colors.length; i++) {
-        colors[i] = '<div class="colour_pick' + (colors[i] == selected ? ' colour_pick_selected' : '') + '" data-colour="' + colors[i] + '" style="background-color:' + colors[i] + ';" />';
-      }
-      for (var i = 0; i < grayScale.length; i++) {
-        grayScale[i] = '<div class="colour_pick' + (grayScale[i] == selected ? ' colour_pick_selected' : '') + '" data-colour="' + grayScale[i] + '" style="background-color:' + grayScale[i] + ';" />';
-      }
-      var picker = $('<div class="colour_picker_box">' + colors.join('') + '<br />' + grayScale.join('') + '</div>');
-      div.append(picker);
-      picker.find('.colour_pick').on('click', function() {
-        var i = $(this);
-        input.val(i.attr("data-colour"));
-        input.change();
-      });
-      this.AddOption(id, name, div);
-      return input;
     },
     AddLabelCheckBox: function(id, name, label) {
-      return this.AddOption(id, name, '<label><input inputID="' + id + '" type="checkbox" />' + label + '</label>').find('input');
+      return this.AddOption(id, name, '<label><input inputID="' + id + '" type="checkbox"></i>' + label + '</label>').firstChild.firstChild;
     },
     AddCheckBox: function(id, name, value) {
+      var label = document.createElement('LABEL');
+      label.innerHTML = '<a></a>';
+      label.classList.add('toggleable-switch');
       var check = addGenericInput(this, id, name, "checkbox");
-      check.attr('id', 'checkBox_' + id);
-      var label = $('<label class="toggleable-switch"><a /></label>');
-      check.before(label);
-      label.prepend(check);
-      check[0].checked = !!value;
+      check.parentNode.insertBefore(label, check);
+      label.insertBefore(check, label.firstChild);
+      check.id = 'checkBox_' + id;
+      check.checked = !!value;
       return check;
     },
     AddSlider: function(id, name, val, min, max) {
       var sl = addGenericInput(this, id, name, "range");
-      sl.attr({'min': min, 'max': max});
-      sl.css('max-width', '50%');
-      sl.val(val);
+      sl.setAttribute('min', min);
+      sl.setAttribute('max', max);
+      sl.style.maxWidth = '50%';
+      sl.value = val;
       return sl;
     },
-    AddRaw: function(field) {if (this.HasInit()) this.container.append(field);},
+    AddRaw: function(field) {
+      if (typeof field === 'string') {
+        var d = document.createElement('DIV');
+        this.container.appendChild(d);
+        d.outerHTML = field;
+        return;
+      }
+      this.container.appendChild(field);
+    },
     AddEmailBox: function(id, name) {return addGenericInput(this, id, name, "text", "email");},
     AddNameBox: function(id, name) {return addGenericInput(this, id, name, "text", "name");},
     AddTextBox: function(id, name) {return addGenericInput(this, id, name, "text");},
     AddPassword: function(id, name) {return addGenericInput(this, id, name, "password", "password");},
     AddDropDown: function(id, name, items, value) {
-      var input = '<select inputID="' + id + '">';
-      for (var i = 0, len = items.length; i < len; i++) {
-        if (items[i]) input += '<option value="' + i + '">' + items[i] + '</option>';
-      }
-      input = $(input + '</select>');
-      if (typeof value !== 'undefined') input.val(value);
-      return this.AddOption(id, name, input);
+      var input = this.AddOption(id, name, '<select inputID="' + id + '">' + items.map(function(a, i) {
+        return '<option value="' + i + '">' + a + '</option>';
+      }).join('') + '</select>');
+      if (typeof value !== 'undefined') input.firstChild.value = value;
+      return input.firstChild;
     },
     AddPresetSelect: function(id, name, count, revert, defaultIndex) {
-      if ($('#settingsTab_presetStyle').length == 0) addPresetStyle();
-      var div = $('<div />');
-      for (var i = 0; i < count; i++) {
-        div.append('<a class="premade_settings" style="margin-bottom:10px"><div class="toolbar"></div><span>item ' + i + '</span></a>');
-      }
-      if (revert == true) {
-        this.AppendResetButton(div.children()[0], defaultIndex).on('click', function() {
-          div.children()[defaultIndex].click();
-        });
-      }
-      return this.AddOption(id, name, div).children();
+      if (!document.querySelector('#settingsTab_presetStyle')) addPresetStyle();
+      return this.AddOption(id, name, function(container) {
+        var mm = '<div>';
+        for (var i = 0; i < count; i++) {
+          mm += '<a class="premade_settings" style="margin-bottom:10px"><div class="toolbar"></div><span>item ' + i + '</span></a>';
+        }
+        mm += '</div>';
+        container.innerHTML = mm;
+        container = container.firstChild;
+        if (revert) {
+          this.AppendResetButton(container.firstChild, defaultIndex).addEventListener('click', function() {
+            container.childNodes[defaultIndex].click();
+          });
+        }
+        return Array.apply(null, container.childNodes);
+      });
     },
     AddTextArea: function(id, name, defaul) {
-      var div = $('<div />');
-      var input = $('<textarea inputID="' + id + '"></textarea>');
-      div.append(input);
-      if (typeof defaul !== 'undefined') input.val(defaul);
-      this.AddOption(id, name, div);
+      var input = this.AddOption(id, name, '<div><textarea inputID="' + id + '" ></textarea></div>').firstChild.firstChild;
+      if (typeof defaul !== 'undefined') input.value = defaul;
       return input;
     },
     AddOption: function(id, name, content) {
-      var row = $('<tr><td id="' + id + '" class="label">' + name + '</td></tr>');
-      var data = $('<td />');
-      content = $(content);
-      data.append(content);
-      row.append(data);
-      this.container.append(row);
-      return content;
+      var row = document.createElement('TR');
+      row.innerHTML = '<td id="' + id + '" class="label">' + name + '</td>';
+      this.container.appendChild(row);
+      var data = document.createElement('TD');
+      row.appendChild(data);
+      if (typeof content === 'string') {
+        data.innerHTML = content;
+        return data;
+      }
+      return content.call(this, data);
     },
     AddToolbar: function(id, buttonCount, span) {
-      var row = $('<tr><td colspan="' + span + '" id="' + id + '" style="padding: 0px;" ><div class="notifications"><div class="type_selector" /></div></td></tr>');
-      this.container.append(row);
-      row = row.find('.type_selector');
+      var row = document.createElement('TR');
+      row.innerHTML = '<td colspan="' + span + '" id="' + id + '" style="padding: 0px;" ><div class="notifications"><div class="type_selector"></div></div></td>';
+      this.container.appendChild(row);
+      row = row.firstChild.firstChild;
       if (buttonCount) {
-        var but = '<a class="styled_button styled_button_grey" href="javascript:void();" />';
+        var but = '';
         for (var i = 0; i < buttonCount; i++) {
-          row.append(but);
+          but += '<a class="styled_button styled_button_grey" href="javascript:void();"></a>';
         }
+        row.innerHTML = but;
       }
       return row;
     },
     AppendResetButton: function(control, defaultIndex) {
-      $(control).parent().append("</br></br>");
-      var rev = this.AppendButton(control, '<i class="fa fa-undo" />Revert to default');
-      if (defaultIndex != null) rev.attr("data-revert-index", defaultIndex);
+      control.parentNode.appendChild(document.createElement('BR'));
+      control.parentNode.appendChild(document.createElement('BR'));
+      var rev = this.AppendButton(control, '<i class="fa fa-undo"></i> Revert to default');
+      if (defaultIndex !== undefined) rev.dataset.revertIndex = defaultIndex;
       return rev;
     },
     AppendButton: function(control, content) {
-      var rev = $('<a class="styled_button styled_button_blue" />');
-      rev.append(content);
-      return this.AppendControl($(control).parent(), rev);
-    },
-    AppendControl: function(holder, appended) {
-      appended = $(appended);
-      $(holder).append(appended);
-      return appended;
+      var rev = document.createElement('A');
+      rev.setAttribute('class', 'styled_button styled_button_blue');
+      control.appendChild(rev);
+      rev.innerHTML = content;
+      return rev;
     },
     AddButton: function(id, name, label) {
       return this.AddOption(id, name, '<a inputID="' + id + '" class="styled_button styled_button_blue">"' + label + '</a>');
     },
     AddFinishButton: function(name, func) {
       var me = this;
-      var field = $('<div />');
-      var link = $('<button class="styled_button"><i class="fa fa-save" />Save Settings</a>');
-      field.append(link);
-      var img = $('<span style="display:none"><i class="fa fa-spinner fa-spin" style="font-size: 25px;vertical-align: middle;padding: 10px;" /></span>');
-      field.append(img);
+      var field = document.createElement('DIV');
+      var link = document.createElement('BUTTON');
+      link.classList.add('styled_button');
+      link.innerHTML = '<i class="fa fa-save"></i>Save Settings';
+      field.appendChild(link);
+      var img = document.createElement('SPAN');
+      img.style.display = 'none';
+      img.style.opacity = '1';
+      img.style.transition = 'opacity 0.5s ease';
+      img.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size: 25px;vertical-align: middle;padding: 10px;"></i>';
+      field.appendChild(img);
       function complete(fails) {
         if (fails) me.showError(fails);
-        img.append('Saved!');
-        img.fadeOut();
+        img.append(document.createTextNode('Saved!'));
+        img.style.opacity = '0';
+        setTimeout(function() {
+          img.style.display = 'none';
+          img.style.opacity = '1';
+        }, 500);
       }
-      link.on('click', function() {
-        img.css('display', 'inline');
+      link.addEventListener('click', function() {
+        img.style.display = 'inline';
         func(complete);
       });
       return this.AddOption('captch', name, field);
     },
-    setEnabled: function(el, enable) {
-      el = $(el);
-      el.parent().each(function() {
-        $(this).find('input,select,button').attr('disabled', !enable);
-      });
-      el.parent().find('.premade_settings,label,select').each(function() {
-        $(this).css(enable ? {'opacity':'', 'pointer-events': ''} : {'opacity':'0.5','pointer-events': 'none'});
+    SetEnabled: function(selector, enable) {
+      all(selector, function(el) {
+        all('.premade_settings, label, input, select, button', function(d) {
+          if (enable) {
+            d.removeAttribute('disabled');
+          } else {
+            d.setAttribute('disabled', true);
+          }
+          d.style.opacity = enable ? '' : '0.5';
+          d.style.pointerEvents = enable ? '' : 'none';
+        }, el.parentNode);
       });
     }
   }
   FimFicSettings.SettingsTab = function SettingsTab(title, description, name, img, category, categoryIcon) {
-    return BuildSettingsTab.apply(this, arguments);
-  }
-  FimFicSettings.SettingsTab.isCustomTabPage = function isCustomTabPage(page, registered) {
-    var i = registered.length;
-    var match = page.split("=")[1];
-    while (i--) {
-      if (match == registered[i][0]) return true;
+    var page = document.location.href.split('://')[1].split('?')[0].split('#')[0].split('/').reverse();
+    if (page[page.length > 3 ? 2 : 1] != 'manage') {
+      return new FimFicSettings.OptionsBuilder();
     }
-    return false;
+    if (!category || category.trim().length == 0) category = 'Account';
+    return initialiseTabs(function(tabs, reference) {
+      var tab = getTab(tabs, category, categoryIcon);
+      var canvas = newCanvas(img, description);
+      if (!document.querySelector('li[pageName="' + name + '"]')) {
+        newTabSwitcher(tab, name, img, title, function() {
+          reference.style.display = 'none';
+          all('.user-cp-content.generated', function(el) {
+            el.parentNode.removeChild(el);
+          });
+          reference.parentNode.insertBefore(canvas, reference);
+          var s = document.querySelector('.tab.tab_selected');
+          if (s) s.classList.remove('tab_selected');
+          linker.addClass('tab_selected');
+        });
+      }
+      return new FimFicSettings.OptionsBuilder(canvas.querySelector('tbody'), newError(canvas));
+    });
+  };
+  
+  function newTabSwitcher(tab, name, img, title, click) {
+    var linker = document.createElement('LI');
+    linker.classList.add('tab');
+    linker.setAttribute('pageName', name);
+    linker.innerHTML = '<a href="#"><i class="' + img + '"></i><span>' + title + '</span></a>';
+    tab.lastElementChild.appendChild(linker);
+    linker.firstChild.addEventListener('click', click);
   }
   
-  function BuildSettingsTab(title, description, name, img, category, categoryIcon) {
-    if (category == '' || category == null) category = 'Account';
-    var registered = getSafe('settingsTabsRegister', []);
-    registered.push([name,img,title,category]);
-    var page = document.location.href.split('/').reverse()[0];
-    var indexPage = page.split('=');
-    var isSettingsPage = indexPage[1] == 'local_settings'
-    var isIndexPage = indexPage[0] == 'index.php?view';
-    var tabs = $('.tab-collection');
-    if (isIndexPage) {
-      if (isSettingsPage) {
-        if ($('.user-cp-content-box > form').length > 1) {
-          $('.user-cp-content-box').first().remove();
-        }
-        var form = $('.user_cp');
-        if (!$('.user-cp-content').length) {
-          form.append('<div class="user-cp-content" />');
-          form.find('.user-cp-content').append(form.find('.user-cp-content-box'));
-        }
-        form.attr("style", "overflow:hidden; display:table; width:100%; margin-bottom:30px;");
-        var p = form.parent();
-        if (!p.hasClass('inner')) {
-          p.after(form).remove();
-        }
-      } else if (!tabs.length && FimFicSettings.SettingsTab.isCustomTabPage(page, registered)) {
-        $('.content_box').after('<div class="user_cp" style="overflow:hidden; display:table; width:100%; margin-bottom:30px;"><div class="user-cp-content" /></div>').remove();
-      }
-    }
-    
-    if (!tabs.length) return new FimFicSettings.OptionsBuilder();
-    
-    var tab = null;
-    for (var i = 0, len = tabs.length; i < len; i++) {
-      var item = $(tabs[i]);
-      if (item.find('h1 span').text() == category) {
+  function newCanvas(img, description) {
+    var canvas = document.createElement('DIV');
+    canvas.setAttribute('class', 'user-cp-content generated');
+    canvas.innerHTML = '<div class="user-cp-content-box"><h1><i class="fa ' + img + '"></i>' + description + '</h1><form><div id="SettingsPage_Parent"><table class="properties"><colgroup><col><col></colgroup><tbody></tbody></table></div></form></div>';
+    return canvas;
+  }
+  
+  function newError(canvas) {
+    var error = document.createElement('DIV');
+    error.id = 'validation_error_message';
+    error.classList.add('validation_error');
+    error.style.display = 'none';
+    error.innerHTML = '<div class="message" style="margin-bottom:10px;">There were errors with the settings you chose. Please correct the fields marked<img class="icon_16" style="vertical-align:-3px;" src="' + staticFimFicDomain() + '/images/icons/cross.png"></img>. Hover over to see the error.</div>';
+    canvas.querySelector('form').appendChild(error);
+    return error;
+  }
+  
+  function getTab(tabs, category, categoryIcon) {
+    var tabGroups = tabs.querySelectorAll('.tab-collection');
+    each(tabGroups, function(item) {
+      if (item.querySelector('h1 span').innerText == category) {
         tab = item;
-        break;
       }
-    }
+    });
     if (!tab) {
-      tab = $('<div class="tab-collection"><h1><i class="fa fa-fw fa-' + categoryIcon + '" /> <span>' + category + '</span></h1><ul /></div>');
-      tabs.last().css('margin-bottom', '20px').after(tab);
+      tab = document.createElement('DIV');
+      tab.classList.add('tab-collection');
+      tab.innerHTML = '<h1><i class="fa fa-fw fa-' + categoryIcon + '" ></i> <span>' + category + '</span></h1><ul></ul>';
+      each(tabGroups, function(item) {
+        item.style.marginBottom = '20px';
+      });
+      tabs.appendChild(tab);
     }
-    var reference = $('.user-cp-content');
+    return tab;
+  }
+  
+  function initialiseTabs(continuation) {
+    var tabs = document.querySelector('.tabs');
+    if (tabs) {
+      return continuation(tabs, document.querySelector('.user-cp-content'));
+    }
     
-    var canvas = $('<div class="user-cp-content generated"><div class="user-cp-content-box"><h1><i class="fa ' + img + '" />' + description + '</h1><form><div id="SettingsPage_Parent"><table class="properties"><colgroup><col><col></colgroup><tbody></tbody></table></div></form></div></div>');
-    var error = $('<div id="validation_error_message" class="validation_error" style="display:none;" ><div class="message" style="margin-bottom:10px;">There were errors with the settings you chose. Please correct the fields marked<img class="icon_16" style="vertical-align:-3px;" src="' + staticFimFicDomain() + '/images/icons/cross.png"></img>. Hover over to see the error.</div></div>');
-    canvas.find('form').append(error);
-    if (tab) {
-      for (var i = 0, len = registered.length; i < len; i++) {
-        if (!$('li[pageName="' + registered[i][0] + '"]').length) {
-          var linker = $('<li class="tab" pageName=' + registered[i][0] + '><a href="#"><i class="' + registered[i][1] + '"></i><span>' + registered[i][2] + '</span></a></li>');
-          tab.find('ul').append(linker);
-          linker.find('a').on('click', function() {
-            reference.css('display', 'none');
-            $('.user-cp-content.generated').detach();
-            reference.after(canvas);
-            $('.tab.tab_selected').removeClass('tab_selected');
-            linker.addClass('tab_selected');
-          });
-        }
-      }
+    tabs = document.createElement('DIV');
+    tabs.classList.add('tabs');
+    tabs.innerHTML = '\
+    <div class="sidebar-shadow"><div class="light-gradient"></div><div class="dark-gradient"></div></div>\
+    <a href="#" data-no-user-popup="true"><img src="https://static.fimfiction.net/images/none_64.png"></a>\
+    <div class="tab-collection" style="margin-bottom:20px;">\
+      <h1><i class="fa fa-fw fa-cog"></i> <span>My Account</span></h1>\
+      <ul><li class="tab "><a title="Local Settings" href="/manage/local-settings"><i class="fa fa-fw fa-cog"></i><span> Local Settings</span></a></li>\
+      </ul></div>';
+    var userCpContentBox = document.querySelector('.user-cp-content-box');
+    if (!userCpContentBox) {
+      return new FimFicSettings.OptionsBuilder();
     }
-    return new FimFicSettings.OptionsBuilder(canvas.find('tbody'), error);
+    
+    var contentMobile = document.createElement('DIV');
+    contentMobile.setAttribute('class', 'content mobile-no-margin');
+    contentMobile.innerHTML = '<div class="user_cp"><div class="user-cp-content"></div></div>';
+    userCpContentBox.parentNode.insertBefore(contentMobile, userCpContentBox);
+    contentMobile.firstChild.firstChild.appendChild(userCpContentBox);
+    contentMobile.insertBefore(contentMobile.firstChild, tabs);
+    
+    return continuation(tabs, userCpContentBox.parentNode);
   }
 })();
