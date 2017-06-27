@@ -172,11 +172,31 @@ function makePopup(title, fafaText, darken, close) {
     return pop;
 }
 
+
 //==API FUNCTION==//
-function makeButton(a, text, img){
-    var result = $('<li class="button-group" data-priority="-1" data-order="200"><button type="button" class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button></li>');
-    $(a).append(result);
-    return result.find('button');
+function registerButton(button, controller, priority) {
+  button = button.parentNode;
+  button.dataset.order = button.parentNode.children.length;
+  button.dataset.priority = priority;
+  if (controller.toolbarItems) {
+    controller.toolbarItems.push({
+      node: button,
+      order: (button.dataset.order = controller.toolbarItems.length),
+      priority: priority,
+      width: 35
+    });
+  }
+}
+
+//==API FUNCTION==//
+function makeButton(a, text, img) {
+    var result = document.createElement('LI');
+    result.classList.add('button-group');
+    result.dataset.priority = 1;
+    result.dataset.order = 200;
+    result.innerHTML = '<button type="button" class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button>';
+    a.appendChild(result);
+    return result.firstChild;
 }
 
 //==API FUNCTION==//
@@ -278,36 +298,35 @@ function tryParseInt(s,d) {
 
 //==API FUNCTION==//
 function inbounds(el, buff) {
-    if (buff == null) buff = 0;
-
-    var left = $(el).offset().left;
-    var top = $(el).offset().top;
-
-    var scrollX = $(window).scrollLeft();
-    var scrollY = $(window).scrollTop();
-
-    left -= scrollX;
-    top -= scrollY;
-
-    var margL = tryParseFloat($(el).css('margin-left'), 0);
-    var margT = tryParseFloat($(el).css('margin-top'), 0);
-    var margR = tryParseFloat($(el).css('margin-right'), 0);
-    var margB = tryParseFloat($(el).css('margin-bottom'), 0);
+    if (!buff) buff = 0;
     
-    var width = $(el).outerWidth(false);
-    var height = $(el).outerHeight(false);
-
-    var winW = $(window).outerWidth(false);
-    var winH = $(window).outerHeight(false);
-
+    var scrollX = document.body.scrollLeft;
+    var scrollY = document.body.scrollTop;
+    
+    var os = offset(el);
+    
+    var left = os.left - scrollX;
+    var top = os.top - scrollY;
+    
+    var st = window.getComputedStyle(el);
+    
+    var margL = tryParseFloat(st.marginLeft, 0);
+    var margT = tryParseFloat(st.marginTop, 0);
+    var margR = tryParseFloat(st.marginRight, 0);
+    var margB = tryParseFloat(st.marginBottom, 0);
+    
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+    
+    var winW = document.body.offsetWidth;
+    var winH = document.body.offsetHeight;
+    
     if (top - margT + height + margB > winH + buff) top = winH - height;
     if (left - margL + width + margR > winW + buff) left = winW - width;
-
     if (top < buff) top = buff;
     if (left < buff) left = buff;
-
-    $(el).css('top', top - margT + scrollY + 'px');
-    $(el).css('left', left - margL + scrollX + 'px');
+    el.style.top = (top - margT + scrollY) + 'px';
+    el.style.left = (left - margL + scrollX) + 'px';
 }
 
 //==API FUNCTION==//
