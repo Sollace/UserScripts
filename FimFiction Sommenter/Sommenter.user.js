@@ -5,86 +5,29 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     2.3
-// @require     http://code.jquery.com/jquery-1.8.3.min.js
-// @grant       GM_getValue
-// @grant       GM_setValue
+// @version     3
+// @grant       none
 // ==/UserScript==
 
-var interactiveP = $('input[name="show_interactive_pony"]');
-if (interactiveP.length) {
-  interactiveP = interactiveP.parent().parent().parent().parent();
-  var Option = $('<input type="checkbox" name="pin_comments" />');
-  var row = $('<tr><td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
-  row.find('.toggleable-switch').prepend(Option);
-  interactiveP.before(row);
-  Option.attr('checked', getPinComments());
-  Option.click(function () {
-    setPinComments(this.checked);
-  });
-  Option = $('<input type="checkbox" name="compact" />');
-  row = $('<tr><td class="label">Minimise Comment Box to corner</td><td><label class="toggleable-switch" ><a /></label></td></tr>');
-  row.find('.toggleable-switch').prepend(Option);
-  Option.attr('checked', getCompact());
-  Option.click(function() {
-    setCompact(this.checked);
-  });
-  interactiveP.before(row);
+var interactiveP = document.querySelector('input[name="show_interactive_pony"]');
+if (interactiveP) {
+  setupOptionsToggle(interactiveP.parentNode.parentNode.parentNode.parentNode);
 }
 
-var commentBox = $("#add_comment_box .toolbar_buttons");
-if (commentBox.length > 0) {
-  setupTogglePin(commentBox[0]);
-  $(document).ready(function () {
-    $('#add_comment_box .form_submitter').on('click', function () {
-      $('body.pin_comment #comment_preview').css('opacity', 0);
-      setTimeout(function () {
-        $('body.pin_comment #comment_preview').html('');
-        $('body.pin_comment #comment_preview').css('display', '');
-        $('body.pin_comment #comment_preview').css('opacity', '');
-      }, 500);
-    });
+var commentBox = document.querySelector("#add_comment_box .toolbar_buttons");
+if (commentBox) {
+  setupTogglePin(commentBox);
+}
+
+var preview = document.getElementById('comment_preview');
+if (preview) {
+  preview.addEventListener('mouseenter', function() {
+    document.body.classList.add('hold_comment');
+  })
+  preview.addEventListener('mouseleave', function() {
+    document.body.classList.remove('hold_comment');
   });
 }
-
-unsafeWindow.AddQuote = function(id, shift) {};
-$(document).on("click",".comment .reply_button",function(a){AddQuote($(this).data("comment-id"),a.shiftKey || $('body.pin_comment').length > 0)});
-
-function AddQuote(a, b) {
-  unsafeWindow.InsertTextAt($('#comment_entry textarea') [0], (0 < $('#comment_entry textarea').val().length ? '\n' : '') + '>>' + a + ' ');
-  b || $('html, body').animate({
-    scrollTop: $('#new_comment').offset().top
-  }, 300)
-}
-
-$('#comment_preview').on('mouseenter', function() {
-  $('body').addClass('hold_comment');
-});
-$('#comment_preview').on('mouseleave', function() {
-  $('body').removeClass('hold_comment');
-});
-$('.jump-to').on('click', function(b) {
-  b.preventDefault();
-  b.stopPropagation();
-  if (!$('body').hasClass('pin_comment')) {
-    var a;
-    if ('bottom' == $(this).data('align')) {
-      a = $($(this).data('jump'));
-      a = a.offset().top - $(window).height() + a.height();
-    } else {
-      a = $($(this).data('jump')).offset().top;
-    }
-    $("html, body").animate({scrollTop: a}, 500);
-  } else {
-    $('body').addClass('hold_comment');
-    setTimeout(function() {
-      if (!$('#comment_preview').is(':hover')) {
-        $('body').removeClass('hold_comment');
-      }
-    },2000);
-  }
-});
-
 
 makeStyle("\
 .comments_pinner:before {\
@@ -169,21 +112,60 @@ body.pin_comment #add_comment_box:hover + #comment_preview {\
 //----------------------------------------FUNCTIONS-------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
-function setupTogglePin(toolbar) {
-  if ($('#add_comment_box_pin').length == 0) {
-    var bod = $('body');
-    var tog = makeButton(toolbar, "Toggle Pin (Temporary)", "fa comments_pinner");
-    $(tog).attr('id', 'add_comment_box_pin');
-    $(tog).click(function () {
-      if (bod.hasClass('pin_comment')) {
-        bod.removeClass('pin_comment');
-      } else {
-        bod.addClass('pin_comment');
-      }
-    });
+function setupOptionsToggle(me) {
+  var row = document.createElement('TR');
+  row.innerHTML = '<td class="label">Pin Comment Section on load</td><td><label class="toggleable-switch" ><input type="checkbox" name="pin_comments"></input><a></a></label></td>';
+  var Option = row.querySelector('input');
+  me.parentNode.insertBefore(row, me);
+  Option.checked = getPinComments();
+  Option.addEventListener('click', function () {
+    setPinComments(this.checked);
+  });
+  row = document.createElement('TR');
+  row.innerHTML = '<td class="label">Minimise Comment Box to corner</td><td><label class="toggleable-switch" ><input type="checkbox" name="compact"></input><a></a></label></td>';
+  Option = row.querySelector('input');
+  Option.checked = getCompact();
+  Option.click(function() {
+    setCompact(this.checked);
+  });
+  me.parentNode.insertBefore(row, me);
+}
 
-    if (getPinComments()) bod.addClass('pin_comment');
-    if (getCompact()) bod.addClass('hide_comment');
+function setupTogglePin(toolbar) {
+  if (!document.querySelector('#add_comment_box_pin')) {
+    var tog = makeButton(toolbar, "Toggle Pin (Temporary)", "fa comments_pinner");
+    tog.setAttribute('id', 'add_comment_box_pin');
+    tog.dataset.click = 'togglePin';
+    
+    registerButton(tog, App.GetControllerFromElement(toolbar.parentNode.parentNode), 1);
+    
+    if (getPinComments()) document.body.classList.add('pin_comment');
+    if (getCompact()) document.body.classList.add('hide_comment');
+    
+    BBCodeEditorController.prototype.togglePin = function(sender, event) {
+        event.preventDefault();
+        document.body.classList.toggle('pin_comment');
+    };
+    
+    CommentListController.prototype.__replyToComment = CommentListController.prototype.replyToComment;
+    CommentListController.prototype.replyToComment = function(sender, event) {
+      event.ctrlKey |= document.body.classList.contains('pin_comment');
+      return this.__replyToComment(sender, event);
+    };
+    
+    NewCommentController.prototype.___save = NewCommentController.prototype.save;
+    NewCommentController.prototype.save = function(sender, event) {
+      this.__save(sender, event);
+      if (document.body.classList.contains('pin_comment')) {
+        var commentPreview = document.getElementById('comment_preview');
+        commentPreview.style.opacity = 0;
+        setTimeout(function () {
+          commentPreview.innerHTML = '';
+          commentPreview.style.display = '';
+          commentPreview.style.opacity = '';
+        }, 500);
+      }
+    };
   }
 }
 
@@ -193,20 +175,20 @@ function setupTogglePin(toolbar) {
 
 //==API FUNCTION==//
 function getPinComments() {
-  return GM_getValue('pin_comments', 0) == 1;
+  return (localStorage['pin_comments'] || '0') == '1';
 }
 
 function setPinComments(val) {
-  GM_setValue('pin_comments', val ? 1 : 0);
+  localStorage['pin_comments'] = val ? '1' : '0';
 }
 
 //==API FUNCTION==//
 function getCompact() {
-  return GM_getValue('compact', 0) == 1;
+  return (localStorage['compact'] || '0') == '1';
 }
 
 function setCompact(val) {
-  GM_setValue('compact', val ? 1 : 0);
+  localStorage['compact'] = val ? '1' : '0';
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -214,16 +196,35 @@ function setCompact(val) {
 //--------------------------------------------------------------------------------------------------
 
 //==API FUNCTION==//
-function makeButton(a, text, img){
-  var result = $('<li class="button-group"><button class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button></li>');
-  $(a).append(result);
-  return result.find('button');
+function registerButton(button, controller, priority) {
+  button = button.parentNode;
+  button.dataset.order = button.parentNode.children.length;
+  button.dataset.priority = priority;
+  if (controller.toolbarItems) {
+    controller.toolbarItems.push({
+      node: button,
+      order: (button.dataset.order = controller.toolbarItems.length),
+      priority: priority,
+      width: 35
+    });
+  }
+}
+
+//==API FUNCTION==//
+function makeButton(a, text, img) {
+  var result = document.createElement('LI');
+  result.classList.add('button-group');
+  result.dataset.priority = 1;
+  result.dataset.order = 200;
+  result.innerHTML = '<button type="button" class="drop-down-expander" title="' + text + '"><i class="' + img + '"></i></button>';
+  a.appendChild(result);
+  return result.firstChild;
 }
 
 var vendor = vendor || null;
 //==API FUNCTION==//
 function getVendorPrefix() {
-  if (vendor == null) {
+  if (!vendor) {
     var styles = window.getComputedStyle(document.documentElement, '');
     var pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o']))[1];
     var dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
@@ -234,11 +235,15 @@ function getVendorPrefix() {
 
 //==API FUNCTION==//
 function makeStyle(input, id) {
-  while (input.indexOf('  ') != -1) input = input.replace(/  /g,' ');
-  input = input.replace(/-\{0\}-/g, getVendorPrefix().css);
-  var style = document.createElement('style');
-  style.setAttribute('type', 'text/css');
-  style.innerHTML = input;
+  var style = styleSheet(input.replace(/-\{0\}-/g, getVendorPrefix().css));
   if (id) style.id = id;
   document.head.appendChild(style);
+}
+
+//==API FUNCTION==//
+function styleSheet(css) {
+  var style = document.createElement('style');
+  style.innerHTML = css;
+  style.type = 'text/css';
+  return style;
 }
