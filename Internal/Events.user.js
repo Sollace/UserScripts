@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     2.2
+// @version     2.3
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @grant       none
@@ -10,7 +10,7 @@
 // ==/UserScript==
 
 function RunScript(func, mustCall, params) {
-  if (!document.body) RunScript.ready(func, mustCall, params);
+  if (!document.body) return RunScript.ready(func, mustCall, params);
   var scr = document.createElement('SCRIPT');
   if (mustCall) {
     if (params) {
@@ -29,7 +29,7 @@ function RunScript(func, mustCall, params) {
   scr.parentNode.removeChild(scr);
 }
 RunScript.ready = function(func, mustCall, params) {
-  window.addEventListener('load', function() {
+  window.addEventListener('DOMContentLoaded', function() {
     RunScript(func, mustCall, params);
   });
 };
@@ -68,7 +68,7 @@ RunScript.build = function(functionText) {
 
 try {
   (function (win) {
-    var ver = 2.2;
+    var ver = 2.3;
     var startup =
         (typeof (FimFicEvents) === 'undefined') && (typeof (win.FimFicEvents) === 'undefined') &&
         (win == window || (typeof (window.FimFicEvents) === 'undefined'));
