@@ -38,25 +38,6 @@ var jSlim = {
             return result;
         };
     })(),
-    on: function addScopedEventListener(node, selector, event, func, capture) {
-        var k = function (ev) {
-            try {
-            for (var target = ev.target; null != target && target != document; ) {
-                if (win().matchesSelector(target, selector)) {
-                    if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) break;
-                    func.call(target, ev);
-                }
-                if (node == k) break;
-                target = target.parentNode
-            }
-            } catch (e) {console.error(e);}
-        };
-        node.addEventListener(event, k, !!capture);
-        return k;
-    },
-    off: function removeScopedEventListener(node, event, func, capture) {
-        node.removeEventListener(event, func, !!capture)
-    },
     ajax: function ajaxRequest(params) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function() {
@@ -82,27 +63,68 @@ var jSlim = {
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.send();
     },
+    one: function(node, event, func) {
+        var ev = function(e) {
+            node.removeEventListener(event, ev);
+            return func.call(this, e);
+        };
+        node.addEventListener(event, ev);
+    },
+    on: function addScopedEventListener(node, selector, event, func, capture) {
+        var k = function (ev) {
+            for (var target = ev.target; target != null && target != document; ) {
+                if (win().matchesSelector(target, selector)) {
+                    if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) break;
+                    func.call(target, ev);
+                }
+                if (node == target) break;
+                target = target.parentNode
+            }
+        };
+        node.addEventListener(event, k, !!capture);
+        return k;
+    },
+    off: function removeScopedEventListener(node, event, func, capture) {
+        node.removeEventListener(event, func, !!capture)
+    },
+    empty: function(el) {
+        while (el.firstChild) el.removeChild(el.firstChild);
+    },
     newEl: function createElement(tag, attr, inner) {
         tag = document.createElement(tag);
-        if (attr) this.objEach(attr, function(key) {
-            tag.setAttribute(key, this); 
+        if (attr) this.objEach(attr, function(value, key) {
+            tag.setAttribute(key, value); 
         });
         if (inner) tag.innerHTML = inner;
         return tag;
     },
+    nearest: function (node, selector) {
+        while (node = node.parentNode) {
+            if (node == document) return null;
+            if (win().matchesSelector(node, selector)) return node;
+        }
+    },
     objEach: function objectEach(obj, f, this_arg) {
-        this.each(Object.keys(obj), function(i, keys) {
-            return f.apply(this_arg || obj[this], [keys[i], obj]);
+        jSlim.each(Object.keys(obj), function(a, index) {
+            return f.apply(this, [obj[a], a]);
         }, this_arg);
         return obj;
     },
-    each: function each(arr, f, this_arg) {
-        for (var j = arr.length, i = 0; j--; i++) if (f.apply(this_arg || arr[i], [i, arr]) == false) break;
-        return arr;
+    each: function(arr, func, this_arg) {
+        return Array.prototype.forEach.call(arr, func, this_arg);
     },
-    nearest: function parents(el, clazz) {
-        while (el && !el.classList.contains(clazz)) el = el.parentNode;
-        return el;
+    all: function(selector, holder, func) {
+        if (!func) {
+            func = holder;
+            holder = document;
+        }
+        return jSlim.each(holder.querySelectorAll(selector), func);
+    },
+    append: function(holder, tag, inner) {
+        tag = document.createElement(tag);
+        holder.appendChild(tag);
+        if (inner) tag.innerHTML = inner;
+        return tag;
     },
     before: function insertBefore(el, newEl) {
         el.parentNode.insertBefore(newEl, el);
@@ -279,6 +301,7 @@ try {
                             me['do' + (type ? 'sniff' : 'snuff')](pop,jSlim.newEl('UL', {}, xml.content));
                         } catch (e) {
                             me.printError(pop, e);
+                            console.error(e);
                         }
                     }
                 }, function(e) {
@@ -289,15 +312,15 @@ try {
                 var followers = [];
                 this.followersRaw = [];
                 this.oldFollowers = this.followers;
-                var me = this;
-                jSlim.each(xml.querySelectorAll('.user-avatar'), function() {
-                    var name = this.parentNode.querySelector('.name').childNodes[0].nodeValue;
-                    var bgimg = window.getComputedStyle(this).backgroundImage;
+                var self = this;
+                jSlim.each(xml.querySelectorAll('.user-avatar'), function(me) {
+                    var name = me.parentNode.querySelector('.name').childNodes[0].nodeValue;
+                    var bgimg = window.getComputedStyle(me).backgroundImage;
                     followers.push({
                         id: bgimg.indexOf('images/') != -1 ? bgimg.split('images/').reverse()[0].split('_')[0] : bgimg.split('user/').reverse()[0].split('-')[2],
                         name: name
                     });
-                    me.followersRaw.push(name);
+                    self.followersRaw.push(name);
                 });
                 var gained = [];
                 var lost = [];
@@ -322,8 +345,8 @@ try {
             },
             dosnuff: function(pop,xml) {
                 var followers = [];
-                jSlim.each(xml.querySelectorAll('.user-avatar'), function() {
-                    followers.push(this.parentNode.href.split('/').reverse()[0]);
+                jSlim.each(xml.querySelectorAll('.user-avatar'), function(me) {
+                    followers.push(me.parentNode.href.split('/').reverse()[0]);
                 });
                 pop.innerHTML = '';
                 followerMapping.registerChild(pop.parent().attr('data-item'), followers);
@@ -354,11 +377,11 @@ try {
                 pop.insertBefore(tabs, pop.children[0]);
                 jSlim.on(tabs, '.button', 'click', function() {
                     var id = this.dataset.tab;
-                    jSlim.each(pop.children, function() {
-                        this.classList[this.dataset.id == id ? 'add' : 'remove']('selected');
+                    jSlim.each(pop.children, function(me) {
+                        me.classList.toggle('selected', me.dataset.id == id);
                     });
-                    jSlim.each(tabs.children, function() {
-                        this.classList.remove('selected');
+                    jSlim.each(tabs.children, function(me) {
+                        me.classList.remove('selected');
                     });
                     this.classList.add('selected');
                 });
@@ -531,12 +554,12 @@ try {
             jSlim.after(userPageHeader.querySelector('.tab-followers'), sniffer);
             sniffer.children[0].scopingElement = userPageHeader;
         }
-        jSlim.each(document.querySelectorAll('.user-card'), function() {
+        jSlim.all('.user-card', function(me) {
             var sniffer = jSlim.newEl('A', {
                 'class': 'sniffer'
             }, '<a><i class="fa fa-fw fa-paw" /> Sniff Followers</a>');
             sniffer.scopingElement = this;
-            jSlim.before(this.querySelector('.drop-down > ul > .divider'), sniffer);
+            jSlim.before(me.querySelector('.drop-down > ul > .divider'), sniffer);
         });
         jSlim.on(document.body, '.sniffer', 'click', function(e) {
             (new Dog(this.scopingElement)).sniffFollowers();
@@ -619,21 +642,21 @@ try {
         });
         jSlim.on(document.body, '.dog .list a', 'mouseenter', function(e) {
             if (this.classList.contains('hover')) return;
-            jSlim.each(document.querySelectorAll('.dog .list a.hover'), function() {
-                this.classList.remove('hover'); 
+            jSlim.all('.dog .list a.hover', function(me) {
+                me.classList.remove('hover'); 
             });
             var name = this.dataset.user;
             this.classList.add('hover');
         });
         FimFicEvents.on('afterinfocard', function(e) {
-            jSlim.each(document.querySelectorAll('.info-card-container .top-info .button-group > .button-group'), function() {
-                if (!this.querySelector('.snuffer').length) {
+            jSlim.all('.info-card-container .top-info .button-group > .button-group', function(me) {
+                if (!me.querySelector('.snuffer')) {
                     var butt = jSlim.newEl('A', {
                         'class': 'snuffer button button-icon-only'
                     }, '<span title="Sniff Followers"><i class="fa fa-paw" /></span>');
-                    butt.scopingElement = jSlim.nearest(this, 'user-card');
+                    butt.scopingElement = jSlim.nearest(me, 'user-card');
                     butt.dataset.user = e.user;
-                    this.insertBefore(butt, this.children[0]);
+                    me.insertBefore(butt, me.children[0]);
                 }
             });
         });
