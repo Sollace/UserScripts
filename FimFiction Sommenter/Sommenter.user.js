@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     3
+// @version     3.1
 // @grant       none
 // ==/UserScript==
 
@@ -153,7 +153,7 @@ function setupTogglePin(toolbar) {
       return this.__replyToComment(sender, event);
     };
     
-    NewCommentController.prototype.___save = NewCommentController.prototype.save;
+    NewCommentController.prototype.__save = NewCommentController.prototype.save;
     NewCommentController.prototype.save = function(sender, event) {
       this.__save(sender, event);
       if (document.body.classList.contains('pin_comment')) {
