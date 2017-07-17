@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.2
+// @version     2.2.3
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -313,15 +313,18 @@ try {
                 this.followersRaw = [];
                 this.oldFollowers = this.followers;
                 var self = this;
+                xml.style.display = 'none';
+                document.body.appendChild(xml);
                 jSlim.each(xml.querySelectorAll('.user-avatar'), function(me) {
                     var name = me.parentNode.querySelector('.name').childNodes[0].nodeValue;
                     var bgimg = window.getComputedStyle(me).backgroundImage;
                     followers.push({
-                        id: bgimg.indexOf('images/') != -1 ? bgimg.split('images/').reverse()[0].split('_')[0] : bgimg.split('user/').reverse()[0].split('-')[2],
+                        id: bgimg.indexOf('images/') > -1 ? 'none' : (bgimg.split('user/').reverse()[0].split('-')[2] || 'none'),
                         name: name
                     });
                     self.followersRaw.push(name);
                 });
+                document.body.removeChild(xml);
                 var gained = [];
                 var lost = [];
                 var named = [];
@@ -334,6 +337,9 @@ try {
                     }
                 }
                 for (var i = this.followers.length; i--;) {
+                    if (!this.followers[i].id) {
+                        this.followers[i].id = 'none';
+                    }
                     if (this.followers[i].id.indexOf('/') == -1) {
                         if (isPresent(followers, this.followers[i]) == null) {
                             lost.unshift(this.followers[i]);
@@ -602,8 +608,7 @@ try {
                 }
             }
         });
-        jSlim.on(document.body, 'button.forget, button.hforget, button.eforget', 'mouseleave', function(e) {
-            alert('leave');
+        jSlim.on(document.body, 'button.forget, button.hforget, button.eforget', 'mouseout', function(e) {
             if (this.dataset.check != '2') {
                 this.dataset.check = '0';
                 this.innerText = this.dataset.text;
@@ -743,9 +748,7 @@ try {
             node.appendChild(search);
             node.appendChild(list);
             function updateContent() {
-                try {
-                    list.innerHTML = followerMapping.structured(id).html(search.value.toUpperCase());
-                } catch (e) { alert(e); }
+                list.innerHTML = followerMapping.structured(id).html(search.value.toUpperCase());
             }
             updateContent();
             return node;
