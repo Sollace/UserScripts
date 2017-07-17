@@ -3,13 +3,13 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1.1
+// @version     1.1.3
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
 (function() {
   function addGenericInput(me, id, name, type, clas) {
-    return me.AddOption(id, name, '<div><input' + (clas != null ? ' class="' + clas + '"' : '') + ' inputID="' + id + '" type="' + type + '"></input></div>').firstChild.firstChild;
+    return me.AddOption(id, name, '<div><input' + (clas != null ? ' class="' + clas + '"' : '') + ' inputID="' + id + '" type="' + type + '"></input></div>').firstChild;
   }
   function all(selector, func, d) {
     return each((d || document).querySelectorAll(selector), func);
@@ -155,7 +155,7 @@ div.colour_pick {\
           var lkey = key.toLowerCase();
           var colourHolder = document.createElement('DIV');
           colourHolder.classList.add(lkey);
-          colourHolder.dataser.key = lkey;
+          colourHolder.dataset.key = lkey;
           colourHolder.innerHTML = '<input class="color" type="text" placeholder="' + key + '"></input><input value="128" type="range" max="255"></input>';
           result[lkey] = [ colourHolder.firstChild, colourHolder.lastChild ]
           div.append(colourHolder);
@@ -170,14 +170,14 @@ div.colour_pick {\
         var up = evIndirect('INPUT', function() {
           var inputs = result[this.parentNode.dataset.key];
           if (this.dataset.changed == '1') {
-            inputs[0].value = inputs[1].value = this.value;
+            inputs[0].value = inputs[1].value = parseFloat(this.value);
           }
           if (this.getAttribute('type') == 'text' && this.value == '') {
             inputs[0].dataset.changed = inputs[1].dataset.changed = '0';
           }
           if (func) func(this, e);
         });
-        div.addEventListener('change', up);
+        div.addEventListener('input', up);
         div.addEventListener('keyup', up);
         
         return result;
@@ -226,7 +226,7 @@ div.colour_pick {\
       });
     },
     AddLabelCheckBox: function(id, name, label) {
-      return this.AddOption(id, name, '<label><input inputID="' + id + '" type="checkbox"></i>' + label + '</label>').firstChild.firstChild;
+      return this.AddOption(id, name, '<label><input inputID="' + id + '" type="checkbox"></i>' + label + '</label>').firstChild;
     },
     AddCheckBox: function(id, name, value) {
       var label = document.createElement('LABEL');
@@ -264,8 +264,8 @@ div.colour_pick {\
       var input = this.AddOption(id, name, '<select inputID="' + id + '">' + items.map(function(a, i) {
         return '<option value="' + i + '">' + a + '</option>';
       }).join('') + '</select>');
-      if (typeof value !== 'undefined') input.firstChild.value = value;
-      return input.firstChild;
+      if (typeof value !== 'undefined') input.value = value;
+      return input;
     },
     AddPresetSelect: function(id, name, count, revert, defaultIndex) {
       if (!document.querySelector('#settingsTab_presetStyle')) addPresetStyle();
@@ -286,7 +286,7 @@ div.colour_pick {\
       });
     },
     AddTextArea: function(id, name, defaul) {
-      var input = this.AddOption(id, name, '<div><textarea inputID="' + id + '" ></textarea></div>').firstChild.firstChild;
+      var input = this.AddOption(id, name, '<div><textarea inputID="' + id + '" ></textarea></div>').firstChild;
       if (typeof defaul !== 'undefined') input.value = defaul;
       return input;
     },
@@ -298,7 +298,7 @@ div.colour_pick {\
       row.appendChild(data);
       if (typeof content === 'string') {
         data.innerHTML = content;
-        return data;
+        return data.firstChild;
       }
       return content.call(this, data);
     },
@@ -315,6 +315,10 @@ div.colour_pick {\
         row.innerHTML = but;
       }
       return row;
+    },
+    AppendControl: function(holder, appended) {
+      holder.insertAdjacentHTML('beforeend', appended);
+      return holder.lastChild;
     },
     AppendResetButton: function(control, defaultIndex) {
       control.parentNode.appendChild(document.createElement('BR'));
