@@ -3,7 +3,7 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1
+// @version     1.1.1
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
