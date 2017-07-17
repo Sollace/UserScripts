@@ -5,7 +5,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net*
 // @include     https://www.fimfiction.net*
-// @version     3.1
+// @version     3.1.1
 // @grant       none
 // ==/UserScript==
 
@@ -125,7 +125,7 @@ function setupOptionsToggle(me) {
   row.innerHTML = '<td class="label">Minimise Comment Box to corner</td><td><label class="toggleable-switch" ><input type="checkbox" name="compact"></input><a></a></label></td>';
   Option = row.querySelector('input');
   Option.checked = getCompact();
-  Option.click(function() {
+  Option.addEventListener('click', function () {
     setCompact(this.checked);
   });
   me.parentNode.insertBefore(row, me);
