@@ -3,7 +3,7 @@
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1.3
+// @version     1.1.1
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
@@ -378,7 +378,7 @@ div.colour_pick {\
         }, el.parentNode);
       });
     }
-  }
+  };
   FimFicSettings.SettingsTab = function SettingsTab(title, description, name, img, category, categoryIcon) {
     var page = document.location.href.split('://')[1].split('?')[0].split('#')[0].split('/').reverse();
     if (page[page.length > 3 ? 2 : 1] != 'manage') {
