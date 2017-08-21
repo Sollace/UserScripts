@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.4
+// @version     2.2.5
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -363,15 +363,12 @@ try {
                 result += '<div class="main">The data for this user may have been damaged. You can clear the follower or history data below and try again.</div>';
                 result += clearButton(this.userId) + emptyHistoryButton(this.userId) + '</div>';
                 
-                pop.appendChild(jSlim.newEl('DIV', {
-                    'data-id': 0, 'class': 'tab shown selected'
-                }), result);
+                pop.appendChild(jSlim.newEl('DIV', { 'data-id': 0, 'class': 'tab shown selected' }, result));
                 if (e.stack) {
                     tabs += '<div data-tab="1" class="button">Stacktrace</div>';
-                    pop.appendChild(jSlim.newEl('DIV', {
-                        'data-id': 1, class: 'tab shown'
-                    }, e.stack));
+                    pop.appendChild(jSlim.newEl('DIV', { 'data-id': 1, class: 'tab shown' }, e.stack));
                 }
+                
                 this.initTabs(tabs, pop);
             },
             initTabs: function(tabs, pop) {
@@ -480,7 +477,8 @@ try {
                 return ((fol_per_story + fol_per_blog)/4)*(story_count*9 + blog_count) / 55;
             },
             processChanges: function(gained, lost, named) {
-                var history = getHistory(this.userId);
+                var history = getHistory(this.userId)
+                
                 for (var i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
                     if (i < gained.length) {
                         for (var j = history.length; --j;) {
@@ -726,7 +724,9 @@ try {
         function getHistory(id) {
             var result = settingsMan.get('changes_' + id);
             
-            return result == null ? [] : JSON.parse(result);
+            return (result == null ? [] : JSON.parse(result)).filter(function(h) {
+                return !!h;
+            });
         }
 
         function listing(name, followers, node) {
