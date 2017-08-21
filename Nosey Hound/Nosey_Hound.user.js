@@ -3,7 +3,7 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.3
+// @version     2.2.4
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -113,11 +113,7 @@ var jSlim = {
     each: function(arr, func, this_arg) {
         return Array.prototype.forEach.call(arr, func, this_arg);
     },
-    all: function(selector, holder, func) {
-        if (!func) {
-            func = holder;
-            holder = document;
-        }
+    all: function(holder, selector, func) {
         return jSlim.each(holder.querySelectorAll(selector), func);
     },
     append: function(holder, tag, inner) {
@@ -315,7 +311,7 @@ try {
                 var self = this;
                 xml.style.display = 'none';
                 document.body.appendChild(xml);
-                jSlim.each(xml.querySelectorAll('.user-avatar'), function(me) {
+                jSlim.all(xml, '.user-avatar', function(me) {
                     var name = me.parentNode.querySelector('.name').childNodes[0].nodeValue;
                     var bgimg = window.getComputedStyle(me).backgroundImage;
                     followers.push({
@@ -351,7 +347,7 @@ try {
             },
             dosnuff: function(pop,xml) {
                 var followers = [];
-                jSlim.each(xml.querySelectorAll('.user-avatar'), function(me) {
+                jSlim.all(xml, '.user-avatar', function(me) {
                     followers.push(me.parentNode.href.split('/').reverse()[0]);
                 });
                 pop.innerHTML = '';
@@ -539,33 +535,33 @@ try {
                 }, finalHistory.length ? historyList(finalHistory) : 'No items to display');
             }
         };
-        var userPageHeader = document.getElementsByClassName('user-page-header')[0];
+        
+        var userPageHeader = document.querySelector('.user-page-header');
         if (userPageHeader) {
             var sniffer = jSlim.newEl('A', {
                 'class': 'sniffer'
             }, 'Sniff');
             var h3 = document.querySelector('.bio_followers > h3');
-            if (h3.innerText.indexOf(name + ' follows') == 0) {
-                jSlim.before(h3.children[0], jSlim.newEl('H3', {
-                    style: 'border-bottom:none'
-                }, '<b>' + document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText + '</b> members follow ' + name));
+            if (h3) {
+                if (h3.innerText.indexOf(name + ' follows') == 0) {
+                    jSlim.before(h3.children[0], jSlim.newEl('H3', {
+                        style: 'border-bottom:none'
+                    }, '<b>' + document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText + '</b> members follow ' + name));
+                }
+                sniffer.scopingElement = userPageHeader;
+                h3.innerHTML += ' - ';
+                h3.appendChild(sniffer);
             }
-            sniffer.scopingElement = userPageHeader;
-            h3.innerHTML += ' - ';
-            h3.appendChild(sniffer);
-            
             var sniffer = jSlim.newEl('LI', {
                 'class': 'tab nosey'
             }, '<a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" ></i></span>Sniff Followers</a>');
             jSlim.after(userPageHeader.querySelector('.tab-followers'), sniffer);
             sniffer.children[0].scopingElement = userPageHeader;
         }
-        jSlim.all('.user-card', function(me) {
-            var sniffer = jSlim.newEl('A', {
-                'class': 'sniffer'
-            }, '<a><i class="fa fa-fw fa-paw" /> Sniff Followers</a>');
-            sniffer.scopingElement = this;
-            jSlim.before(me.querySelector('.drop-down > ul > .divider'), sniffer);
+        jSlim.all(document, '.user-card', function(me) {
+            var divider = me.querySelector('.drop-down > ul > .divider');
+            divider.insertAdjacentHTML('beforebegin', '<li class="sniffer"><a><i class="fa fa-fw fa-paw"></i> Sniff Followers</a></li>');
+            divider.previousSibling.scopingElement = me;
         });
         jSlim.on(document.body, '.sniffer', 'click', function(e) {
             (new Dog(this.scopingElement)).sniffFollowers();
