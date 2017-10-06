@@ -3,112 +3,49 @@
 // @namespace   fimfiction-sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.5
+// @version     2.2.6
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
-// @grant       GM_setValue
-// @grant       GM_getValue
-// @grant       GM_listValues
-// @grant       GM_deleteValue
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
+// @grant       none
 // ==/UserScript==
 
-var settingsMan = {
-    get: function getValue(key) {
-        return GM_getValue(key);
-    },
-    set: function setValue(key, value) {
-        GM_setValue(key, value);
-    },
-    delete: function deleteValue(key) {
-        GM_deleteValue(key);
-    },
-    list: function() {
-        return GM_listValues();
-    }
+const settingsMan = {
+    __get: (key, parse, def) => settingsMan.has(key) ? parse(localStorage[key]) : def,
+    has: key => localStorage[key] !== undefined,
+    remove: key => localStorage.removeItem(key),
+    get: (key, def) => settingsMan.__get(key, a => a, def),
+    set: (key, val, def) => {
+        if (def === undefined) def = '';
+        if (val === def) return settingsMan.remove(key);
+        localStorage[key] = val;}
 };
 
-var jSlim = {
-    html: (function() {
-        var DIV = document.createElement('DIV');
-        return function(s, w) {
-            w = w || DIV;
-            w.innerHTML = s;
-            var result = [];
-            result.push.apply(result, w.childNodes);
-            w.innerHTML = '';
-            return result;
+const ajax = (method, url, complete, error) => {
+    complete = complete || (a => a);
+    error = error || (a => a);
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = () => {
+        if (request.readyState !== XMLHttpRequest.DONE) return;
+        if (request.status < 200 && request.status >= 300) return error(e);
+        try {
+            return complete(JSON.parse(request.responseText));
+        } catch (e) { error(e); }
+    };
+    request.open(method, url, true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send();
+};
+
+const jSlim = {
+    on: function addDelegatedEvent(node, selector, event, func, capture) {
+        const k = ev => {
+            const target = ev.target.closest(selector);
+            if (!target) return;
+            if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) return;
+            func.call(target, ev, target);
         };
-    })(),
-    ajax: function ajaxRequest(params) {
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            try {
-                if (request.readyState === XMLHttpRequest.DONE) {
-                    if (request.status >= 200 && request.status < 300) {
-                        var answer = request.responseXML;
-                        if (!answer) {
-                            try {
-                                answer = JSON.parse(request.responseText);
-                            } catch (e) {
-                                answer = request.responseText;
-                            }
-                        }
-                        params.success(answer);
-                    } else {
-                        params.fail(request.responseText, request.status);
-                    }
-                }
-            } catch (e) { console.error(e); }
-        };
-        request.open(params.method, params.url, true);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.send();
-    },
-    one: function(node, event, func) {
-        var ev = function(e) {
-            node.removeEventListener(event, ev);
-            return func.call(this, e);
-        };
-        node.addEventListener(event, ev);
-    },
-    on: function addScopedEventListener(node, selector, event, func, capture) {
-        var k = function (ev) {
-            for (var target = ev.target; target != null && target != document; ) {
-                if (win().matchesSelector(target, selector)) {
-                    if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) break;
-                    func.call(target, ev);
-                }
-                if (node == target) break;
-                target = target.parentNode
-            }
-        };
-        node.addEventListener(event, k, !!capture);
+        node.addEventListener(event, k, capture);
         return k;
-    },
-    off: function removeScopedEventListener(node, event, func, capture) {
-        node.removeEventListener(event, func, !!capture)
-    },
-    empty: function(el) {
-        while (el.firstChild) el.removeChild(el.firstChild);
-    },
-    newEl: function createElement(tag, attr, inner) {
-        tag = document.createElement(tag);
-        if (attr) this.objEach(attr, function(value, key) {
-            tag.setAttribute(key, value); 
-        });
-        if (inner) tag.innerHTML = inner;
-        return tag;
-    },
-    nearest: function (node, selector) {
-        while (node = node.parentNode) {
-            if (node == document) return null;
-            if (win().matchesSelector(node, selector)) return node;
-        }
-    },
-    objEach: function objectEach(obj, f, this_arg) {
-        jSlim.each(Object.keys(obj), function(a, index) {
-            return f.apply(this, [obj[a], a]);
-        }, this_arg);
-        return obj;
     },
     each: function(arr, func, this_arg) {
         return Array.prototype.forEach.call(arr, func, this_arg);
@@ -116,70 +53,44 @@ var jSlim = {
     all: function(holder, selector, func) {
         return jSlim.each(holder.querySelectorAll(selector), func);
     },
-    append: function(holder, tag, inner) {
-        tag = document.createElement(tag);
-        holder.appendChild(tag);
-        if (inner) tag.innerHTML = inner;
-        return tag;
-    },
-    before: function insertBefore(el, newEl) {
-        el.parentNode.insertBefore(newEl, el);
-    },
-    after: function insertAfter(el, newEl) {
-        el.parentNode.insertBefore(newEl, el.nextSibling);
+    map: function(holder, selector, func) {
+        return Array.prototype.map.call(holder.querySelectorAll(selector), func);
     }
 };
 
-var followerMapping = (function() {
-    var internalMapping = [];
-    var idToChildMapping = {};
-    var nameToChildMapping = {};
-    var openedMapping = [];
-    var structured = {};
-    var dirty = false;
+const followerMapping = (_ => {
+    const internalMapping = [];
+    const idToChildMapping = {};
+    const nameToChildMapping = {};
+    const openedMapping = [];
+    let structured = null;
+    let dirty = false;
     function structuredChilds(x, y) {
-        var result = {
+        const child = idToChildMapping[`${x}|${y}`];
+        return {
             content: internalMapping[x][y],
-            children: [],
-            opened: function() {
-                return openedMapping[x + '|' + y];
+            children: internalMapping[child] ? internalMapping[child].map((a, i) => structuredChilds(child, i)) : [],
+            opened: _ => openedMapping[`${x}|${y}`],
+            matches: function(filter) {
+                return this.content.replace(/\+/g, ' ').toUpperCase().indexOf(filter.toUpperCase()) > -1 || this.children.some(a => a.matches(filter));
             },
             html: function(filter) {
-                var t = '<li data-item="' + x + '|' + y + '"><a ';
-                if (result.opened() || result.children.length == 0) {
-                    t += 'class="';
-                    if (result.opened()) t+= 'opened ';
-                    if (result.children.length == 0) t += 'unloaded';
-                    t += '" ';
+                if (!this.matches(filter)) return '';
+                let t = `<li data-item="${x}|${y}"><a `;
+                if (this.opened() || !this.children.length) {
+                    t += `class="${this.opened() ? 'opened ' : ''}${!this.children.length ? 'unloaded' : ''}" `;
                 }
-                t += 'target="_blank" href="/user/' + result.content.replace(/ /g,'+') + '" data-user="' + result.content + '">' + result.content.replace(/\+/g, ' ') + '</a>';
-                if (result.children.length > 0) {
-                    t += '<span class="open-pin" /><div class="dog"><div class="list content"><ol>';
-                    var s = '';
-                    for (var i = 0; i < result.children.length; i++) {
-                        s += result.children[i].html(filter);
-                    }
-                    if (s != '') {
-                        t += s;
-                    } else if (result.content.replace(/\+/g, ' ').toUpperCase().indexOf(filter) == -1) {
-                        return '';
-                    }
+                t += `target="_blank" href="/user/${this.content.replace(/ /g,'+')}" data-user="${this.content}">${this.content.replace(/\+/g, ' ')}</a>`;
+                if (this.children.length) {
+                    t += '<span class="open-pin"></span><div class="dog"><div class="list content"><ol>';
+                    t += this.children.map(a => a.html(filter)).join('');
                     t += '</ol></div></div>';
-                } else if (result.content.replace(/\+/g, ' ').toUpperCase().indexOf(filter) == -1) {
-                    return '';
-                } else if (nameToChildMapping[result.content]) {
-                    t += '<span class="open-pin async" data-user="' + result.content + '" /><div class="dog"><div class="list content"><ol></ol></div></div>';
+                } else if (nameToChildMapping[this.content]) {
+                    t += `<span class="open-pin async" data-user="${this.content}"></span><div class="dog"><div class="list content"><ol></ol></div></div>`;
                 }
                 return t;
             }
         };
-        var child = idToChildMapping[x + '|' + y];
-        if (child != null) {
-            for (var i = 0; i < internalMapping[child].length; i++) {
-                result.children.push(structuredChilds(child,i));
-            }
-        }
-        return result;
     }
     function followee(id) {
         x = parseInt(id.split('|')[0]);
@@ -194,14 +105,14 @@ var followerMapping = (function() {
             return internalMapping.length - 1;
         },
         registerChild: function(id, arr) {
-            var ch = this.registerList(followee(id), arr);
+            const ch = this.registerList(followee(id), arr);
             idToChildMapping[id] = ch;
             dirty = true;
             return ch;
         },
         setOpened: function(id, val) {
             openedMapping[id] = val;
-            var cached = nameToChildMapping[followee(id)];
+            const cached = nameToChildMapping[followee(id)];
             if (val) {
                 if (cached && !idToChildMapping[id]) {
                     this.registerChild(id, cached);
@@ -209,277 +120,238 @@ var followerMapping = (function() {
             }
         },
         childs: function(id, filter) {
-            var result = '';
-            var child = idToChildMapping[id];
-            if (child) {
-                for (var i = 0; i < internalMapping[child].length; i++) {
-                    result += structuredChilds(child,i).html(filter);
-                }
-            }
-            return result;
+            const child = idToChildMapping[id];
+            if (child) return internalMapping[child].map((a, i) => structuredChilds(child,i).html(filter)).join('');
+            return '';
         },
         structured: function(id) {
-            if (structured == null || structured.user != id || dirty) {
-                var result = {
-                    dirty: false,
+            if (!structured || structured.user != id || dirty) {
+                dirty = false;
+                structured = {
                     user: id,
-                    children: [],
+                    children: internalMapping[id].map((a,i) => structuredChilds(id, i)),
                     html: function(filter) {
-                        var nod = '<ol>';
-                        for (var i = 0; i < result.children.length; i++) {
-                            nod += result.children[i].html(filter);
-                        }
-                        return nod + '</ol>';
+                        return `<ol>${this.children.map(a => a.html(filter)).join('')}</ol>`;
                     }
                 };
-                for (var i = 0; i < internalMapping[id].length; i++) {
-                    result.children.push(structuredChilds(id, i));
-                }
-                dirty = false;
-                structured = result;
             }
             return structured;
         }
     };
 })();
 try {
-    if (getIsLoggedIn()) (function() {
-        var name = getUserName();
+    if (getIsLoggedIn()) (_ => {
+        const name = getUserName();
         Dog = function(c) {
-            this.container = c;
+            this.container = c.closest('.user-card, .user-page-header') || document.querySelector('.user-page-header');
+            this.userName = this.container.querySelector('.info-container > h1 > a, .card-content > h2 a').innerText;
+            this.tabs = this.container.parentNode.querySelector('ul.tabs, .user-links');
             if (this.container.classList.contains('user-page-header')) {
-                this.userName = this.container.querySelector('.info-container > h1 > a').innerText;
                 this.userId = this.container.querySelector('ul.tabs li a').href.split('/user/')[1].split('/')[0];
-                this.tabs = this.container.querySelector('ul.tabs');
             } else {
-                this.userName = this.container.querySelector('.card-content > h2 a').innerText;
                 this.userId = this.container.querySelector('.drop-down > ul > li > a > i.fa-warning').parentNode.href.split('/').reverse()[0];
-                this.tabs = this.container.parentNode.querySelector('.user-links');
             }
             this.myPage = this.userName == name;
             this.followers = getFollowers(this.userId);
             this.followersRaw = [];
+            Dog.instance = this;
         };
         Dog.prototype = {
+            restart: function() {
+              this.Sniff(true, this.pop.content);
+            },
             sniffFollowers: function() {
-                var pop = makeGlobalPopup(this.myPage ? 'Results' : 'Results for ' + this.userName, 'fa fa-table');
-                pop.content.style.minWidth = '400px';
-                pop.content.style.minHeight = '400px';
-                pop.content.style.width = '400px';
-                pop.content.style.height = '400px';
+                const pop = this.pop = makeGlobalPopup(`Results${this.myPage ? '' : ` for ${this.userName}`}`, 'fa fa-table');
+                pop.content.style.minWidth = pop.content.style.width = '400px';
+                pop.content.style.minHeight = pop.content.style.height = '400px';
                 pop.content.parentNode.style.width = 'auto';
+                pop.content.insertAdjacentHTML('afterend', '<div class="resize-handle"></div>');
                 document.body.appendChild(document.getElementById('info-cards'));
-                this.Sniff(true, pop);
-                jSlim.after(pop.content, jSlim.newEl('DIV', { 'class': 'resize-handle' }));
-                pop.show();
+                this.Sniff(true, pop.content);
+                pop.Show();
             },
             snubFollowers: function(link) {
-                var pop = document.createElement('DIV');
-                jSlim.after(link, pop);
-                jSlim.after(link, jSlim.newEl('SPAN', { 'class': 'open-pin' }));
+                link.insertAdjacentHTML('afterend', '<div></div><span class="open-pin"></span>');
                 link.classList.add('opened');
                 link.classList.remove('unloaded');
-                followerMapping.setOpened(link.parentNode.dataset('item'), true);
-                this.Sniff(false, pop);
+                followerMapping.setOpened(link.parentNode.dataset.item, true);
+                this.Sniff(false, link.nextSibling);
             },
             Sniff: function(type, pop) {
-                var closed = false;
-                if (pop.onclose) {
-                    pop.onclose(function() {closed = true;});
-                    pop = pop.content;
-                }
+                let closed = false;
+                pop.addEventListener('close', () => closed = true);
                 pop.classList.add('dog');
                 pop.innerHTML = '<div style="width:100%;height:100%;text-align:center;line-height:300px;" ><i style="font-size:50px;" class="fa fa-spinner fa-spin" /></div>';
-                var me = this;
-                requestFollowers(this.userId, function(xml) {
-                    if (!closed) {
-                        try {
-                            me['do' + (type ? 'sniff' : 'snuff')](pop,jSlim.newEl('UL', {}, xml.content));
-                        } catch (e) {
-                            me.printError(pop, e);
-                            console.error(e);
-                        }
-                    }
-                }, function(e) {
-                    if (!closed) me.printError(pop, '<b>' + e.statusText + '</b><br />' + e.responseText);
+
+                requestFollowers(this.userId, json => {
+                    if (closed) return;
+                    document.body.insertAdjacentHTML('beforeend', `<ul style="display:none">${json.content}</ul>`);
+                    const xml = document.body.lastChild;
+                    this[`do${type ? 'sniff' : 'snuff'}`](pop, xml);
+                    xml.parentNode.removeChild(xml);
+                }, e => {
+                    if (closed) return;
+                    console.error(e);
+                    this.printError(pop, e.responseText ? `<b>${e.statusText}</b><br />${e.responseText}` : e);
                 });
             },
-            dosniff: function(pop,xml) {
-                var followers = [];
+            dosniff: function(pop, xml) {
                 this.followersRaw = [];
                 this.oldFollowers = this.followers;
-                var self = this;
-                xml.style.display = 'none';
-                document.body.appendChild(xml);
-                jSlim.all(xml, '.user-avatar', function(me) {
-                    var name = me.parentNode.querySelector('.name').childNodes[0].nodeValue;
-                    var bgimg = window.getComputedStyle(me).backgroundImage;
-                    followers.push({
+
+                const followers = jSlim.map(xml, '.user-avatar', me => {
+                    const name = me.parentNode.querySelector('.name').childNodes[0].nodeValue;
+                    const bgimg = window.getComputedStyle(me).backgroundImage;
+                    this.followersRaw.push(name);
+                    return {
                         id: bgimg.indexOf('images/') > -1 ? 'none' : (bgimg.split('user/').reverse()[0].split('-')[2] || 'none'),
                         name: name
-                    });
-                    self.followersRaw.push(name);
+                    };
                 });
-                document.body.removeChild(xml);
-                var gained = [];
-                var lost = [];
-                var named = [];
-                for (var i = followers.length; i--;) {
-                    var old = isPresent(this.followers, followers[i]);
-                    if (!old) {
-                        gained.unshift(followers[i]);
-                    } else if (old.id != 'none' && old.name != followers[i].name) {
-                        named.unshift({name: followers[i].name, oldName: old.name, id: followers[i].id});
+
+                const gained = [];
+                const named = [];
+                followers.forEach(a => {
+                    const old = isPresent(this.followers, a);
+                    if (!old) return gained.unshift(a);
+                    if (old.id != 'none' && old.name != a.name) {
+                        named.unshift({name: a.name, oldName: old.name, id: a.id});
                     }
-                }
-                for (var i = this.followers.length; i--;) {
-                    if (!this.followers[i].id) {
-                        this.followers[i].id = 'none';
+                });
+                const lost = this.followers.filter(a => {
+                    if (!a.id) a.id = 'none';
+                    if (a.id.indexOf('/') == -1) {
+                        if (!isPresent(followers, a)) return true;
                     }
-                    if (this.followers[i].id.indexOf('/') == -1) {
-                        if (isPresent(followers, this.followers[i]) == null) {
-                            lost.unshift(this.followers[i]);
-                        }
-                    }
-                }
-                pop.innerHTML = '';
+                });
                 this.printFollowers(!setFollowers(this.userId, this.followers = followers), pop, gained, lost, named);
             },
             dosnuff: function(pop,xml) {
-                var followers = [];
-                jSlim.all(xml, '.user-avatar', function(me) {
-                    followers.push(me.parentNode.href.split('/').reverse()[0]);
-                });
                 pop.innerHTML = '';
-                followerMapping.registerChild(pop.parent().attr('data-item'), followers);
-                this.container.listing.search.dispatchEvent(new Event('input'));
+                followerMapping.registerChild(pop.parentNode.dataset.item, jSlim.map(xml, '.user-avatar', me => me.parentNode.href.split('/').reverse()[0]));
+                this.search.dispatchEvent(new Event('input'));
             },
             printError: function(pop, e) {
-                pop.innerHTML = '';
-                var tabs = '';
-                var result = '';
-                tabs += '<div data-tab="0" class="button selected">Error</div>';
-                result += '<div class="main">' + e + '</div>';
-                result += '<div class="main">The data for this user may have been damaged. You can clear the follower or history data below and try again.</div>';
-                result += clearButton(this.userId) + emptyHistoryButton(this.userId) + '</div>';
-                
-                pop.appendChild(jSlim.newEl('DIV', { 'data-id': 0, 'class': 'tab shown selected' }, result));
-                if (e.stack) {
-                    tabs += '<div data-tab="1" class="button">Stacktrace</div>';
-                    pop.appendChild(jSlim.newEl('DIV', { 'data-id': 1, class: 'tab shown' }, e.stack));
-                }
-                
-                this.initTabs(tabs, pop);
+                pop.innerHTML = `<div class="tab selected" data-tab="0">
+                        <div class="main">${e}</div>
+                        <div class="main">The data for this user may have been damaged. You can clear the follower or history data below and try again.</div>
+                        ${actionButtons(this.userId)}
+                </div>
+                <div class="tab" data-tab="1">${e.stack || 'No stack available'}</div>`;
+                this.initTabs(`<div data-tab="0" class="button selected">Error</div
+                               ><div data-tab="1" class="button">Stacktrace</div>`, pop);
             },
             initTabs: function(tabs, pop) {
-                tabs = jSlim.newEl('DIV', { 'class': 'tabs' }, tabs);
-                pop.insertBefore(tabs, pop.children[0]);
-                jSlim.on(tabs, '.button', 'click', function() {
-                    var id = this.dataset.tab;
-                    jSlim.each(pop.children, function(me) {
-                        me.classList.toggle('selected', me.dataset.id == id);
-                    });
-                    jSlim.each(tabs.children, function(me) {
-                        me.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                });
+                pop.insertAdjacentHTML('afterbegin', `<div class="tabs">${tabs}</div>`);
             },
             printFollowers: function(firstTime, pop, gained, lost, named) {
-                var infoCard = document.getElementById('info-cards');
+                const infoCard = document.getElementById('info-cards');
                 if (infoCard) {
                     infoCard.parentNode.appendChild(infoCard);
                     infoCard.style.zIndex = '9999999999';
                 }
-                
+
                 if (firstTime) gained = lost = named = [];
 
-                var localeG = gained.length.toLocaleString('en');
-                var localeL = lost.length.toLocaleString('en');
-                var localeN = named.length.toLocaleString('en');
-                
-                var tabs = '';
-                tabs += '<div data-tab="0" class="button selected">Overview</div>';
-                pop.appendChild(jSlim.newEl('DIV', { 'data-id': 0, 'class': 'tab shown selected' }, firstTime ? this.loaded() : this.overview(gained, lost, named, localeG, localeL, localeN)));
-                tabs += '<div data-tab="1" class="button">Stats</div>';
-                pop.appendChild(jSlim.newEl('DIV', { 'data-id': 1, 'class': 'tab shown' }, this.stats(gained, lost, localeG, localeL, localeN) + forgetButton(this.userId) + emptyHistoryButton(this.userId)));
-                if (gained.length > 0) {
-                    tabs += '<div data-tab="2" class="button">Gained</div>';
-                    pop.appendChild(jSlim.newEl('DIV', { 'data-id': 2, 'class': 'tab shown' }, '<b>Total Gained:</b> ' + localeG + '<div class="main">' + linkList(gained) + '</div>'));
-                }
-                if (lost.length > 0) {
-                    tabs += '<div data-tab="3" class="button">Lost</div>';
-                    pop.appendChild(jSlim.newEl('DIV', { 'data-id': 3, 'class': 'tab shown' }, '<b>Total Lost:</b> ' + localeL + '<div class="main">' + linkList(lost) + '</div>'));
-                }
-                tabs += '<div data-tab="4" class="button hidden">List</div>';
-                this.container.listing = listing(this.userName, this.followersRaw, jSlim.newEl('DIV', {'data-id': 4, 'class': 'tab hidden'}));
-                pop.appendChild(this.container.listing);
-                tabs += '<div data-tab="5" class="button hidden">History</div>';
-                pop.appendChild(this.history(gained, lost, named));
-                this.initTabs(tabs, pop);
+                const localeG = gained.length.toLocaleString('en'),
+                      localeL = lost.length.toLocaleString('en'),
+                      localeN = named.length.toLocaleString('en');
+
+                const id = followerMapping.registerList(this.userName, this.followersRaw);
+
+                pop.innerHTML = `
+                <div class="tab selected" data-tab="0">
+                    ${firstTime ? this.loaded() : this.overview(gained, lost, named, localeG, localeL, localeN)}
+                </div>
+                <div class="tab" data-tab="1">
+                    ${this.stats(gained, lost, localeG, localeL, localeN)}
+                    ${actionButtons(this.userId)}
+                </div>
+                <div class="tab" data-tab="2">
+                    <b>Total Gained:</b> ${localeG}
+                    <div class="main">${linkList(gained)}</div>
+                </div>
+                <div class="tab" data-tab="3">
+                    <b>Total Lost:</b> ${localeL}
+                    <div class="main">${linkList(lost)}</div>
+                </div>
+                <div class="tab tab-listing" data-tab="4">
+                    <input id="nosey_follower_searcher" data-id="${id}" type="text" placeholder="search followers"></input>
+                    <div class="list content">
+                        ${followerMapping.structured(id).html('')}
+                    </div>
+                </div>
+                <div class="tab" data-tab="5">${this.history(gained, lost, named)}</div>`;
+
+
+                this.search = pop.querySelector('#nosey_follower_searcher');
+
+                this.initTabs(`<div data-tab="0" class="button selected">Overview</div
+                            ><div data-tab="1" class="button">Stats</div
+                            ><div data-tab="2" class="button${!gained.length ? ' hidden' : ''}">Gained</div
+                            ><div data-tab="3" class="button${!lost.length ? ' hidden' : ''}">Lost</div
+                            ><div data-tab="4" class="button">List</div
+                            ><div data-tab="5" class="button">History</div>`, pop);
             },
             loaded: function() {
-                return '<div class="score fresh">' + this.followers.length + '</div><div class="main">' + (this.myPage ? 'Welcome! Your' : this.userName + '\'s') + ' followers have been successfully saved.</div>';
+                return `<div class="score fresh">${this.followers.length}</div>
+                        <div class="main">${this.myPage ? 'Welcome! Your' : `${this.userName}'s`} followers have been successfully saved.</div>`;
             },
             stats: function(g, l, G, L, N) {
-                var result = '';
                 var all = this.oldFollowers.length + g.length;
-                var percentG = (all > 0 ? (g.length * 100 / all) : 0);
-                var percentL = (all > 0 ? (l.length * 100 / all) : 0);
-                var percentN = ((this.followers.length - l.length) > 0 ? (N * 100 / (this.followers.length - l.length)) : 0);
-                result += '<div class="score bar neutral"><div class="glass" ></div>';
-                result += '<div class="percentage g" style="width:' + percentG + '%;" >' + (percentG > 0 ? percentG.toFixed(2) + '%' : '') + '</div>';
-                result += '<div class="percentage l" style="width: ' + percentL + '%" >' + (percentL > 0 ? percentL.toFixed(2) + '%' : '') + '</div>';
-                result += '<div class="percentage n" style="width: ' + percentN + '%;margin-left:' + percentG + '%" >' + (percentN > 0 ? percentN.toFixed(2) + '%' : '') + '</div>';
-                result += '</div>';
-                result += '<div class="main"><b>Total: </b>' + this.followers.length.toLocaleString('en') + ' was ' + this.oldFollowers.length.toLocaleString('en') + '<br /><br />';
-                result += '<b>Arrived:</b> ' + G + ' ( ' + percentG.toFixed(2) + '% )<br />';
-                result += '<b>Left:</b> ' + L + ' ( ' + percentL.toFixed(2) + '% )<br />';
-                result += '<b>Name Changes:</b> ' + N + ' ( ' + percentN + '% )<br />';
-                result += '<b>Stayed:</b> ' + (this.followers.length - g.length).toLocaleString('en') + ' (' + (100 - percentG - percentL).toFixed(2) + '%)';
-                result += '<br /><b>Score: </b>' + this.popularity(g.length, l.length, this.followers.length);
-                return result + '</div>';
+                const percentG = (all ? (g.length * 100 / all) : 0),
+                      percentL = (all ? (l.length * 100 / all) : 0),
+                      percentN = ((this.followers.length - l.length) > 0 ? (N * 100 / (this.followers.length - l.length)) : 0);
+
+                const percentage = (a,l,b) => `<div class="percentage ${l}" style="width:${a}%;margin-left:${b || 0}%">${round(a || 0, 2)}%</div>`;
+                return `<div class="score bar neutral"><div class="glass" ></div>
+                    ${percentage(percentG, 'g')}${percentage(percentL, 'l')}${percentage(percentN, 'n', percentG)}
+                </div>
+                <div class="main">
+                    <b>Total: </b>${this.followers.length.toLocaleString('en')} was ${this.oldFollowers.length.toLocaleString('en')}<br /><br />
+                    <b>Arrived:</b> ${G} ( ${round(percentG, 2)}% )<br />
+                    <b>Left:</b> ${L} ( ${round(percentL, 2)}% )<br />
+                    <b>Name Changes:</b> ${N} ( ${round(percentN, 2)}% )<br />
+                    <b>Stayed:</b> ${(this.followers.length - g.length).toLocaleString('en')} (${round(100 - percentG - percentL, 2)}%)<br />
+                    <b>Score: </b> ${this.popularity(g.length, l.length, this.followers.length)}
+                </div>`;
             },
             overview: function(g, l, n, G, L, N) {
                 var result = '';
                 var diff = g.length - l.length;
-                result += '<div class="score ' + (diff >= 0 ? (diff == 0 ? 'neutral">' : 'good">') : 'bad">') + named(diff) + '</div><div class="main">';
+                result += `<div class="score ${diff >= 0 ? (!diff ? 'neutral">' : 'good">') : 'bad">'}${named(diff)}</div><div class="main">`;
                 if (diff) {
-                    result += (this.myPage ? 'You have' : this.userName + ' has') + ' <b>' + this.followers.length + '</b> followers';
-                    result += (g.length ? ' of which' : '');
-                    result += (diff > 0 ? ' only' : '') + (g.length > 0 ? ' <b>' + G + '</b>' : '<b>none</b>') + ' are new additions whilst ';
-                    result += (l.length ? 'only <b>' + L : '<b>none') + '</b> of ' + (this.myPage ? 'your' : this.userName + '\'s') + ' old followers have left.';
+                    result += `${this.myPage ? 'You have' : this.userName + ' has'} <b>${this.followers.length}</b> followers
+                               ${g.length ? ' of which' : ''} <b>${g.length ? G : 'none'}</b> are new additions whilst
+                               <b>${l.length ? L : 'none'}</b> of ${this.myPage ? 'your' : `${this.userName}'s`} old followers have left.`;
                 } else if (!g.length) {
-                    result += '<b>No changes detected!</b><br />' + (this.myPage ? 'You have ' : this.userName + ' has ') + 'not lost any followers, but ' + (this.myPage ? 'you have ' : 'he has ') + 'not gained any either.';
+                    result += `<b>No changes detected!</b><br />${this.myPage ? 'You have' : this.userName + ' has'} not lost any followers, but ${this.myPage ? 'you have' : 'he has'} not gained any either.`;
                 } else {
-                    result += (this.myPage ? 'You' : this.userName) + ' simultaneously gained and lost <b>' + G + '</b> followers.';
+                    result += `${this.myPage ? 'You' : this.userName} simultaneously gained and lost <b>${G}</b> followers.`;
                 }
                 result += '</div>';
-                if (n.length) {
-                    result += '<b>Name changes (' + N + '):</b>';
-                    result += '<div class="main"><ol>';
-                    for (var i = n.length; i--;) {
-                        result += '<li>' + n[i].oldName.replace(/\+/g, ' ') + ' is now known as <a target="_blank" href="/user/' + n[i].name + '">' + n[i].name.replace(/\+/g, ' ') + '</a></li>';
-                    }
-                    result += '</ol></div>';
-                }
+                if (n.length) return `${result}
+                    <b>Name changes (${N}):</b>
+                    <div class="main">
+                        <ol>${n.map(a => `<li>${a.oldName.replace(/\+/g, ' ')} is now known as <a target="_blank" href="/user/${a.name}">${a.name.replace(/\+/g, ' ')}</a></li>`).join('')}</ol>
+                    </div>`;
                 return result;
             },
             popularity: function(g, l, t) {
-                var _count = this.tabs.children[0];
-                var story_count = parseInt(_count.querySelector('.number').innerText);
-                var blog_count = parseInt(_count.nextElementSibling.querySelector('.number').innerText);
-                return parseImperial(this.computeScore(story_count, blog_count, t + g - l));
-            },
-            computeScore: function(story_count, blog_count, fol_count) {
-                var fol_per_story = story_count > 0 ? fol_count/story_count : 0;
-                var fol_per_blog = blog_count > 0 ? fol_count/blog_count : 0;
-                return ((fol_per_story + fol_per_blog)/4)*(story_count*9 + blog_count) / 55;
+                const _count = this.tabs.children[0];
+                const storyCount = parseInt(_count.querySelector('.number').innerText);
+                const blogCount = parseInt(_count.nextElementSibling.querySelector('.number').innerText);
+                const folCount = t + g - l;
+
+                const folPerStory = storyCount ? folCount/storyCount : 0;
+                const folPerBlog = blogCount ? folCount/blogCount : 0;
+
+                return parseImperial(((folPerStory + folPerBlog) / 4) * (storyCount * 9 + blogCount) / 55);
             },
             processChanges: function(gained, lost, named) {
-                var history = getHistory(this.userId)
-                
-                for (var i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
+                const history = getHistory(this.userId);
+
+                for (let i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
                     if (i < gained.length) {
                         for (var j = history.length; --j;) {
                             if (history[j].type == 'l' && history[j].id == gained[i].id) {
@@ -499,94 +371,76 @@ try {
                 return this.migrate(history, named);
             },
             migrate: function(history, named) {
-                for (var i = 0; i < history.length; i++) {
-                    if (typeof(history[i].id) === 'undefined') {
-                        history[i].id = idFor(history[i], history) || idFor(history[i], this.followers) || idFor(history[i], this.oldFollowers);
-                        if (history[i].id) {
-                            for (var k = 0; k < history.length; k++) {
-                                if (k != i && (history[k].name == history[i].name || history[k].display == history[i].display)) {
-                                    history[k].id = history[i].id;
-                                }
-                            }
+                const nameConversions = [];
+                return history.reverse().reduce((results, h) => {
+                    if (!h) return results;
+
+                    nameConversions.forEach(k => {
+                        if (h.name == k.name || h.display == k.display) h.id = k.id;
+                    });
+
+                    if (h.id === undefined) {
+                        h.id = idFor(h, history) || idFor(h, this.followers) || idFor(h, this.oldFollowers);
+                        if (h.id !== undefined) {
+                            nameConversions.unshift(h);
                         }
                     }
-                }
-                return history;
+
+                    if (h.id) results.unshift(h);
+                    return results;
+                }, []);
             },
             history: function(gained, lost, named) {
-                var history = this.processChanges(gained, lost, named);
-                var finalHistory = [];
-                for (var i = 0; i < history.length; i++) {
+                const history = this.processChanges(gained, lost, named);
+                const finalHistory = history.filter((a, i) => {
                     if (i < history.length - 1) {
-                        if (history[i].type != 'n' && history[i + 1].type != 'n') {
-                            if (history[i].name == history[i + 1].name) {
-                                i++;
-                                continue;
-                            }
+                        if (a.type != 'n' && history[i + 1].type != 'n') {
+                            if (a.name == history[i + 1].name) return false;
                         }
                     }
-                    finalHistory.push(history[i]);
-                }
+                    return true;
+                });
                 setHistory(this.userId, finalHistory);
-                return jSlim.newEl('DIV', {
-                    'data-id': 5, 'class': 'tab hidden'
-                }, finalHistory.length ? historyList(finalHistory) : 'No items to display');
+                return finalHistory.length ? historyList(finalHistory) : 'No items to display';
             }
         };
-        
-        var userPageHeader = document.querySelector('.user-page-header');
+
+        const userPageHeader = document.querySelector('.user-page-header');
         if (userPageHeader) {
-            var sniffer = jSlim.newEl('A', {
-                'class': 'sniffer'
-            }, 'Sniff');
-            var h3 = document.querySelector('.bio_followers > h3');
+            const h3 = document.querySelector('.bio_followers > h3');
             if (h3) {
-                if (h3.innerText.indexOf(name + ' follows') == 0) {
-                    jSlim.before(h3.children[0], jSlim.newEl('H3', {
-                        style: 'border-bottom:none'
-                    }, '<b>' + document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText + '</b> members follow ' + name));
+                if (h3.innerText.indexOf(`${name} follows`) == 0) {
+                    h3.insertAdjacentHTML('afterbegin', `<h3 style="border-bottom:none"><b>${document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText}</b> members follow ${name}</h3>`);
                 }
-                sniffer.scopingElement = userPageHeader;
-                h3.innerHTML += ' - ';
-                h3.appendChild(sniffer);
+                h3.insertAdjacentHTML('beforeend', ' - <a class="sniffer">Sniff</a>');
             }
-            var sniffer = jSlim.newEl('LI', {
-                'class': 'tab nosey'
-            }, '<a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" ></i></span>Sniff Followers</a>');
-            jSlim.after(userPageHeader.querySelector('.tab-followers'), sniffer);
-            sniffer.children[0].scopingElement = userPageHeader;
+            userPageHeader.querySelector('.tab-followers').insertAdjacentHTML('afterend', '<li class="tab nosey"><a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" ></i></span>Sniff Followers</a></li>');
         }
-        jSlim.all(document, '.user-card', function(me) {
-            var divider = me.querySelector('.drop-down > ul > .divider');
-            divider.insertAdjacentHTML('beforebegin', '<li class="sniffer"><a><i class="fa fa-fw fa-paw"></i> Sniff Followers</a></li>');
-            divider.previousSibling.scopingElement = me;
+        jSlim.all(document, '.user-card', me => {
+            me.querySelector('.drop-down > ul > .divider').insertAdjacentHTML('beforebegin', '<li class="sniffer"><a><i class="fa fa-fw fa-paw"></i> Sniff Followers</a></li>');
         });
-        jSlim.on(document.body, '.sniffer', 'click', function(e) {
-            (new Dog(this.scopingElement)).sniffFollowers();
+        jSlim.on(document.body, '.sniffer', 'click', (e, target) => {
             e.preventDefault();
+            (new Dog(target)).sniffFollowers();
         });
-        jSlim.on(document.body, 'a.snuffer', 'click', function(e) {
-            if (document.querySelectorAll('.dog .list a.unloaded.hover').length) {
-                (new Dog(this.scopingElement)).snubFollowers(document.querySelector('.dog a.hover'));
-            } else {
-                (new Dog(this.scopingElement)).sniffFollowers();
-            }
+
+        jSlim.on(document.body, 'a.snuffer', 'click', (e, target) => {
             e.preventDefault();
-        });
-        jSlim.on(document.body, 'button.eforget', 'click', function(e) {
-            if (confirm(this, 'Done')) {
-                clearFollowers(this.dataset.id);
+            target = new Dog(target);
+            if (document.querySelector('.dog .list a.unloaded.hover')) {
+                return target.snubFollowers(document.querySelector('.dog a.hover'));
             }
+            target.sniffFollowers();
         });
-        jSlim.on(document.body, 'button.forget', 'click', function(e) {
-            if (confirm(this, 'Forgot this User')) {
+        jSlim.on(document.body, 'button.forget', 'click', (e, target) => {
+            if (confirm(target, 'Forgot this User')) {
                 clearFollowers(this.dataset.id);
                 clearChanges(this.dataset.id);
             }
         });
-        jSlim.on(document.body, 'button.hforget', 'click', function(e) {
-            if (confirm(this, 'Alrighty then...')) {
-                var id = this.dataset.id;
+        jSlim.on(document.body, 'button.hforget', 'click', (e, target) => {
+            if (confirm(target, 'Alrighty then...')) {
+                var id = target.dataset.id;
                 var limit = this.dataset.limit;
                 if (limit && (limit = parseInt(limit)) > 0) {
                     var history = getHistory(id);
@@ -602,64 +456,87 @@ try {
                 }
             }
         });
-        jSlim.on(document.body, 'button.forget, button.hforget, button.eforget', 'mouseout', function(e) {
-            if (this.dataset.check != '2') {
-                this.dataset.check = '0';
-                this.innerText = this.dataset.text;
+        jSlim.on(document.body, '.dog button.export', 'click', function() {
+            window.open(`data:application/octet-stream,${JSON.stringify({
+                followers: getFollowers(this.dataset.id),
+                history: getHistory(this.dataset.id)
+            }, null, '\t')}`, `followers-${this.dataset.id}.json`);
+        });
+        jSlim.on(document.body, '.dog button.import', 'change', function() {
+            document.querySelector('.dog input.import').click();
+        });
+        jSlim.on(document.body, '.dog input.import', 'change', function() {
+            const file = target.files[0];
+            const id = this.dataset.id;
+            const reader = new FileReader();
+
+            reader.onload = e => {
+                alert(e.target.result);
+                const data = JSON.parse(e.target.result);
+                //setFollowers(id, data.followers);
+                //setHistory(id, data.history);
+                Dog.instance.restart();
+            };
+
+            reader.readAsDataURL(file);
+        });
+        jSlim.on(document.body, '#nosey_follower_searcher', 'input', (e, target) => {
+            target.nextElementSibling.innerHTML = followerMapping.structured(parseInt(target.dataset.id)).html(target.value.toUpperCase());
+        });
+        jSlim.on(document.body, '.dog .button[data-tab]', 'click', (e, target) => {
+            const tab = target.dataset.tab;
+            jSlim.all(target.closest('.dog'), '[data-tab]', a => {
+                a.classList.toggle('selected', a.dataset.tab == tab);
+            });
+        });
+        jSlim.on(document.body, 'button.forget, button.hforget', 'mouseout', (e, target) => {
+            if (target.dataset.check != '2') {
+                target.dataset.check = '0';
+                target.innerText = target.dataset.text;
             }
         });
-        jSlim.on(document.body, '.resize-handle', 'mousedown', function(e) {
+        jSlim.on(document.body, '.resize-handle', 'mousedown', (e, target) => {
             e.preventDefault();
-            var holder = this.parentNode.querySelector('.drop-down-pop-up-content');
+            target = target.parentNode.querySelector('.drop-down-pop-up-content');
+            const resize = e => {
+                const off = offset(holder);
+                target.style.width = `${e.pageX - off.left}px`;
+                target.style.height = `${e.pageY - off.top}px`;
+            };
+
+            const stopResize = () => {
+                document.body.removeEventListener('mouseup', stopResize);
+                document.body.removeEventListener('mousemove', resize);
+            };
+
             document.body.addEventListener('mousemove', resize);
             document.body.addEventListener('mouseup', stopResize);
-            function resize(e) {
-                var width = e.pageX - holder.offset().left;
-                var height = e.pageY - holder.offset().top;
-                holder.css('width', width + 'px');
-                holder.css('height', height + 'px');
-            }
-            function stopResize() {
-                bod.removeEventListener('mouseup', stopResize);
-                bod.removeEventListener('mousemove', resize);
-            }
         });
-        jSlim.on(document.body, '.dog .open-pin', 'click', function(e) {
+        jSlim.on(document.body, '.dog .open-pin', 'click', e => {
             e.preventDefault();
             var a = this.parentNode.querySelector('a');
             followerMapping.setOpened(this.parentNode.dataset.item, !a.classList.contains('opened'));
-            if (a.classList.contains('opened')) {
-                a.classList.remove('opened');
-            } else {
-                a.classList.add('opened');
-                if (this.classList.contains('async')) {
-                    this.classList.remove('async');
-                    this.parentNode.classList.remove('unloaded');
-                    this.parentNode.querySelector('ol').innerHTML = followerMapping.childs(this.parentNode.dataset.item, document.getElementById('nosey_follower_searcher').value.toUpperCase());
-                }
+            a.classList.toggle('opened');
+            if (a.classList.contains('opened') && this.classList.contains('async')) {
+                this.classList.remove('async');
+                this.parentNode.classList.remove('unloaded');
+                this.parentNode.querySelector('ol').innerHTML = followerMapping.childs(this.parentNode.dataset.item, document.querySelector('#nosey_follower_searcher').value.toUpperCase());
             }
         });
-        jSlim.on(document.body, '.dog .list a', 'mouseenter', function(e) {
-            if (this.classList.contains('hover')) return;
-            jSlim.all('.dog .list a.hover', function(me) {
-                me.classList.remove('hover'); 
-            });
-            var name = this.dataset.user;
-            this.classList.add('hover');
+        jSlim.on(document.body, '.dog .list a', 'mouseenter', (e, target) => {
+            if (target.classList.contains('hover')) return;
+            jSlim.all('.dog .list a.hover', me => me.classList.remove('hover'));
+            target.classList.add('hover');
         });
-        FimFicEvents.on('afterinfocard', function(e) {
-            jSlim.all('.info-card-container .top-info .button-group > .button-group', function(me) {
+
+        FimFicEvents.on('afterinfocard', e => {
+            Array.prototype.forEach.call(document.querySelectorAll('.info-card-container .top-info .button-group > .button-group'), me => {
                 if (!me.querySelector('.snuffer')) {
-                    var butt = jSlim.newEl('A', {
-                        'class': 'snuffer button button-icon-only'
-                    }, '<span title="Sniff Followers"><i class="fa fa-paw" /></span>');
-                    butt.scopingElement = jSlim.nearest(me, 'user-card');
-                    butt.dataset.user = e.user;
-                    me.insertBefore(butt, me.children[0]);
+                    me.insertAdjacentHTML('afterbegin', `<a class="snuffer button button-icon-only" data=user="${e.user}><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>`);
                 }
             });
         });
-        
+
         function confirm(button, finalMessage) {
             if (button.dataset.check != '2') {
                 if (button.dataset.check != '1') {
@@ -676,120 +553,83 @@ try {
             return false;
         }
 
-        function clearButton(id) {
-            return '<div class="main"><button data-id="' + id + '" data-text="Clear follower data" class="eforget styled_button">Clear follower data</button></div>';
-        }
-
-        function forgetButton(id) {
-            return '<div class="main"><button data-id="' + id + '" data-text="Forget this User" class="forget styled_button">Forget this User</button></div>';
-        }
-
-        function emptyHistoryButton(id) {
-            return '<div class="main"><button data-id="' + id + '" data-limit="30" data-text="Trim History" title="Deletes all but the last 30 items" class="hforget styled_button">Trim History</button><button data-id="' + id + '" data-text="Clear History" title="Deletes all history for this user" class="hforget styled_button">Clear History</button></div>';
+        function actionButtons(id) {
+            return `<div class="main">
+                        <button data-id="${id}" data-text="Forget this User" class="forget styled_button">Forget this User</button>
+                        <button data-id="${id}" class="export styled_button">Export Data</button>
+                        <button data-id="${id}" class="import styled_button">Import Data</button>
+                        <input type="file" hidden></input>
+                    </div>
+                    <div class="main">
+                      <button data-id="${id}" data-limit="30" data-text="Trim History" title="Deletes all but the last 30 items" class="hforget styled_button">Trim History</button>
+                      <button data-id="${id}" data-text="Clear History" title="Deletes all history for this user" class="hforget styled_button">Clear History</button>
+                    </div>`;
         }
 
         function requestFollowers(id, success, failure) {
-            jSlim.ajax({
-                url: '/ajax/users/' + id + '/followers',
-                method: 'GET',
-                signed: false,
-                success: success,
-                fail: failure
-            });
+            ajax('GET', `/ajax/users/${id}/followers`, success, failure);
         }
 
         function setFollowers(id, val) {
-            var result = settingsMan.get('followers_' + id) != null;
-            settingsMan.set('followers_' + id, JSON.stringify(val));
+            const result = settingsMan.get(`followers_${id}`) != null;
+            settingsMan.set(`followers_${id}`, JSON.stringify(val));
             return result;
         }
 
         function getFollowers(id) {
-            var result = settingsMan.get('followers_' + id);
+            const result = settingsMan.get(`followers_${id}`);
             return result == null ? [] : JSON.parse(result);
         }
 
         function clearFollowers(id) {
-            settingsMan.delete('followers_' + id);
+            settingsMan.delete(`followers_${id}`);
         }
 
         function clearChanges(id) {
-            settingsMan.delete('changes_' + id);
+            settingsMan.delete(`changes_${id}`);
         }
 
         function setHistory(id, items) {
-            settingsMan.set('changes_' + id, JSON.stringify(items));
+            settingsMan.set(`changes_${id}`, JSON.stringify(items));
         }
 
         function getHistory(id) {
-            var result = settingsMan.get('changes_' + id);
-            
-            return (result == null ? [] : JSON.parse(result)).filter(function(h) {
-                return !!h;
-            });
-        }
-
-        function listing(name, followers, node) {
-            var id = followerMapping.registerList(name, followers);
-            var list = jSlim.newEl('DIV', {
-                'class': 'list content'
-            });
-            var search = jSlim.newEl('INPUT', {
-                id: 'nosey_follower_searcher',
-                type: 'text',
-                placeholder: 'search followers'
-            });
-            node.search = search;
-            search.addEventListener('input', updateContent);
-            node.appendChild(search);
-            node.appendChild(list);
-            function updateContent() {
-                list.innerHTML = followerMapping.structured(id).html(search.value.toUpperCase());
-            }
-            updateContent();
-            return node;
+            const result = settingsMan.get('changes_' + id);
+            return (result == null ? [] : JSON.parse(result)).filter(h => !!h);
         }
 
         function list(arr) {
-            var result = '<div class="list"><ul>';
-            for (var i = 0; i < arr.length; i++) {
-                result += '<li>' + arr[i].replace(/\+/g, ' ') + '</li>';
-            }
-            return result + '</ul></div>';
+            return `<div class="list"><ul>${arr.map(a => `<li>${a.replace(/\+/g, ' ')}</li>`).join('')}</ul></div>`;
+        }
+
+        function historyListItemName(a) {
+            if (a.type == 'j' || a.type == 'l') return `<a target="_blank" href="/user/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a> `;
+            return `${a.old.replace(/\+/g, ' ')} `;
+        }
+
+        function historyListItemMessage(a) {
+            if (a.type == 'j') return '<i>joined</i>';
+            if (a.type == 'l') return '<i>left</i>';
+            return `changed names to</i> <a target="_blank" href="/user/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a>`;
         }
 
         function historyList(arr) {
-            var result = '<div class="history list"><ul>';
-            for (var i = arr.length - 1; i >= 0; i--) {
-                result += '<li data-index="' + i + '" class="history ' + arr[i].type;
-                if (arr[i].type == 'j' || arr[i].type == 'l') {
-                    result += '"><a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a> ';
-                } else {
-                    result += '">' + arr[i].old.replace(/\+/g, ' ') + ' ';
-                }
-                if (arr[i].type == 'j') {
-                    result += '<i>joined</i>';
-                } else if (arr[i].type == 'l') {
-                    result += '<i>left</i>';
-                } else if (arr[i].type == 'n') {
-                    result += '<i>changed names to</i> <a target="_blank" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].display.replace(/\+/g, ' ') + '</a>';
-                }
-                result += '</li>';
-            }
-            return result + '</ul></div>';
+            return `<div class="history list"><ul>${arr.map((a, i) =>
+                `<li data-index="${i}" class="history ${a.type}">
+                    ${historyListItemName(a)} ${historyListItemMessage(a)}
+                </li>`).reverse().join('')}
+            </ul></div>`;
         }
 
         function linkList(arr) {
-            var result = '<div class="list"><ol>';
-            for (var i = 0; i < arr.length; i++) {
-                result += '<li><a target="_blank" data-id="' + arr[i].id + '" href="/user/' + arr[i].name.replace(/ /g,'+') + '">' + arr[i].name.replace(/\+/g, ' ') + '</a></li>';
-            }
-            return result + '</ol></div>';
+            return `<div class="list"><ol>${arr.map(a =>
+                `<li><a target="_blank" data-id="${a.id}" href="/user/${a.name.replace(/ /g,'+')}">${a.name.replace(/\+/g, ' ')}</a></li>`)}
+            </ol></div>`;
         }
 
         function idFor(hist, followers) {
             for (var i = 0; i < followers.length; i++) {
-                if (followers[i].id != 'none' && typeof(followers[i].id) !== 'undefined' && followers[i].id == hist.id) {
+                if (followers[i].id != 'none' && followers[i].id !== undefined && followers[i].id == hist.id) {
                     return hist.id;
                 }
                 if ((hist.name == followers[i].name || hist.old == followers[i].name) && followers[i].id) {
@@ -799,403 +639,212 @@ try {
         }
 
         function isPresent(arr, follower) {
-            if (follower.id == 'none') {
-                for (var i = 0; i < arr.length; i++) {
-                    if (arr[i].name == follower.name) {
-                        if (arr[i].id != 'none') follower.id = arr[i].id;
-                        return arr[i];
-                    }
+            return arr.find(a => {
+                if (follower.id == 'none' && a.name == follower.name) {
+                    if (a.id != 'none') follower.id = a.id;
+                    return true;
                 }
-            } else {
-                for (var i = 0; i < arr.length; i++) {
-                    if (arr[i].id == follower.id) {
-                        if (arr[i].id == 'none') arr[i].id = follower.id;
-                        return arr[i];
-                    }
+                if (a.id == follower.id) return true;
+                if (a.id == 'none' && a.name == follower.name) {
+                    a.id = follower.id;
+                    return true;
                 }
-                for (var i = 0; i < arr.length; i++) {
-                    if (arr[i].id == 'none' && arr[i].name == follower.name) {
-                        arr[i].id = follower.id;
-                        return arr[i];
-                    }
-                }
-            }
-            return null;
+            });
         }
 
         function named(numb) {
-            var sign = numb < 0 ? '-' : numb == 0 ? '' : '+';
-            numb = numb < 0 ? -numb : numb;
-            if (numb / 1000 >= 1) {
-                if (numb / 1000000 >= 1) {
-                    if (numb / 1000000000 >= 1) {
-                        return sign + parseFloat((numb/1000000000).toFixed(3).toString()) + ' billion';
-                    }
-                    return sign + parseFloat((numb/1000000).toFixed(3).toString()) + ' million';
-                }
-                return sign + parseFloat((numb/1000).toFixed(3).toString()) + ' thousand';
+            const units = ['', 'thousand','million','billion'];
+            const sign = numb < 0 ? '-' : numb == 0 ? '' : '+';
+            numb = Math.abs(numb);
+            let index = 0;
+            while (index < units.length && numb >= 1000) {
+                index++;
+                numb /= 1000;
             }
-            return sign + numb.toString();
+            return `${sign}${round(numb, 2)}${units[index]}`;
         }
 
-        makeStyle('\
-.drop-down-pop-up-content.dog {\
-    position: relative;}\
-.dog .button {\
-    display: inline-block;\
-    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);\
-    line-height: 20px;\
-    margin-top: 4px;\
-    padding: 5px 5px 0 5px;\
-    border-radius: 5px 5px 0 0;\
-    border: solid 1px rgba(0, 0, 0, 0.6);\
-    border-bottom: none;\
-    cursor: pointer;}\
-.dog .button:not(.selected) {\
-    background: linear-gradient(to bottom, #ddd 0%, #ccc 100%);}\
-.dog .tabs {\
-    width: 100%;\
-    height: 100%;\
-    position: relative;\
-    border-bottom: solid 1px rgba(0,0,0,0.6);}\
-.dog .tab {\
-    display: none;\
-    position: absolute;\
-    bottom: 0px;\
-    top: 30px;\
-    left: 0px;\
-    right: 0px;\
-    background: #ddd;\
-    min-height: 270px;\
-    overflow-y: auto;\
-    padding: 10px;}\
-.dog .list {\
-    padding: 5px;}\
-.dog .tab .main .li {\
-    height: 20px;}\
-.dog .list .history {\
-    font-size: 80%;\
-    padding-left: 5px;\
-    margin-left: -10px;\
-    margin-right: -10px;\
-    box-shadow: 0 0 2px rgba(0,0,0,0.3) inset;}\
-.dog .list .history:first-child {\
-    border-top-left-radius: 5px;\
-    border-top-right-radius: 5px;}\
-.dog .list .history:last-child {\
-    border-bottom-left-radius: 5px;\
-    border-bottom-right-radius: 5px;}\
-.history.j {\
-    background: rgba(0, 240, 0, 0.07);}\
-.history.l {\
-    background: rgba(240, 0, 0, 0.07);}\
-.dog .list .history.j:before {\
-    content: "+ ";}\
-.dog .list .history.l:before {\
-    content: "- ";}\
-.dog .tab .main {\
-    background: rgb(220, 250, 200);\
-    border-radius: 20px;\
-    padding: 15px;\
-    border: dashed 1px rgba(0,0,0,0.2);\
-    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);\
-    color: #555;\
-    margin: 5px 0px;}\
-.dog .tab.selected {\
-    display: block !important;}\
-.dog .score {\
-    text-align: center;\
-    font-weight: bold;\
-    font-size: 40px;\
-    border-radius: 300px;\
-    border: solid 5px;\
-    margin-bottom: 5px;\
-    height: 58px;\
-    line-height: 45px;\
-    text-shadow: 0 0 2px rgba(0,0,100,0.6);}\
-.dog .score:not(.bar) {\
-    box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4),0 0 3px 1px rgba(0,0,30,0.3);}\
-.dog .score.good {\
-    background: rgba(0, 240, 0, 0.3);\
-    color: #A5C75B;}\
-.dog .score.bad {\
-    background: rgba(240, 0, 0, 0.3);\
-    color: #B15B5B;}\
-.dog .score.neutral {\
-    background: rgba(120, 120, 120, 0.3);\
-    color: rgb(240, 240, 240);}\
-.dog .score.fresh {\
-    background: rgba(0, 0, 240, 0.3);\
-    color: blue;}\
-.dog .score.bar {\
-    position: relative;\
-    overflow: hidden;\
-    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);\
-    background: rgba(0, 0, 240, 0.3);\
-    line-height: 50px;\
-    font-size: 15px;}\
-.dog .score.bar div {\
-    position: absolute;}\
-.dog .glass {\
-    top: 0px;\
-    bottom: 0px;\
-    left: 0px;\
-    right: 0px;\
-    z-index: 1;\
-    border-radius: 500px;\
-    box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4);}\
-.dog .percentage.g {\
-    top: 0px;\
-    bottom: 0px;\
-    left: 0px;\
-    background: #A5C75B;}\
-.dog .percentage.l {\
-    top: 0px;\
-    right: 0px;\
-    bottom: 0px;\
-    background: #B15B5B;}\
-.dog .percentage.n {\
-    top: 0px;\
-    bottom: 0px;\
-    background: rgba(255,255,255,0.3);}\
-.dog li .dog {\
-    display: none;}\
-.dog li a.opened ~ .dog {\
-    display: block;}\
-.open-pin:after {\
-    content: "";\
-    float: right;\
-    display: inline-block;\
-    width: 0px;\
-    height: 0px;\
-    text-align: center;\
-    line-height: 15px;\
-    margin-top: 10px;\
-    cursor: pointer;\
-    border: solid;\
-    border-width: 5px;\
-    border-color: #507E2C transparent transparent transparent;}\
-a:hover + .open-pin:after, .open-pin:hover:after {\
-    border-color: #609734 transparent transparent transparent;}\
-.opened:hover + .open-pin:after, .opened + .open-pin:hover:after {\
-    border-color: transparent transparent #609734 transparent;}\
-.opened + .open-pin:after {\
-    margin-top: 5px;\
-    border-color: transparent transparent #507E2C transparent;}\
-#info-cards > * {\
-    z-index: 99999999999999999 !important;}\
-.global_popup input[type="text"], .global_popup input[type="url"] {\
-    padding: 8px;\
-    width: 100%;\
-    border: 1px solid #CCC;\
-    background: none repeat scroll 0% 0% #F8F8F8;\
-    outline: medium none;\
-    color: #333;\
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;\
-    border-radius: 3px;\
-    margin: 5px 0px;}\
-.resize-handle {\
-    height: 10px;\
-    width: 10px;\
-    display: inline-block;\
-    position: absolute;\
-    bottom: 0;\
-    right: 0;\
-    border-bottom: solid 2px;\
-    border-right: solid 2px;}');
+        makeStyle(`
+.drop-down-pop-up-content.dog {position: relative;}
+.dog .button {
+    display: inline-block;
+    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);
+    line-height: 20px;
+    margin-top: 4px;
+    padding: 5px 5px 0 5px;
+    border-radius: 5px 5px 0 0;
+    border: solid 1px rgba(0, 0, 0, 0.6);
+    border-bottom: none;
+    cursor: pointer;}
+.dog .button:not(.selected) {background: linear-gradient(to bottom, #ddd 0%, #ccc 100%);}
+.dog .tabs {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-bottom: solid 1px rgba(0,0,0,0.6);}
+.dog .tab {
+    display: none;
+    position: absolute;
+    bottom: 0px;
+    top: 30px;
+    left: 0px;
+    right: 0px;
+    background: #ddd;
+    min-height: 270px;
+    overflow-y: auto;
+    padding: 10px;}
+.dog .list {padding: 5px;}
+.dog .tab .main .li {height: 20px;}
+.dog .tabs .button.hidden {display: none;}
+.dog .list .history {
+    font-size: 80%;
+    padding-left: 5px;
+    margin-left: -10px;
+    margin-right: -10px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3) inset;}
+.dog .list .history:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;}
+.dog .list .history:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;}
+.history.j {
+    background: rgba(0, 240, 0, 0.07);}
+.history.l {
+    background: rgba(240, 0, 0, 0.07);}
+.dog .list .history.j:before {content: "+ ";}
+.dog .list .history.l:before {content: "- ";}
+.dog .tab .main {
+    background: rgb(220, 250, 200);
+    border-radius: 20px;
+    padding: 15px;
+    border: dashed 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
+    color: #555;
+    margin: 5px 0px;}
+.dog .tab.selected {display: block !important;}
+.dog .score {
+    text-align: center;
+    font-weight: bold;
+    font-size: 40px;
+    border-radius: 300px;
+    border: solid 5px;
+    margin-bottom: 5px;
+    height: 58px;
+    line-height: 45px;
+    text-shadow: 0 0 2px rgba(0,0,100,0.6);}
+.dog .score:not(.bar) {box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4),0 0 3px 1px rgba(0,0,30,0.3);}
+.dog .score.good {
+    background: rgba(0, 240, 0, 0.3);
+    color: #A5C75B;}
+.dog .score.bad {
+    background: rgba(240, 0, 0, 0.3);
+    color: #B15B5B;}
+.dog .score.neutral {
+    background: rgba(120, 120, 120, 0.3);
+    color: rgb(240, 240, 240);}
+.dog .score.fresh {
+    background: rgba(0, 0, 240, 0.3);
+    color: blue;}
+.dog .score.bar {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
+    background: rgba(0, 0, 240, 0.3);
+    line-height: 50px;
+    font-size: 15px;}
+.dog .score.bar div {position: absolute;}
+.dog .glass {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    border-radius: 500px;
+    box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4);}
+.dog .percentage.g {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    background: #A5C75B;}
+.dog .percentage.l {
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    background: #B15B5B;}
+.dog .percentage.n {
+    top: 0px;
+    bottom: 0px;
+    background: rgba(255,255,255,0.3);}
+.dog li .dog {display: none;}
+.dog li a.opened ~ .dog {display: block;}
+.open-pin:after {
+    content: "";
+    float: right;
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+    text-align: center;
+    line-height: 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: solid;
+    border-width: 5px;
+    border-color: #507E2C transparent transparent transparent;}
+a:hover + .open-pin:after, .open-pin:hover:after {border-color: #609734 transparent transparent transparent;}
+.opened:hover + .open-pin:after, .opened + .open-pin:hover:after {border-color: transparent transparent #609734 transparent;}
+.opened + .open-pin:after {
+    margin-top: 5px;
+    border-color: transparent transparent #507E2C transparent;}
+#info-cards > * {z-index: 99999999999999999 !important;}
+.global_popup input[type="text"], .global_popup input[type="url"] {
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #CCC;
+    background: none repeat scroll 0% 0% #F8F8F8;
+    outline: medium none;
+    color: #333;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;
+    border-radius: 3px;
+    margin: 5px 0px;}
+.resize-handle {
+    height: 10px;
+    width: 10px;
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-bottom: solid 2px;
+    border-right: solid 2px;}`);
     })();
 } catch (e) {
     try {
-        makeGlobalPopup('Nosey Hound', '', false, true).setContent(e + '');
+        makeGlobalPopup('Nosey Hound', '', false).SetContent(e);
     } catch (ee) {
-        alert('Nosey Hound: ' + e);
+        alert(`Nosey Hound: ${e}`);
     }
 }
 
-//==API FUNCTION==//
-function Popup(native) {
-    this.native = native;
-    this.holder = native.element;
-    this.dark = native.dimmer;
-    this.content = this.unscoped = native.content;
-    this.position = function(x, y, buff) {
-        
-    };
-    this.setContent = function(c) {
-        this.native.SetContent(c);
-        return this;
-    };
-    this.scope = function(el) {
-        if (typeof el == 'string') {
-            this.content.appendChild(jslim.html(el)[0]);
-        } else {
-            this.content.appendChild(el);
-        }
-        return (this.content = el);
-    };
-    this.unscope = function(el) {
-        this.content = this.unscoped;
-        if (typeof el !== 'undefined') this.scope(el);
-        return this.content;
-    };
-    this.find = function(el) {
-        return this.content[0].querySelectorAll(el);
-    };
-    this.onclose = function(func) {
-        if (typeof func === 'function') {
-            this.holder.addEventListener('close', func);
-        } else {
-            this.holder.dispatchEvent(new CustomEvent('close'));
-        }
-    };
-    this.close = function() {
-        this.native.close();
-    };
-    this.show = function() {
-        this.native.Show();
-    };
-    this.hide = function() {
-        this.holder.style.display = 'none';
-    };
-}
-
-//==API FUNCTION==//
 function makeGlobalPopup(title, fafaText, darken, close) {
-    var p = new Popup(makePopup(title, fafaText, darken, close));
-    p.holder.classList.add('global_popup');
+    const p = makePopup(title, fafaText, darken, close);
+    p.element.classList.add('global_popup');
     return p;
 }
 
-//==API FUNCTION==//
-function makePopup(title, fafaText, darken, close) {
-    if (typeof (close) == 'undefined') close = true;
-    if (typeof (darken) == 'undefined') darken = true;
-    var pop = new (win().PopUpMenu)('','<i class="fa fa-' + fafaText + '" ></i>' + title);
-    pop.SetCloseOnHoverOut(false);
-    pop.SetFixed(true);
-    pop.SetContent('');
-    pop.SetSoftClose(!close);
-    if (!darken) pop.SetDimmerEnabled(false);
-    if (typeof darken == 'number') {
-        var show = pop.Show;
-        pop.Show = function() {
-            show.apply(this, arguments);
-            this.dimmer.style.opacity = darken / 100;
-        }
-    }
-    pop.element.appendChild(styleSheet("\
-.drop-down-pop-up-content input[type='text'], .drop-down-pop-up-content input[type='url'] {\
-    padding:8px;\
-    width:100%;\
-    border:1px solid rgb(204, 204, 204);\
-    background:none repeat scroll 0% 0% rgb(248,248,248);\
-    outline:medium none;\
-    color:rgb(51,51,51);\
-    box-shadow:0px 2px 4px rgba(0,0,0,0.1) inset;\
-    border-radius:3px;\
-    margin:5px 0px;}"));
-    return pop;
+function round(n, decimals) {
+    const c = Math.pow(10, decimals);
+    return Math.floor(n*c)/c;
 }
 
-//==API FUNCTION==//
-function urlSafe(me){return me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');}
-
-//==API FUNCTION==//
-function offset(element) {
-    if (!element || !element.getClientRects().length) {
-        return { top: 0, left: 0 };
-    }
-    var rect = element.getBoundingClientRect();
-    var doc = element.ownerDocument || document;
-    var win = doc.defaultView || win;
-    doc = doc.documentElement;
-    return {
-        top: rect.top + win.pageYOffset - doc.clientTop,
-        left: rect.left + win.pageXOffset - doc.clientLeft
-    };
-}
-
-//==API FUNCTION==//
-function position(obj, x, y, buff) {
-    if (typeof x == 'string' && x.toLowerCase() == 'center') x = (document.body.clientWidth - obj.clientWidth) / 2;
-    if (typeof y == 'string' && y.toLowerCase() == 'center') y = (document.body.clientHeight - obj.clientHeight) / 2;
-    if (typeof x == 'object') {
-        var parameters = x;
-        var positioner = x.object != null ? x.object : x;
-        buff = x.buffer != null ? x.buffer : y;
-        var off = offset(positioner);
-        y = off.top - document.body.scrollTop;
-        x = off.left - document.body.scrollLeft;
-        if (parameters.offX != null) x += parameters.offX;
-        if (parameters.offY != null) y += parameters.offY;
-    }
-    
-    if (buff == null) buff = 0;
-    if (x < buff) x = buff;
-    if (y < buff) y = buff;
-    
-    var maxX = document.body.clientWidth - (obj.clientWidth + buff);
-    if (x > maxX) x = maxX;
-    
-    var maxY = document.body.clientHeight - (obj.clientHeight + buff);
-    if (y > maxY) y = maxY;
-    
-    obj.style.top = y + 'px';
-    obj.style.left = x + 'px';
-}
-
-//==API FUNCTION==//
-function isMyPage() {
-    var match = document.location.href.split('?')[0].match(/(?:http:|https:|)\/\/www\.fimfiction\.net\/user\/([0-9]+)\/.*/);
-    return match && match[1] && match[1] == (getUserId() + '');
-}
-
-//==API FUNCTION==//
-function win() {return this['unsafeWindow'] || window['unsafeWindow'] || window;}
-
-//==API FUNCTION==//
-function getUserNameUrlSafe() { return getIsLoggedIn() ? getUserButton().getAttribute("href").split("/" + getUserId() + "/").reverse()[0].split("/")[0] : 'Anon'; }
-
-//==API FUNCTION==//
-function getUserNameEncoded() { return encodeURIComponent(getUserNameUrlSafe()); }
-
-//==API FUNCTION==//
-function getUserName() {return getUserNameUrlSafe().replace(/\+/g,' ');}
-
-//==API FUNCTION==//
-function getUserButton() {return document.querySelector('.user_toolbar a.button[href^="/user/"]');}
-
-//==API FUNCTION==//
-function getIsLoggedIn() {return !!win()['logged_in_user'];}
-
-//==API FUNCTION==//
-function getUserId() {var w = win()['logged_in_user'];return w ? w.id : -1;}
-
-//==API FUNCTION==//
-function styleSheet(input, id) {
-    while (input.indexOf('  ') != -1) input = input.replace(/  /g, ' ');
-    var style = document.createElement('style');
-    style.innerText = input;
-    style.type = 'text/css';
-    if (id) style.id = id;
-    return style;
-}
-
-//==API FUNCTION==//
-function makeStyle(input, id) {
-    document.head.appendChild(styleSheet(input, id));
-}
-
-//==API FUNCTION==//
 function parseImperial(amount) {
-    var units = [['Inch',1,'Inches'],['Foot',12,'Feet'],['Yard',3,'Yards'],['Mile',1760,'Miles']];
+    const units = [['Inch',1,'Inches'],['Foot',12,'Feet'],['Yard',3,'Yards'],['Mile',1760,'Miles']];
     if (!amount) return '0 ' + units[0][2];
     var result = '';
     if (amount < 0) {
         amount = -amount;
         result += 'negative ';
     }
-    if (amount < units[0][1]) return amount.toFixed(3).toString().toLocaleString('en') + units[0][2];
+    if (amount < units[0][1]) return `${round(amount, 2).toLocaleString('en')}${units[0][2]}`;
     var measure = {
         data: 0,
         index: units.length - 1,
@@ -1218,7 +867,7 @@ function parseImperial(amount) {
         },
         write: function() {
             if (this.data) {
-                result += this.data + ' ' + units[this.index][this.data > 1 ? 2 : 0] + ' ';
+                result += `${this.data} ${units[this.index][this.data > 1 ? 2 : 0]} `;
                 this.data = 0;
             }
         },

@@ -2,67 +2,26 @@
 // @name        RunScript Sandbox Breakout Utility
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.2
+// @version     1.3
 // @grant       none
 // ==/UserScript==
 
 function RunScript(func, mustCall, params) {
-  if (!document.body) {
-    var _ready = document.onready;
-    document.onready = function() {
-      RunScript(func, mustCall, params);
-      if (typeof _ready === 'function') {
-        _ready.apply(this, arguments);
-      }
-    }
-  } else {
-    var scr = document.createElement('SCRIPT');
-    if (mustCall) {
-      if (params) {
-        var pars = [];
-        for (var i = 2; i < arguments.length; i++) {
-          pars.push(arguments[i]);
-        }
-        scr.innerHTML = '(' + func.toString() + ').apply(this, ' + JSON.stringify(pars) + ');';
-      } else {
-        scr.innerHTML = '(' + func.toString() + ')();';
-      }
-    } else {
-      scr.innerHTML = func.toString();
-    }
-    document.body.appendChild(scr);
-    scr.parentNode.removeChild(scr);
-  }
+	const pars = [].push.apply([], arguments);
+	pars.slice(0, 2);
+	RunScript.build(func.toString(), pars).run(immediate);
+}
+RunScript.ready = function(func, mustCall, params) {
+	window.addEventListener('DOMContentLoaded', () => RunScript(func, mustCall, params));
 };
-RunScript.toString = (function() {
-  var result = function toString() {
-    return 'function ' + this.name + '() {\n  [native code]\n}';
-  }
-  result.toString = result;
-  return result;
-})();
-RunScript.build = function(functionText) {
-  return {
-    run: function(mustCall) {
-      if (!document.body) {
-        var me = this;
-        var _ready = document.onready;
-        document.onready = function() {
-          me.run(mustCall);
-          if (typeof _ready === 'function') {
-            _ready.apply(this, arguments);
-          }
-        }
-      } else {
-        var scr = document.createElement('SCRIPT');
-        if (mustCall) {
-          scr.innerHTML = '(' + functionText + ')();';
-        } else {
-          scr.innerHTML = functionText;
-        }
-        document.body.appendChild(scr);
-        scr.parentNode.removeChild(scr);
-      }
-    }
-  }
+RunScript.build = (functionText, params) => {
+	return {
+		run: function(immediate) {
+			if (!document.body) return window.addEventListener('DOMContentLoaded', () => this.run(immediate));
+			const scr = document.createElement('SCRIPT');
+			scr.innerHTML = immediate ? `(${functionText}).apply(this, ${params ? JSON.stringify(params) : ''});` : functionText;
+			document.body.appendChild(scr);
+			scr.parentNode.removeChild(scr);
+		}
+	};
 };

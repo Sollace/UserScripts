@@ -7,28 +7,11 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/jquery-1.8.3.min.wrap.js
-// @version     2
+// @version     2.1
 // @grant       none
 // ==/UserScript==
 
-/*---Fix for window_focused not being reset. Knighty pls.---*/
-if (!window.__window_focused_fix) {
-    window.__window_focused_fix = true;
-    $(window).on('focus', function() {
-      window.window_focused = true;
-    }).on('blur', function() {
-      window.window_focused = false;
-    });
-}
-
-/*\--------------------------------------------------------------------------------------------------
-|*|  Syntaxes:
-|*|  * docCookies.setItem(name, value[, end[, path[, domain[, secure]]]])
-|*|  * docCookies.getItem(name)
-|*|  * docCookies.removeItem(name[, path], domain)
-|*|  * docCookies.hasItem(name)
-\*/ var docCookies={
+var docCookies={
 getItem: function(sKey){return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=\\s*([^;]*).*$)|^.*$"),"$1")) || null;},
 setItem: function(sKey,sValue,vEnd,sPath,sDomain,bSecure){if(!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey))return false;var sExpires = "";if(vEnd){switch(vEnd.constructor){case Number: sExpires=vEnd === Infinity ?"; expires=Fri, 31 Dec 9999 23:59:59 GMT":"; max-age="+vEnd;break;case String: sExpires="; expires="+vEnd;break;case Date: sExpires="; expires="+vEnd.toUTCString();break;}}document.cookie=encodeURIComponent(sKey)+"="+encodeURIComponent(sValue)+sExpires+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"")+(bSecure ?"; secure":"");return true;},
 removeItem: function(sKey,sPath,sDomain){if(!sKey || !this.hasItem(sKey))return false;document.cookie=encodeURIComponent(sKey)+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT"+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"");return true;},
@@ -39,11 +22,7 @@ function pickOne(arr, rare){
     return arr[Math.floor(Math.random()*arr.length)];}
 function makeStyle(input, id) {
     while (input.indexOf('  ') != -1) input = input.replace(/  /g, ' ');
-    var style = document.createElement('style');
-    $(style).attr('type', 'text/css');
-    $(style).append(input);
-    if (id != undefined && id != null) style.id = id;
-    $('head').append(style);
+    document.head.insertAdjacentHTML('beforeend', '<style id="' + id + '" type="text/css">' + input + '</style>');
 }
 function setDocCookie(name, val) {
     docCookies.removeItem(name, "/", "/", "fimfiction.net");
@@ -56,18 +35,18 @@ if (window.top != window) {
         document.body.innerHTML = document.body.innerHTML.replace(/\<embed /g, '<embed wmode="opaque" menu="false" ');
     }
 }
-if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || document.location.href.indexOf("https://www.fimfiction.net/") == 0)
-    //--------------------------------------------------------------------------------------------------
+if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || document.location.href.indexOf("https://www.fimfiction.net/") == 0) run();
+
+function run() {
     //--------------------------------------SCRIPT START------------------------------------------------
-    //--------------------------------------------------------------------------------------------------
-    var stateMap = {
+    const stateMap = {
         'cloud_sleep_right.gif': 'sleep','cloud_sleep_left.gif': 'sleep',
         'dashing_right.gif': 'dash','dashing_left.gif': 'dash',
         'stand_rainbow_right.gif': 'stand','stand_rainbow_left.gif': 'stand',
         'fly_rainbow_right.gif': 'fly','fly_rainbow_left.gif': 'fly',
         'trotcycle_rainbow_right.gif': 'trot','trotcycle_rainbow_left.gif': 'trot'
     };
-    var pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", function(img, pon) {
+    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", function(img, pon) {
         switch (img) {
             case 'sleep4': 
             case 'sleep': return buildRef(pon, 'sleep');
@@ -88,9 +67,9 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             case 'stand3': return /*dance*/'//fc01.deviantart.net/fs70/f/2011/261/a/f/pinkie_pie_dancing_by_deathpwny-d4a46i0.gif';
         }
     }, { 3: "Oppan Pinkie Style;Pinkie Style;Eh~ Sexy Pony;Pinkie Pie Time;What does the Pony say? Chipi-chi-pow-chippy-cheep-chip-chip" });
-    var Ponies = [
+    const Ponies = [
         Spacer('Mane Six', new DummyPony('Rainbow Dash')),
-        offset(new SpecialPony('Twilight Sparkle', 'twi', 6,"Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img,pon) {
+        offset(new SpecialPony('Twilight Sparkle', 'twi', 6,"Reading is something everypony can enjoy, if they just give it a try.;*books horse noises*;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", (img,pon) => {
             switch (img) {
                 case 'sleep': return buildRef(pon, 'read');
                 case 'dash': return buildRef(pon, img);
@@ -102,7 +81,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand4': return buildRef(pon, 'snap');
                 case 'stand5': return /*eqg*/'//orig11.deviantart.net/5ef2/f/2016/103/8/a/twilight_sparkle__equestria_girls__idle_by_botchan_mlp-d9ysg33.gif';
             }
-        }), function(el, state) {
+        }),(el, state) => {
             if (state == 'trot' && this.getState() == 1 || (state == 'stand' && this.getState() == 3)) {
                 el.css('margin-top', '-25px');
             }
@@ -224,7 +203,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'dash': return 'http://orig11.deviantart.net/b121/f/2016/087/5/d/starlight_glimmer_trotting_by_botchan_mlp-d9wrkqw.gif';
             }
         }),
-        new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", function(img, pon) {
+        attachMemory(attachEvents(new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'dash':
@@ -234,11 +213,54 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand_ac1': return buildRef(pon, 'deck');
             }
         }, {
-            1: "Oh this, it's just my BASS CANNON!;Rock on!;Let's have some WUBS!;*WUB WUB WUB WUB*;Crank it up!;I do my dishes with WUBS!;Toothpaste? I don't need that, I have WUBS!;*BOOMWOOM-BOOMWOOM*",
-            'effect': {
-                'target': '.speech_container',
-                'label': 'animation',
-                'value': 'wub 1.5s infinite alternate'}}),
+            1: "Oh this, it's just my BASS CANNON!;Rock on!;*bow-chika-bowow*;Let's have some WUBS!;*WUB WUB WUB WUB*;Crank it up!;I do my dishes with WUBS!;Toothpaste? I don't need that, I've got WUBS!;*BOOMWOOM-BOOMWOOM*",
+            effect: {
+                target: '.speech_container',
+                css: {
+                    animation: 'wub 1.5s infinite alternate'
+                }
+            }
+        }), {
+            mouseenter: function () {
+                if (Math.random() * 20 <= 5) {
+                    let special = (this.ponyType().getMemory('special') + 1) % 15;
+                    let timer = this.ponyType().getMemory('timer');
+                    let wubbing = this.ponyType().getMemory('wubbing');
+                    let player = this.ponyType().getMemory('player');
+                    this.ponyType().setMemory('special', special);
+                    if (special == 0 || wubbing) {
+                        this.Speak(wubbing ? "Oh you want MORE?;I can keep this up ALL DAY:BRING IT" : "Oh, now it is ON!!!");
+                        
+                        document.body.classList.add('wubadub');
+                        if (wubbing > 2) document.body.classList.add('bass');
+                        
+                        this.ponyType().setMemory('wubbing', wubbing + 1);
+                        
+                        const songStarted = () => {
+                            this.ponyType().setMemory('timer', setTimeout(() => {
+                                document.body.classList.remove('wubadub');
+                                document.body.classList.remove('bass');
+                                this.Speak("Don't say I didn't warn ya.");
+                                this.ponyType().setMemory('wubbing', 0);
+                                if (player) player.parentNode.removeChild(player);
+                                this.ponyType().setMemory('player', null);
+                            }, 50000));
+                        };
+                        
+                        if (timer) {
+                            clearTimeout(timer);
+                            songStarted();
+                        } else if (!player) {
+                            this.ponyType().setMemory('player', player = playSong('uNHS09davuY', songStarted));
+                        }
+                    } else {
+                        this.Speak("Don't you try anything funny, aight?;What'chu looking at?;WUBADUBDUB, buster.");
+                    }
+                }
+                
+                
+            }
+        }), {special: 0, wubbing: 0}),
         new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs",
                  function(img) {
             switch (img) {
@@ -283,10 +305,11 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'stand2': return buildRef(pon, 'leap');
             }
         }, {
-            'effect': {
-                'target': 'self',
-                'label': 'cursor',
-                'value': 'pointer'
+            effect: {
+                target: 'self',
+                css: {
+                    cursor: 'pointer'
+                }
             }
         }), {
             'mouseover': function() {
@@ -325,10 +348,14 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }, {
             1: "Rainbow Dash says I must be careful around clouds;Dark clouds make Derpy go ouchie;I'm on the weather team you know;Ahoy!;Nyan nyan nyan nyan Ni hao nyan;One... Two... Muffin! Four...;Squee!",
             2: "Call me Dr. Derp;I have a PHD you know;My bubble theory saved Equestria 30,000 bits!;I derp, therefore I am;If a tree falls and nopony is there to hear it. Derp?;The meaning of life is.... ooh a MUFFIN!",
-            'effect': {'level': 2,
-                       'target': '.speech',
-                       'label': 'transform',
-                       'value': 'scale(-1,-1)'}}),{
+            effect: {
+                level: 2,
+                target: '.speech',
+                css: {
+                    transform: 'scale(-1,-1)'
+                }
+            }
+        }),{
             'mouseover': function() {
                 if (Math.random() * 80 <= 5) {
                     this.ponyType().setMemory('explode', true);
@@ -336,21 +363,21 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 }
             },
             'tick': function() {
-                if ($('.muffin').length) {
-                    if (!this.dom().container.hasClass('muffin')) {
+                if (document.querySelector('.muffin')) {
+                    if (!this.container.classList.contains('muffin')) {
                         this.pastState = {
-                            'container': this.dom().container,
+                            'container': this.container,
                             'target_x': this.target_x
-                        }
-                        var c = $('.muffin').first();
-                        var offset = c.offset();
-                        this.UpdateMouse(offset.left + c.width()/2, offset.top + c.height()/2, c);
+                        };
+                        var c = document.querySelector('.muffin');
+                        var offset = c.getBoundingClientRect();
+                        this.UpdateMouse(offset.left + c.offsetWidth/2, offset.top + c.offsetHeight/2, c);
                     }
                     var difX = this.target_x - this.x;
-                    var difY = (this.dom().container.offset().top + this.dom().container.height()/2) - this.y;
-                    if (Math.sqrt(difX*difX + difY*difY) < this.dom().height()/3 + 10) {
-                        this.dom().container.remove();
-                        this.dom().container = this.pastState.dom().container;
+                    var difY = (this.container.getBoundingClientRect().top + this.container.offsetHeight/2) - this.y;
+                    if (Math.sqrt(difX*difX + difY*difY) < this.dom_element.offsetHeight/3 + 10) {
+                        this.container.parentNode.removeChild(this.container);
+                        this.container = this.pastState.container;
                         this.target_x = this.pastState.target_x;
                         this.pastState = null;
                     }
@@ -360,13 +387,13 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
             'keydown': function(e) {
                 var pony = this.ponyType();
                 if (e.keyCode == 77 && pony.getMemory('explode')) {
-                    if (!$('input:focus, textarea:focus').length) {
+                    if (!document.querySelector('input:focus, textarea:focus')) {
                         pony.setMemory('explode', false);
                         for (var i = 0; i < 20; i++) {
                             new Particle('<div class="muffin" />', this.x, this.y, (Math.random() * 50) - 25, (Math.random() * 50) - 25);
                         }
                         this.x = this.y = 0;
-                        this.dom().find('div.speech').fadeOut();
+                        this.fadeOutText();
                         this.Say('');
                     }
                 }
@@ -398,10 +425,10 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         (function(pony) {
             var Mode = Math.floor((Math.random() * 100) % 4);
             pony.__getSprite = pony.getSprite;
-            pony.getSprite = function(elem, face, base, url) {
+            pony.getSprite = function(ip, face, base, url) {
                 var other = this.getMemory('disguise');
-                if (other && this.cache.ready) return other.getSprite(elem, face, base, url);
-                return this.__getSprite(elem, face, base, url);
+                if (other && this.cache.ready) return other.getSprite(ip, face, base, url);
+                return this.__getSprite(ip, face, base, url);
             };
             pony.__cssImages = pony.cssImages;
             pony.cssImages = function(elem, face) {
@@ -504,7 +531,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                 case 'trot': return /*trot*/'//orig03.deviantart.net/449b/f/2013/111/b/f/filly_rarity___trotting_by_rj_p-d62kfh7.gif';
             }
         })),
-        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!Hey!", function(img, pon) {
+        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!;Hey!", function(img, pon) {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -611,17 +638,18 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
                             this.Speak(anger < 3 ? "Ouch! Stop that!;*sobs*" : anger < 6 ? "Leave me alone!" : "I'm telling cheerilee!");
                             if (anger > 6) {
                                 anger = -1;
-                                var a = new InteractivePony();
-                                a.dom().find('div.speech').fadeOut();
+                                const a = new InteractivePony();
+                                a.fadeOutText();
                                 a.ponyType = function () {
                                     return PoniesRegister['Scootaloo'];
                                 };
                                 PoniesRegister['Scootaloo'].setMemory('special', true);
-                                a.InitEvents();
+                                a.InitPony();
                                 a.Say('');
-                                setInterval(function () {
-                                    window_focused && (a.Update(0.016), a.Render())
-                                }, 16);
+                                fQuery.animationFrame(function (time) {
+                                    a.Update(time);
+                                    a.Render()
+                                }, 0.1);
                             }
                             pony.setMemory('anger', anger);
                         }
@@ -655,7 +683,7 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
         }))
     ];
 
-    var CustomPony = {
+    let CustomPony = {
         "name": "Rainbow Dash",
         "sayings": dash_sayings,
         "sprites": {
@@ -673,633 +701,593 @@ if (document.location.href.indexOf("http://www.fimfiction.net/") == 0 || documen
     } catch (e) {}
     
     Ponies.push((function(pony) {
-        pony.getSay = function() {
-            return CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...";
-        };
-        pony.bakeGif = function(url, suffex, cache) {
-            return this.bakeSprite(stateMap[url] + suffex);
-        };
-        pony.bakeSprite = function(img) {
-            return CustomPony.sprites[img];
-        }
-        pony.args = function() {
-            return CustomPony;
-        }
+        pony.getSay = () => CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...";
+        pony.bakeGif = (url, suffex, cache) => pony.bakeSprite(stateMap[url] + suffex);
+        pony.bakeSprite = img => CustomPony.sprites[img];
+        pony.args = () => CustomPony;
         pony.Name = CustomPony.name;
         return pony;
     })(new Pony('Custom', 'custom', '', function(img) {
         return CustomPony.sprites[img];
     })));
     
-    var PoniesRegister = {};
-    for (var i = 0; i < Ponies.length; i++) {
-        PoniesRegister[Ponies[i].Id] = Ponies[i];
-    }
+    const PoniesRegister = {};
+    Ponies.forEach(a => {
+        PoniesRegister[a.Id] = a;
+    });
     var GlobalInteractivePony = null, GlobalPonyType = getPonyType();
-
     addOptionsSelect();
     setupMorePonies();
-//--------------------------------------------------------------------------------------------------
-//----------------------------------------FUNCTIONS-------------------------------------------------
-//--------------------------------------------------------------------------------------------------
 
-function isOnDay(day, month) {
-    if (!isOnDay.date) {
-        var t = new Date();
-        isOnDay.date = {'day': t.getDate(),'month': t.getMonth() + 1}
+    //--------------------------------------------------------------------------------------------------
+    //----------------------------------------FUNCTIONS-------------------------------------------------
+    //--------------------------------------------------------------------------------------------------
+
+    function isOnDay(day, month) {
+        if (!isOnDay.date) {
+            const t = new Date();
+            isOnDay.date = {day: t.getDate(), month: t.getMonth() + 1}
+        }
+        return isOnDay.date.day == day && isOnDay.date.month == month;
     }
-    return isOnDay.date.day == day && isOnDay.date.month == month;
-}
 
-function getPonyType() {
-    var result = docCookies.getItem("interactive_pony_type");
-    if (PoniesRegister[result] != null) {
+    function getPonyType() {
+        var result = docCookies.getItem("interactive_pony_type");
+        return PoniesRegister[result] ? result : Ponies[0].Id;
+    }
+
+    function setPonyType(val) {
+        GlobalPonyType = val;
+        setDocCookie("interactive_pony_type", val);
+        if (GlobalInteractivePony) {
+            GlobalInteractivePony.ponySwitched();
+        }
+    }
+
+    function alias(name, pony) {
+        pony.Name = name;
+        return pony;
+    }
+
+    function sleepless(pony) {
+        pony.Sleepless = true;
+        return pony;
+    }
+
+    function offset(pony, func) {
+        pony.offset = func;
+        return pony;
+    }
+
+    function speechPause(length) {
+        var result = '';
+        while (result.length < length) result += ' ';
         return result;
     }
-    return Ponies[0].Id;
-}
 
-function setPonyType(val) {
-    GlobalPonyType = val;
-    setDocCookie("interactive_pony_type", val);
-    if (GlobalInteractivePony) {
-        GlobalInteractivePony.ponySwitched();
+    function extendOriginalSays(pony, ratio) {
+        const s = pony.getSay;
+        pony.getSay = a => Math.random() < ratio ? s.call(pony, a) : a;
+        return pony;
     }
-}
 
-function alias(name, pony) {
-    pony.Name = name;
-    return pony;
-}
-
-function sleepless(pony) {
-    pony.Sleepless = true;
-    return pony;
-}
-
-function offset(pony, func) {
-    pony.offset = func;
-    return pony;
-}
-
-function speechPause(length) {
-    var result = '';
-    while (result.length < length) result+= ' ';
-    return result;
-}
-
-function extendOriginalSays(pony, ratio) {
-    var s = pony.getSay;
-    pony.getSay = function(a) {
-        if (Math.random() < ratio) return s.call(this, a);
-        return a;
-    };
-    return pony;
-}
-
-function attachCache(pony) {
-    var record = {};
-    var loading = 0;
-    pony.cache = {
-        ready: true,
-        cache: function(img) {
-            if (record[img] == undefined) {
-                record[img] = false;
-                this.ready = false;
-                loading++;
-                var image = $('<img src="' + img + '" style="display:none;" />');
-                image.on('load', function() {
-                    image.remove();
-                    record[img] = true;
-                    loading--;
-                    pony.cache.ready = loading <= 0;
-                });
-                image.on('error', function() {
-                   image.remove();
-                    loading--;
-                    pony.cache.ready = loading <= 0;
-                });
-            }
-            return img;
-        }
-    }
-    return pony;
-}
-
-function attachMemory(pony, memory) {
-    pony.getMemory = function(key) {
-        return memory[key];
-    };
-    pony.setMemory = function(key, val) {
-        memory[key] = val;
-    };
-    return pony;
-}
-
-function attachEvents(pony, eventObject) {
-    eventObject.Trigger = function (interactivePony, e) {
-        if (typeof e === 'string') e = {'type': e};
-        return this[e.type] ? this[e.type].apply(interactivePony, [e]) : null;
-    };
-    pony.Events = eventObject;
-    return pony;
-}
-
-function Spacer(name, pony) {
-    pony.section = name;
-    return pony;
-}
-
-function DummyPony(name) {
-    this.Id = name;
-    this.Name = name;
-    this.getSay = function(a) {return a;};
-    this.getSprite = function(elem, face, base, url) {return base + url;};
-    this.getAccess = function() { return ''; };
-    this.cssImages = function(elem, face) { elem.find('img.interactive_pony').css('transform', '');}; 
-}
-
-function SpecialPony(name, key, level, sayings, giffactory, args) {
-    if (!args) {
-        args = {};
-    } else {
-        for (var i in args) {
-            if (typeof args[i] == 'string') {
-                args[i] = args[i].split(';');
+    function attachCache(pony) {
+        const record = {};
+        let loading = 0;
+        pony.cache = {
+            ready: true,
+            cache: img => {
+                if (record[img] === undefined) {
+                    record[img] = false;
+                    pony.cache.ready = false;
+                    loading++;
+                    document.body.insertAdjacentHTML('beforeend', `<img style="display:none;" src="${img}"></img>`)
+                    const image = document.body.lastChild;
+                    image.addEventListener('load', () => {
+                        image.parentNode.removeChild(image);
+                        record[img] = true;
+                        loading--;
+                        pony.cache.ready = loading <= 0;
+                    });
+                    image.addEventListsner('error', () => {
+                        image.parentNode.removeChild(image);
+                        loading--;
+                        pony.cache.ready = loading <= 0;
+                    });
+                }
+                return img;
             }
         }
+        return pony;
     }
-    
-    var parent = new Pony(name, key, sayings, giffactory, args);
-    var Active = -1;
-    var next_active_timer = 10;
-    var Specials = {};
-    var SpecialAccess = {};
-    
-    this.Id = name;
-    this.Name = name;
-    this.getSay = function(a) {
-        if (Active > -1 && args[Active + 1] != null) {
-            return pickOne(args[Active + 1]);
-        }
-        return parent.getSay(a);
-    };
-    this.getState = function() {
-        return Active;
-    };
-    this.setState = function(a) {
-        Active = a < 0 ? 0 : a;
-    };
-    this.getSprite = function(elem, face, base, url) {
-        url = parent.resolveUrl(face, url);
-        var result = null;
-        for (var looked = Active; looked > 0; looked--) {
-            if (!Specials[looked]) Specials[looked] = {};
-            result = parent.bakeGif(url, looked, Specials[looked]);
-            if (result) return result;
-            result = parent.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
-            if (result) return result;
-        }
-        return parent.getSprite(elem, face, base, url);
-    };
-    this.bakeSprite = function(img) {
-        return parent.bakeSprite(img);
-    }
-    this.getAccess = function(elem, face, base, url) {
-        next_active_timer = (next_active_timer + 1) % 11;
-        if (next_active_timer == 0) Active = Math.floor(Math.random() * (level + 1));
-        url = parent.resolveUrl(face, url);
-        var result = null;
-        for (var looked = Active; looked > 0; looked--) {
-            if (!SpecialAccess[looked]) SpecialAccess[looked] = {};
-            result = parent.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
-            if (result) return result;
-            result = parent.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
-            if (result) return result;
-        }
-        return parent.getAccess(elem, face, base, url);
-    };
-    this.cssImages = function(elem, face) {
-        parent.internal__cssImages(elem, face);
-        args = parent.args();
-        if (args.effect && (args.effect.level == undefined || args.effect.level == Active)) {
-            if (args.effect.css) {
-                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.css);
-                elem.attr('data-target', args.effect.target);
-                elem.attr('data-label', Object.keys(args.effect.css).join(';'));
-            } else {
-                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
-                elem.attr('data-target', args.effect.target);
-                elem.attr('data-label', args.effect.label);
-            }
-        }
-    };
-}
 
-function Pony(name, key, sayings, giffactory, args) {
-    if (!args) args = {};
-    sayings = sayings.split(';');
-    var Images = {};
-    var Accessories = {};
-    this.Id = name;
-    this.Name = name;
-    this.Grounded = !giffactory('fly', key);
-    this.getSay = function(a) {return pickOne(sayings);}
-    this.getSprite = function(elem, face, base, url) {
-        return this.bakeGif(this.resolveUrl(face, url), '', Images);
-    };
-    this.getAccess = function(elem, face, base, url) {
-        return this.bakeGif(this.resolveUrl(face, url), '_ac', Accessories);
-    };
-    this.resolveUrl = function(face, url) {
-        if (this.Grounded) url = url.replace('fly', 'trotcycle');
-        return face == 'left' ? url.replace('left', 'right') : url;
-    };
-    this.bakeGif = function(url, suffex, cache) {
-        if (cache[url] === undefined) cache[url] = this.bakeSprite(stateMap[url] + suffex, key);
-        return cache[url];
-    };
-    this.bakeSprite = function(img) {
-        return giffactory(img, key) || null;
+    function attachMemory(pony, memory) {
+        pony.getMemory = key => memory[key],
+        pony.setMemory = (key, val) => memory[key] = val;
+        return pony;
     }
-    this.args = function() {
-      return args;
-    };
-    this.internal__cssImages = function(elem, face) {
-        if (face == 'left') {
-            elem.find('img.interactive_pony').css('transform', 'scaleX(-1)');
-            elem.find('img.interactive_pony_accessory').css({'transform': 'scaleX(-1)','left': '-30px','right': ''});
+
+    function attachEvents(pony, eventObject) {
+        eventObject.Trigger = (interactivePony, e) => {
+            if (typeof e === 'string') e = {type: e};
+            return eventObject[e.type] ? eventObject[e.type].call(interactivePony, e) : null;
+        };
+        pony.Events = eventObject;
+        return pony;
+    }
+
+    function Spacer(name, pony) {
+        pony.section = name;
+        return pony;
+    }
+
+    function DummyPony(name) {
+        return {
+            Id: name, Name: name,
+            getSay: a => a,
+            getSprite: (ip, face, base, url) => base + url,
+            getAccess: _ => '',
+            cssImages: (ip, face) => ip.pony_element.style.transform = ''
+        };
+    }
+
+    function SpecialPony(name, key, level, sayings, giffactory, args) {
+        if (!args) {
+            args = {};
         } else {
-            elem.find('img.interactive_pony').css('transform', '');
-            elem.find('img.interactive_pony_accessory').css({'transform': '','left': '','right': '-30px'});
-        }
-    };
-    this.cssImages = function(elem, face) {
-        this.internal__cssImages(elem, face);
-        args = this.args();
-        var anim_target = elem.attr('data-target');
-        if (anim_target != null && anim_target != '') {
-            anim_target = (anim_target === 'self' ? elem : elem.find(anim_target));
-            var anim_label = elem.attr('data-label').split(';');
-            for (var i = anim_label.length; i--;) anim_target.css(anim_label[i], '');
-        }
-        if (args.effect) {
-            if (args.effect.css) {
-                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.css);
-                elem.attr('data-target', args.effect.target);
-                elem.attr('data-label', Object.keys(args.effect.css).join(';'));
-            } else {
-                (args.effect.target === 'self' ? elem : elem.find(args.effect.target)).css(args.effect.label, args.effect.value);
-                elem.attr('data-target', args.effect.target);
-                elem.attr('data-label', args.effect.label);
+            for (var i in args) {
+                if (typeof args[i] == 'string') {
+                    args[i] = args[i].split(';');
+                }
             }
         }
-    };
-}
 
-function Particle(el, x, y, vx, vy) {
-    this.ticks = 0;
-    this.dead = false;
-    this.x = x;
-    this.y = y;
-    this.rotation = Math.random() * 360;
-    this.velX = vx;
-    this.velY = vy;
-    this.scrollX = $(window).scrollLeft();
-    this.scrollY = $(window).scrollTop();
-    this.element = $(el);
-    $('body').append(this.element);
-    this.particleWidth = this.element.width();
-    this.particleHeight = this.element.height()
-    this.element.css({
-        'position': 'absolute',
-        'left': this.x - (this.particleWidth/2),
-        'top': this.y - (this.particleHeight/2)
-    });
-    this.Tick();
-}
-Particle.prototype = {
-    Tick: function() {
-        this.Render();
-        this.Update();
-        if (!this.dead) {
-            var me = this;
-            setTimeout(function() {
-                me.Tick();
-            }, 16);
-        }
-    },
-    Update: function() {
-        var posY = this.y - this.scrollY;
-        if ((posY >= $(window).height() - this.particleHeight/2 && this.velY > 0) || (posY <= this.particleHeight/2 && this.velY < 0)) {
-            this.velY = -this.velY * 0.9;
-        }
-        if (Math.random() * Math.abs(this.velY) < 1) {
-            this.velY = -this.velY * 0.9;
-            this.rotation = (this.rotation + 90) % 360;
-        }
-        var posX = this.x - this.scrollX;
-        if ((posX >= $(window).width() - this.particleWidth/2 && this.velX > 0) || (posX <= this.particleWidth/2 && this.velX < 0)) {
-            this.velX = -this.velX * 0.9;
-        }
-        this.x += this.velX;
-        this.y += this.velY;
-        this.velX *= 0.96;
-        this.velY *= 0.99;
-        
-        this.dead = (this.velY < 0.1 && this.velY > -0.1) || (this.velX < 0.1 && this.velX > -0.1) || this.ticks++ > 50000;
-    },
-    Render: function() {
-        this.element.css({
-            'left': this.x - (this.element.width()/2),
-            'top': this.y - (this.element.height()/2),
-            'transform': 'rotate(' + this.rotation + 'deg)'
-        });
-    }
-}
+        const parent = new Pony(name, key, sayings, giffactory, args);
+        let Active = -1;
+        let next_active_timer = 10;
+        let Specials = {};
+        let SpecialAccess = {};
 
-function setupMorePonies() {
-    var register = [];
-    
-    InteractivePony.prototype.NextId = function() {
-        return register.length;
+        return {
+            Id: name, Name: name,
+            getSay: function(a) {
+                if (Active > -1 && args[Active + 1] != null) {
+                    return pickOne(args[Active + 1]);
+                }
+                return parent.getSay(a);
+            },
+            getState: _ => Active,
+            setState: a => Active = a < 0 ? 0 : a,
+            getSprite: function(ip, face, base, url) {
+                url = parent.resolveUrl(face, url);
+                var result = null;
+                for (var looked = Active; looked > 0; looked--) {
+                    if (!Specials[looked]) Specials[looked] = {};
+                    result = parent.bakeGif(url, looked, Specials[looked]);
+                    if (result) return result;
+                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
+                    if (result) return result;
+                }
+                return parent.getSprite(ip, face, base, url);
+            },
+            bakeSprite: _ => parent.bakeSprite(img),
+            getAccess: function(ip, face, base, url) {
+                next_active_timer = (next_active_timer + 1) % 11;
+                if (next_active_timer == 0) Active = Math.floor(Math.random() * (level + 1));
+                url = parent.resolveUrl(face, url);
+                var result = null;
+                for (var looked = Active; looked > 0; looked--) {
+                    if (!SpecialAccess[looked]) SpecialAccess[looked] = {};
+                    result = parent.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
+                    if (result) return result;
+                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
+                    if (result) return result;
+                }
+                return parent.getAccess(ip, face, base, url);
+            },
+            cssImages: function(ip, face) {
+                parent.internal__cssImages(ip, face);
+                args = parent.args();
+                if (args.effect && (args.effect.level == undefined || args.effect.level == Active)) {
+                    const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
+                    ip.dom_element.dataset.target = args.effect.target;
+                    const keys = Object.keys(args.effect.css);
+                    keys.forEach(a => {
+                        anim_target.style[a] = args.effect.css[a];
+                    });
+                    ip.dom_element.dataset.label = keys.join(';');
+                }
+            }
+        };
     }
-    InteractivePony.prototype.Register = function() {
-        this.uniqueId = this.id = this.NextId() + 1;
-        register.push(this);
+
+    function Pony(name, key, sayings, giffactory, args) {
+        if (!args) args = {};
+        sayings = sayings.split(';');
+        var Images = {};
+        var Accessories = {};
+        return {
+            Id: name, Name: name,
+            args: _ => args,
+            getSay: a => pickOne(sayings),
+            getSprite: function(ip, face, base, url) {
+                return this.bakeGif(this.resolveUrl(face, url), '', Images);
+            },
+            getAccess: function(ip, face, base, url) {
+                return this.bakeGif(this.resolveUrl(face, url), '_ac', Accessories);
+            },
+            resolveUrl: function(face, url) {
+                if (!giffactory('fly', key)) url = url.replace('fly', 'trotcycle');
+                return face == 'left' ? url.replace('left', 'right') : url;
+            },
+            bakeGif: function(url, suffex, cache) {
+                if (cache[url] === undefined) cache[url] = this.bakeSprite(stateMap[url] + suffex, key);
+                return cache[url];
+            },
+            bakeSprite: function(img) {
+                return giffactory(img, key) || null;
+            },
+            internal__cssImages: function(ip, face) {
+                ip.pony_element.style.transform = ip.accessory_element.style.transform = face == 'left' ? 'scaleX(-1)' : '';
+                if (face == 'left') {
+                    ip.accessory_element.style.left = '-30px';
+                    ip.accessory_element.style.right = '';
+                } else {
+                    ip.accessory_element.style.left = '';
+                    ip.accessory_element.style.right = '-30px';
+                }
+            },
+            cssImages: function(ip, face) {
+                this.internal__cssImages(ip, face);
+                args = this.args();
+                var anim_target = ip.dom_element.dataset.target;
+                if (anim_target && anim_target != '') {
+                    anim_target = (anim_target === 'self' ? ip.dom_element : ip.dom_element.querySelector(anim_target));
+                    ip.dom_element.dataset.label.split(';').forEach(a => {
+                        anim_target.style[a] = '';
+                    });
+                }
+                if (args.effect) {
+                    const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
+                    ip.dom_element.dataset.target = args.effect.target;
+                    const keys = Object.keys(args.effect.css);
+                    keys.forEach(a => {
+                        anim_target.style[a] = args.effects.css[a];
+                    });
+                    ip.dom_element.dataset.label = keys.join(';');
+                }
+            }
+        };
     }
-    InteractivePony.prototype.Unregister = function() {
-        register.splice(this.id - 1, 1);
-        for (var i = 0; i < register.length; i++) {
-            register[i].id = i + 1;
+
+    function Particle(el, x, y, vx, vy) {
+        this.ticks = 0;
+        this.dead = false;
+        this.x = x;
+        this.y = y;
+        this.rotation = Math.random() * 360;
+        this.velX = vx;
+        this.velY = vy;
+        this.scrollX = document.scrollingElement.scrollLeft;
+        this.scrollY = document.scrollingElement.scrollTop;
+        this.element = el;
+        document.body.appendChild(el);
+        this.particleWidth = this.element.offsetWidth;
+        this.particleHeight = this.element.offsetWidth;
+        this.element.style.position = 'absolute';
+        this.Tick();
+    }
+    Particle.prototype = {
+        Tick: function() {
+            this.Render();
+            this.Update();
+            if (!this.dead) setTimeout(() => this.Tick(), 16);
+        },
+        Update: function() {
+            const posY = this.y - this.scrollY;
+            if ((posY >= window.offsetHeight - this.particleHeight/2 && this.velY > 0) || (posY <= this.particleHeight/2 && this.velY < 0)) {
+                this.velY = -this.velY * 0.9;
+            }
+            if (Math.random() * Math.abs(this.velY) < 1) {
+                this.velY = -this.velY * 0.9;
+                this.rotation = (this.rotation + 90) % 360;
+            }
+            const posX = this.x - this.scrollX;
+            if ((posX >= window.offsetWidth - this.particleWidth/2 && this.velX > 0) || (posX <= this.particleWidth/2 && this.velX < 0)) {
+                this.velX = -this.velX * 0.9;
+            }
+            this.x += this.velX;
+            this.y += this.velY;
+            this.velX *= 0.96;
+            this.velY *= 0.99;
+            this.dead = (this.velY < 0.1 && this.velY > -0.1) || (this.velX < 0.1 && this.velX > -0.1) || this.ticks++ > 50000;
+        },
+        Render: function() {
+            this.element.style.left = (this.x - (this.particleWidth/2)) + 'px';
+            this.element.style.top = (this.y - (this.particleHeight/2)) + 'px';
+            this.element.style.transform = 'rotate(' + this.rotation + 'deg)';
         }
     }
-    InteractivePony.prototype.ponyType = function () {
-        return PoniesRegister[GlobalPonyType];
-    };
-    InteractivePony.prototype.dom = function() {
-        if (!this.__dom) {
-            this.__dom = $(this.dom_element);
-            this.__dom.container = $(this.container);
+
+    function setupMorePonies() {
+        var register = [];
+
+        InteractivePony.prototype.NextId = function() {
+            return register.length;
         }
-        return this.__dom;
-    };
-    InteractivePony.prototype.ponySwitched = function() {
-        var sprite = this.sprite;
-        this.sprite = 'foobar';
-        this.dom().find('div.speech').fadeOut();
-        this.SetSprite(sprite);
-    };
-    InteractivePony.prototype.Trigger = function (e) {
-        if (!this.forceSleep) {
-            var pone = this.ponyType();
-            if (pone.Events) {
-                return pone.Events.Trigger(this, e);
+        InteractivePony.prototype.Register = function() {
+            this.uniqueId = this.id = this.NextId() + 1;
+            register.push(this);
+        }
+        InteractivePony.prototype.Unregister = function() {
+            register.splice(this.id - 1, 1);
+            for (var i = 0; i < register.length; i++) {
+                register[i].id = i + 1;
             }
         }
-        return null;
-    };
-    InteractivePony.prototype.Say = function (a) {
-        this.text = this.Trigger('say');
-        if (!this.text) {
-            var pone = this.ponyType();
-            this.text = (pone.Sleepless || !this.forceSleep && this.state != 'sleeping') ? pone.getSay(a) : 'zzz...';
-        }
-        this.next_text_timer = this.text_counter = 0;
-        if (this.text) this.dom().find('div.speech').fadeIn();
-    };
-    InteractivePony.prototype.Speak = function (a) {
-        this.text = pickOne(a.split(';'));
-        this.next_text_timer = this.text_counter = 0;
-        if (this.text) this.dom().find('div.speech').fadeIn();
-    };
-    InteractivePony.prototype.Clicked = function() {
-        this.state = this.state == 'sleeping' ? 'default' : 'sleeping';
-        this.forceSleep = this.state == 'sleeping';
-        if (this.forceSleep) {
-            this.SetSprite('cloud_sleep_right.gif');
-            this.dom().find('div.speech').fadeOut();
-        }
-        this.Trigger('click');
-    };
-    InteractivePony.prototype.SetSprite = function (a) {
-        if (this.sprite != a) {
-            this.sprite = a;
-            var pone = this.ponyType();
-            pone.cssImages(this.dom(), this.facing);
-            var access = pone.getAccess(this.dom(), this.facing, this.base_url, a);
-            this.dom().find('img.interactive_pony_accessory').attr('src', access).css('display', access == '' ? 'none' : '');
-            this.dom().find('img.interactive_pony').attr('src', pone.getSprite(this.dom(), this.facing, this.base_url, a));
-            this.dom().css('margin', '');
-            if (pone.offset) {
-                pone.offset(this.dom(), stateMap[a]);
+        InteractivePony.prototype.ponyType = function () {
+            return PoniesRegister[GlobalPonyType];
+        };
+        InteractivePony.prototype.ponySwitched = function() {
+            var sprite = this.sprite;
+            this.sprite = 'foobar';
+            this.FadeOutText();
+            this.SetSprite(sprite);
+        };
+        InteractivePony.prototype.Trigger = function (e) {
+            if (!this.forceSleep) {
+                var pone = this.ponyType();
+                if (pone.Events) {
+                    return pone.Events.Trigger(this, e);
+                }
             }
-        }
-    };
-    InteractivePony.prototype.__Render = InteractivePony.prototype.Render;
-    InteractivePony.prototype.Render = function() {
-        if (!this.accessory_element) {
-            this.accessory_element = $('<img class="interactive_pony_accessory" style="position:absolute;bottom:0px;" />');
-            this.dom().find('img.interactive_pony').after(this.accessory_element);
-            this.dom().find('img.interactive_pony, img.interactive_pony_accessory').css({
-                'user-select': 'none', 'pointer-events': 'none'
-            });
-            
-            var me = this;
-            this.dom().on('mousedown mouseenter mouseleave mousemove mouseover mouseout mouseup dblclick hover', function (e) {
-                me.Trigger(e);
-            });
-            $('body').on('keydown keypress keyup', function (e) {
-                me.Trigger(e);
-            });
-            
-            if (this.id == undefined) {
-                this.id = this.uniqueId = 0;
+            return null;
+        };
+        InteractivePony.prototype.Say = function (a) {
+            this.text = this.Trigger('say');
+            if (!this.text) {
+                var pone = this.ponyType();
+                this.text = (pone.Sleepless || !this.forceSleep && this.state != 'sleeping') ? pone.getSay(a) : 'zzz...';
+            }
+            this.next_text_timer = this.text_counter = 0;
+            if (this.text) this.FadeInText();
+        };
+        InteractivePony.prototype.Speak = function (a) {
+            this.text = pickOne(a.split(';'));
+            this.next_text_timer = this.text_counter = 0;
+            if (this.text) this.FadeInText();
+        };
+        InteractivePony.prototype.Clicked = function() {
+            this.state = this.state == 'sleeping' ? 'default' : 'sleeping';
+            this.forceSleep = this.state == 'sleeping';
+            if (this.forceSleep) {
+                this.SetSprite('cloud_sleep_right.gif');
+                this.FadeOutText();
+            }
+            this.Trigger('click');
+        };
+        InteractivePony.prototype.SetSprite = function (a) {
+            if (this.sprite != a) {
+                this.sprite = a;
+                var pone = this.ponyType();
+                pone.cssImages(this, this.facing);
+                var access = pone.getAccess(this, this.facing, this.base_url, a);
+                this.accessory_element.src = access;
+                this.accessory_element.style.display = access == '' ? 'none' : '';
+                this.pony_element.src = pone.getSprite(this, this.facing, this.base_url, a);
+                this.dom_element.style.margin = '';
+                if (pone.offset) pone.offset(stateMap[a]);
+            }
+        };
+        InteractivePony.prototype.__Render = InteractivePony.prototype.Render;
+        InteractivePony.prototype.Render = function() {
+            if (!this.accessory_element) {
+                this.InitPony();
                 GlobalInteractivePony = this;
                 this.ponySwitched();
             }
-        }
-        if (!this.forceSleep) {
-            this.__Render();
-        } else {
-            this.dom().find('div.speech').text(this.text.substr(0, parseInt(this.text_counter)));
-        }
-    };
-    InteractivePony.prototype.FindSecret = function(e) {
-        var key = e.originalEvent.interactivePony_secret;
-        return key && key.indexOf(this.uniqueId) != -1;
-    }
-    InteractivePony.prototype.AddSecret = function(e) {
-        var key = e.originalEvent.interactivePony_secret;
-        if (key) {
-            key += ',' + this.uniqueId;
-        } else {
-            key = '' + this.uniqueId;
-        }
-        e.originalEvent.interactivePony_secret = key;
-    }
-    InteractivePony.prototype.InitEvents = function() {
-        this.Register();
-        var me = this;
-        $('.user_toolbar').mousemove(function (b) {
-            if (!me.FindSecret(b)) {
-                me.AddSecret(b);
-                me.UpdateMouse(b.pageX, b.pageY, $(this));
+            if (this.forceSleep) {
+                return this.dom_element.querySelector('.speech').textContent = this.text.substr(0, parseInt(this.text_counter));
             }
-        });
-        $('img').mousemove(function (b) {
-            if (!me.FindSecret(b)) {
-                if (50 < $(this).width() && !$(this).hasClass('interactive_pony')) {
-                    me.AddSecret(b);
-                    me.UpdateMouse(b.pageX, b.pageY, $(this));
-                }
-            }
-        });
-        $('*').mousemove(function (b) {
-            if (!me.FindSecret(b)) {
-                if (80 < $(this).height()) {
-                    me.AddSecret(b);
-                    me.UpdateMouse(b.pageX, b.pageY, $(this));
-                }
-            }
-        });
-    }
-    InteractivePony.prototype.__UpdateMouse = InteractivePony.prototype.UpdateMouse;
-    InteractivePony.prototype.UpdateMouse = function(x, y, el) {
-        x -= 80 * (this.id ? this.id : 0);
-        x += 40 * (this.NextId());
-        this.__UpdateMouse(x, y, el);
-    }
-    InteractivePony.prototype.__Update = InteractivePony.prototype.Update;
-    InteractivePony.prototype.Update = function (a) {
-        if (this.forceSleep) this.state = 'sleeping';
-        if (this.Trigger('tick') == false) return;
-        this.__Update(a);
-    }
-    
-    $(document).ready(function () {
-        $(window).unbind('konami');
-        $(window).bind('konami', function() {
-            try {
-                var a = new InteractivePony();
-                a.InitEvents();
-                a.dom().find('div.speech').fadeOut();
-                var type = Math.floor(Math.random() * (Ponies.length - 1));
-                a.ponyType = function () {
-                    return Ponies[type];
-                };
-                markTemp(setInterval(function () {
-                    try {
-                        if (window_focused) {
-                            a.Update(0.016);
-                            a.Render();
-                        }
-                    } catch (e) {alert(e)}
-                }, 16), a);
-            } catch (e) {alert(e)}
-        });
-    });
-    
-    makeStyle('\
-        .interactive_pony .speech_container {\
-              pointer-events: none;}\
-        div.interactive_pony div.speech {\
-              font-size: 0.844em !important;}\
-        .muffin {\
-              z-index: 10;\
-              pointer-events: none;\
-              width:20px;\
-              height:20px;\
-              background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;\
-              background-size:fit;\
-              border-radius:30px;}\
-        @-webkit-keyframes wub {\
-            0% {transform: scale(1,1);}\
-            10% {transform: scale(1.00125,1.00125);}\
-            20% {transform: scale(1.0125,1.0125);}\
-            30% {transform: scale(1.00125,1.00125);}\
-            40% {transform: scale(1.0125,1.0125);}\
-            50% {transform: scale(1.00125,1.00125);}\
-            60% {transform: scale(1,1);}\
-            70% {transform: scale(0.99985,0.99985);}\
-            80% {transform: scale(1,1);}\
-            90% {transform: scale(1.0125,1.0125);}\
-            100% {transform: scale(1.00125,1.00125);}}\
-        @keyframes wub {\
-            0% {transform: scale(1,1);}\
-            10% {transform: scale(1.00125,1.00125);}\
-            20% {transform: scale(1.0125,1.0125);}\
-            30% {transform: scale(1.00125,1.00125);}\
-            40% {transform: scale(1.0125,1.0125);}\
-            50% {transform: scale(1.00125,1.00125);}\
-            60% {transform: scale(1,1);}\
-            70% {transform: scale(0.99985,0.99985);}\
-            80% {transform: scale(1,1);}\
-            90% {transform: scale(1.0125,1.0125);}\
-            100% {transform: scale(1.00125,1.00125);}}\
-    ');
-    
-    function markTemp(ticker, interactivePony) {
-        var timeout = 5000;
-        var render = interactivePony.Render;
-        interactivePony.Render = function() {
-            if (timeout-- <= 0) {
-                this.dom().css('transition', 'opacity 0.5s linear');
-                this.dom().css('opacity', '0');
-                clearInterval(ticker);
-                var me = this;
-                setTimeout(function() {
-                    me.Unregister();
-                    me.dom().remove();
-                }, 500);
-            }
-            render.apply(this, arguments);
-        }
-    }
-}
 
-function addOptionsSelect() {
-    var interactiveP = $('input[name="show_interactive_pony"]');
-    if (interactiveP.length) {
-        interactiveP.parent().closest('tr').after('<tr><td class="label">Interactive Pony Type</td><td><div id="ponyTypeDiv" /></td></tr><tr id="custom_pony_field" style="' + (GlobalPonyType != 'Custom' ? 'display:none' : '') + '"><td class="label">Custom interactive Pony</td><td><div id="pony_customDiv" /></td></tr>');
-        var InteractivePonyType = '<select name="interactive_pony_type">';
-        for (var i = 0; i < Ponies.length; i++) {
-            if (Ponies[i].section) {
-                InteractivePonyType += (i ? '</optgroup>' : '') + '<optgroup label="' + Ponies[i].section + '">';
+            this.__Render();
+        };
+
+        function registerEvents(sender, handler) {
+            'mousedown mouseenter mouseleave mousemove mouseover mouseout mouseup click hover'.split(' ').forEach(e => sender.dom_element.addEventListener(e, handler));
+            'keydown keypress keyup'.split(' ').forEach(e => document.body.addEventListener(e, handler));
+            sender.dom_element.addEventListener('mousedown', e => e.preventDefault());
+        }
+
+        InteractivePony.prototype.FindSecret = function(e) {
+            const key = e.interactivePony_secret;
+            return key && key.indexOf(this.uniqueId) > -1;
+        }
+        InteractivePony.prototype.AddSecret = function(e) {
+            const key = e.interactivePony_secret || [];
+            key.push(this.uniqueId);
+            e.interactivePony_secret = key;
+        }
+
+        InteractivePony.prototype.FadeOutText = function() {
+            //originally a noop, knitty pls
+            if (this.text && this.text_counter >= this.text.length) {
+                this.dom_element.querySelector('.speech').style.opacity = '0';
             }
-            if (Ponies[i].Id == 'Custom') {
-                InteractivePonyType += '<option id="custom_option" value="Custom">Custom (' + Ponies[i].Name + ')</option>';
-            } else {
-                InteractivePonyType += '<option value="' + Ponies[i].Name + '">' + Ponies[i].Name + '</option>';
+        };
+        InteractivePony.prototype.FadeInText = function() {
+            //originally doesn't exist, knitty pls
+            this.dom_element.querySelector('.speech').style.opacity = '1';
+        };
+        InteractivePony.prototype.InitPony = function() {
+            this.pony_element = this.dom_element.querySelector('img.interactive_pony');
+            this.pony_element.insertAdjacentHTML('afterend', '<img class="interactive_pony_accessory" style="position:absolute;bottom:0px;opacity:0" />');
+            this.accessory_element = this.dom_element.querySelector('img.interactive_pony_accessory');
+
+            this.pony_element.style.userSelect = this.accessory_element.userSelect = 'none';
+            this.pony_element.style.pointerEvents = this.accessory_element.pointerEvents = 'none';
+
+            this.dom_element.style.pointerEvents = 'initial'; //enable clicking, knitty pls
+
+            this.Register();
+            registerEvents(this, e => this.Trigger(e));
+            document.body.addEventListener('mousemove', d => {
+                var e = d.target;
+                if (!fQuery.isOrChildOf(e, this.dom_element)) {
+                    do {
+                        if (e.getBoundingClientRect().height > 50) {
+                            if (!this.FindSecret(d)) {
+                                this.AddSecret(d);
+                                return this.UpdateMouse(d.pageX, d.pageY, e, d);
+                            }
+                        }
+                    } while (e = e.parentNode);
+                }
+            });
+
+            this.Say('');
+        }
+        InteractivePony.prototype.__UpdateMouse = InteractivePony.prototype.UpdateMouse;
+        InteractivePony.prototype.UpdateMouse = function(x, y, el, ev) {
+            if (!ev) return;
+            x -= 80 * (this.id ? this.id : 0);
+            x += 40 * (this.NextId());
+            this.__UpdateMouse(x, y, el);
+        }
+        InteractivePony.prototype.__Update = InteractivePony.prototype.Update;
+        InteractivePony.prototype.Update = function (a) {
+            if (this.forceSleep) this.state = 'sleeping';
+            if (this.Trigger('tick') == false) return;
+            this.__Update(a);
+        }
+
+        makeStyle(`
+            .interactive_pony .speech {
+                transition: opacity 0.5s linear;
+                opacity: 0;}
+            .interactive_pony .speech_container {pointer-events: none;}
+            div.interactive_pony div.speech {font-size: 0.844em !important;}
+            .muffin {
+                z-index: 10;
+                pointer-events: none;
+                width:20px;
+                height:20px;
+                background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;
+                background-size:fit;
+                border-radius:30px;}
+            .wubadub {animation: wub 1.5s infinite alternate, acid 1.5s infinite alternate;}
+            .wubadub.bass {
+                animation: bass 1.5s infinite alternate, acid 1.5s infinite alternate;}
+            ${expand(['@-webkit-', '@'], `keyframes bass {
+                0% {transform: scale(1,1), translate(0,0);}
+                10% {transform: scale(1.00125,1.00125) translate(5%,-5%);}
+                20% {transform: scale(1.0125,1.0125) translate(-5%,5%);}
+                30% {transform: scale(1.00125,1.00125);}
+                40% {transform: scale(1.0125,1.0125);}
+                50% {transform: scale(1.00125,1.00125) translate(-5%,5%);}
+                60% {transform: scale(1,1);}
+                70% {transform: scale(0.99985,0.99985) translate(-5%,5%);}
+                80% {transform: scale(1,1) translate(-5%,5%);}
+                90% {transform: scale(1.0125,1.0125) translate(5%,5%);}
+                100% {transform: scale(1.00125,1.00125) translate(5%,-5%);}}`)}
+            ${expand(['@-webkit-', '@'], `keyframes acid {
+                0%: {filter: hue-rotate(0deg);}
+                33% {filter: hue-rotate(180deg);}
+                66% {filter: hue-rotate(270deg);}
+                100%: {filter: hue-rotate(0deg);}}`)}
+            ${expand(['@-webkit-', '@'], `keyframes wub {
+                0% {transform: scale(1,1);}
+                10% {transform: scale(1.00125,1.00125);}
+                20% {transform: scale(1.0125,1.0125);}
+                30% {transform: scale(1.00125,1.00125);}
+                40% {transform: scale(1.0125,1.0125);}
+                50% {transform: scale(1.00125,1.00125);}
+                60% {transform: scale(1,1);}
+                70% {transform: scale(0.99985,0.99985);}
+                80% {transform: scale(1,1);}
+                90% {transform: scale(1.0125,1.0125);}
+                100% {transform: scale(1.00125,1.00125);}}`)}`);
+
+        function expand(arr, block) {
+            arr.push('');
+            return arr.join(`${block}\n`);
+        }
+
+        function markTemp(ticker, interactivePony) {
+            let timeout = 5000;
+            const render = interactivePony.Render;
+            interactivePony.Render = function() {
+                if (timeout-- <= 0) {
+                    this.dom_element.style.transition = 'opacity 0.5s linear';
+                    this.dom_element.style.opacity = '0';
+                    clearInterval(ticker);
+                    setTimeout(() => {
+                        this.Unregister();
+                        this.dom_element.parentNode.removeChild(this.dom_element);
+                    }, 500);
+                }
+                render.apply(this, arguments);
             }
         }
-        InteractivePonyType += '</select>';
-        InteractivePonyType = $(InteractivePonyType);
-        $('#ponyTypeDiv').append(InteractivePonyType);
-        InteractivePonyType.val(GlobalPonyType);
-        InteractivePonyType.change(function() {
-            setPonyType(this.value);
-            if (this.value == 'Custom') {
-                $('#custom_pony_field').css('display', '');
-            } else {
-                $('#custom_pony_field').css('display', 'none');
-            }
+    }
+
+    function addOptionsSelect() {
+        const interactiveP = document.querySelector('input[name="show_interactive_pony"]');
+        if (!interactiveP) return;
+        const optItem = (a,i) => {
+            let res = '';
+            if (a.section) res += `${i ? '</optgroup>' : ''}<optgroup label="${a.section}">`;
+            if (a.Id == 'Custom') return `${res}<option id="custom_option" value="Custom">Custom (${a.Name})</option>`;
+            return `${res}<option value="${a.Name}">${a.Name}</option>`;
+        };
+        interactiveP.parentNode.closest('tr').insertAdjacentHTML('afterend', `<tr>
+            <td class="label">Interactive Pony Type</td>
+            <td><div id="ponyTypeDiv"><select name="interactive_pony_type">${Ponies.map(optItem).join('')}</select></div></td>
+        </tr>
+        <tr id="custom_pony_field" style="${GlobalPonyType != 'Custom' ? 'display:none' : ''}">
+            <td class="label">Custom interactive Pony</td>
+            <td><div id="pony_customDiv"><textarea style="resize:vertical;min-height:500px;">${JSON.stringify(CustomPony, null, 4)}</textarea></div></td>
+        </tr>`);
+
+        const InteractivePonyType = document.querySelector('#ponyTypeDiv select');
+        InteractivePonyType.value = GlobalPonyType;
+
+        const field = document.querySelector('#custom_pony_field');
+        InteractivePonyType.addEventListener('change', e => {
+            setPonyType(InteractivePonyType.value);
+            field.style.display = InteractivePonyType.value == 'Custom' ? '' : 'none';
         });
-        $('option#custom_option').text('Custom (' + CustomPony.name + ')');
-        var pony_custom = $('<textarea style="resize:vertical;min-height:500px;">');
-        pony_custom.val(JSON.stringify(CustomPony, null, 4));
-        $('#pony_customDiv').append(pony_custom);
-        pony_custom.on('change keyup', function() {
+        const customOption = document.querySelector('option#custom_option');
+        customOption.innerText = `Custom (${CustomPony.name})`;
+
+        const ponyCustom = document.querySelector('#pony_customDiv textarea');
+        ponyCustom.addEventListener('change', ponyChanged);
+        ponyCustom.addEventListener('keyup', ponyChanged);
+
+        function ponyChanged() {
             try {
                 CustomPony = JSON.parse(localStorage['custom_pony'] = this.value);
                 PoniesRegister.Custom.Name = CustomPony.name;
-                $('option#custom_option').text('Custom (' + CustomPony.name + ')');
+                customOption.innerText = `Custom (${CustomPony.name})`;
             } catch (e) {}
             if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
-        });
+        }
     }
-}
 
-function buildRef(pon, img) {
-    return '//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/' + pon + '/' + img + '.gif';
+    function buildRef(pon, img) {
+        return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img}.gif`;
+    }
+
+    function playSong(ytid, loaded) {
+        if (!document.querySelector('#song_frame')) {
+            document.body.insertAdjacentHTML('beforeend', '<iframe style="display:none;" id="song_frame" />');
+        }
+        const player = document.querySelector('#song_frame');
+        player.src = `//www.youtube.com/embed/${ytid}?autoplay=1&controls=0&enablejsapi=1&loop=1&playlist=uNHS09davuY&showinfo=0`;
+        player.addEventListener('load', player.ready = (() => {
+            loaded();
+            player.removeEventListener('load', player.ready);
+        }));
+        return player;
+    }
 }

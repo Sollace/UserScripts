@@ -1,97 +1,75 @@
+// ==UserScript==
+// @name Fimfiction Logger
+// @namespace sollace_fimfiction
+// @include     http://www.fimfiction.net/*
+// @include     https://www.fimfiction.net/*
+// @grant none
+// @run-at      document-start
+// ==/UserScript==
+
 function Logger(name, l) {
-  var test = null;
-  var minLevel = 0;
-  var paused = false;
-  var line = 0;
-  if (typeof (l) == 'number') minLevel = l;
+  let test = document.querySelector('#debug-console');
+  let minLevel = typeof (l) == 'number' ? l : 0;
+  let paused = false;
+  let line = 0;
+	
+	function linkify(txt) {
+		return txt.replace(/((http[s]?|file):\/\/[^\s]+)/gi, '<a href="$1">$1</a>');
+	}
+	
   function SOut(txt, level) {
-    if (level == null || level == undefined) level = 0;
-    if (test != null && level >= minLevel) {
-      test[(line = (line + 1) % 150) ? 'append' : 'html']('<p style="background: rgba(' + (line % 2 ? '0,155' : '155,0') + ',255,0.3);">' + line + '):' + name + ') ' + txt + '</p>');
-      try {
-        test.stop().animate({scrollTop: test[0].scrollHeight},800);
-      } catch (e) {}
+    level = level || 0;
+    if (level >= minLevel) {
+			if (!test) {
+				document.body.insertAdjacentHTML('beforeend', '<div id="debug-console" style="z-index:9999;overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;"></div>');
+				test = document.body.lastChild;
+				test.addEventListener('mouseup', (e) => {
+					if (!e.target.closest('a')) test.innerHTML = '';
+				});
+				SOut('===Logging Started===', minLevel + 1);
+			}
+			test.insertAdjacentHTML('beforeend', `<p style="background: rgba(${line % 2 ? '0,155' : '155,0'},255,0.3);">${line++}):${name}) ${txt}</p>`);
+			test.scrollTop = test.scrollHeight;
     }
   }
-  this.Start = function (level) {
-    if (typeof (level) == 'number') minLevel = level;
-    paused = false;
-    if (!test) {
-      test = $('#debug-console');
-      if (!test.length) {
-        test = $('<div id="debug-console" style="z-index:9999;overflow-y:auto;max-height:50%;max-width:100%;min-width:50%;background:rgba(255,255,255,0.8);position:fixed;bottom:0px;left:0px;" />');
-        $('body').append(test);
-        test.on('click', function () {test.empty();});
-      }
-      SOut('===Logging Started===', minLevel + 1);
-    }
-  }
-  this.Stop = function () {
-    if (test) {
-      SOut('===Logging Stopped===', minLevel + 1);
-      test = null;
-    }
-  }
-  this.Pause = function () {
-    SOut('===Logging Paused===', minLevel + 1);
-    paused = true;
-  }
-  this.Continue = function () {
-    if (paused) SOut('===Logging Continued===', minLevel + 1);
-    paused = false;
-  }
-  this.Log = function (txt, level, params) {
-    if (arguments.length > 1) {
-      if (typeof arguments[1] == 'string') {
-        [].splice.apply(arguments, [1, 0, 0]);
-        level = 0;
-      }
-      for (var i = 2; i < arguments.length; i++) {
-        txt = txt.replace(new RegExp('\\{' + (i-2) + '\\}', 'g'), arguments[i]);
-      }
-    } else {
-      level = 0;
-    }
-    if (!paused) SOut(txt, level);
-  }
-  this.Error = function (txt, params) {
-    [].splice.apply(arguments, [1,0,1000]);
-    this.Log.apply(this,arguments);
-  }
-  this.SevereException = function (txt, excep) {
-    if (excep != 'handled') {
-      try {
-        var stopped = false;
-        if (test == null) {
-          stopped = true;
-          this.Start();
-        }
-        if (txt.indexOf('{0}') != -1) {
-          SOut(txt.replace('{0}', excep), 2000);
-        } else {
-          SOut(txt + '<br/>' + except, 2000);
-        }
-        if (excep.stack) {
-            var stack = '<br><b>' + decodeURIComponent(excep.stack).replace(/\n/g, '<br><b>').replace(/@/g, '</b> @<br> ');
-            SOut(stack, 2000);
-        }
-        if (stopped) this.Pause();
-      } catch (e) {
-        alert('Error in displaying Severe: ' + e + '\n' + 'Message: ' + txt + '\n' + 'Severe: ' + excep);
-      }
-    }
-  }
-  this.Severe = function (txt) {
-    try {
-      var stopped = false;
-      if (test == null) {
-        stopped = true;
-        this.Start();
-      }
-      SOut(txt, 2);
-      if (stopped) this.Pause();
-    } catch (e) {
-      alert('Error in displaying Severe: ' + e + '\n' + 'Severe: ' + txt);
-    }
-  }
+	
+	function fillPars(txt, args) {
+		args.forEach((a, i) => txt = txt.replace('{' + i + '}', a));
+		return txt;
+	}
+	
+	return {
+		Start: level => {
+			if (level) minLevel = level;
+			paused = false;
+		},
+		Stop: _ => {
+			if (test) test.innerHTML = '';
+			SOut('===Logging Stopped===', minLevel + 1);
+			paused = true;
+		},
+		Pause: _ => {
+			SOut('===Logging Paused===', minLevel + 1);
+			paused = true;
+		},
+		Continue: _ => {
+			if (paused) SOut('===Logging Continued===', minLevel + 1);
+			paused = false;
+		},
+		Log: (txt, level, ...params) => {
+			if (paused) return;
+			txt = fillPars(txt, params);
+			level = 0;
+			SOut(txt, level);
+		},
+		Error: function(txt, ...params) {
+			this.Log.call(null, 1000, params);
+		},
+		SevereException: (txt, ...params) => {
+			if (params[0] === 'handled') return;
+			SOut(fillPars(txt, params), 2000);
+			if (params[0].stack) SOut(`<br><b>${linkify(params[0].stack).replace(/\n/g, '<br><b>').replace(/@/g, '</b> @<br> ')}`, 2000);
+		},
+		Severe: txt => SOut(txt, 2)
+	};
 }
