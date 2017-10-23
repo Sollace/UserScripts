@@ -4,13 +4,19 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     2.2.6
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
-// @grant       none
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
+// @grant       GM_getValue
+// @grant       GM_deleteValue
 // ==/UserScript==
 
 const settingsMan = {
-    __get: (key, parse, def) => settingsMan.has(key) ? parse(localStorage[key]) : def,
+    __gm: (key, parse, def) => {
+      let val = parse(GM_getValue(key) || String(def));
+      GM_deleteValue(key);
+      return localStorage[key] = val;
+    },
+    __get: (key, parse, def) => settingsMan.has(key) ? parse(localStorage[key]) : this.__gm(key, def),
     has: key => localStorage[key] !== undefined,
     remove: key => localStorage.removeItem(key),
     get: (key, def) => settingsMan.__get(key, a => a, def),
@@ -456,29 +462,38 @@ try {
                 }
             }
         });
-        jSlim.on(document.body, '.dog button.export', 'click', function() {
-            window.open(`data:application/octet-stream,${JSON.stringify({
-                followers: getFollowers(this.dataset.id),
-                history: getHistory(this.dataset.id)
-            }, null, '\t')}`, `followers-${this.dataset.id}.json`);
+        jSlim.on(document.body, '.dog button.export', 'click', (e, target) => {
+            /*window.open(`data:application/json,${JSON.stringify({
+                followers: getFollowers(target.dataset.id),
+                history: getHistory(target.dataset.id)
+            }, null, '\t')}`, `followers-${target.dataset.id}.json`);*/
+            
+            const a = document.createElement('A');
+            a.download = `followers-${target.dataset.id}.json`;
+            a.href = URL.createObjectURL(new Blob([JSON.stringify({
+                followers: getFollowers(target.dataset.id),
+                history: getHistory(target.dataset.id)
+            }, null, ' ')], {type: 'application/json'}));
+            document.body.appendChild(a);
+            a.click();
+            a.parentNode.removeChild(a);
         });
-        jSlim.on(document.body, '.dog button.import', 'change', function() {
+        jSlim.on(document.body, '.dog button.import', 'click', () => {
             document.querySelector('.dog input.import').click();
         });
-        jSlim.on(document.body, '.dog input.import', 'change', function() {
-            const file = target.files[0];
-            const id = this.dataset.id;
+        jSlim.on(document.body, '.dog input.import', 'change', e => {
+            const file = e.target.files[0];
+            const id = e.target.dataset.id;
             const reader = new FileReader();
 
             reader.onload = e => {
-                alert(e.target.result);
                 const data = JSON.parse(e.target.result);
-                //setFollowers(id, data.followers);
-                //setHistory(id, data.history);
+                setFollowers(id, data.followers);
+                setHistory(id, data.history);
                 Dog.instance.restart();
             };
 
-            reader.readAsDataURL(file);
+            reader.readAsText(file);
         });
         jSlim.on(document.body, '#nosey_follower_searcher', 'input', (e, target) => {
             target.nextElementSibling.innerHTML = followerMapping.structured(parseInt(target.dataset.id)).html(target.value.toUpperCase());
@@ -558,7 +573,7 @@ try {
                         <button data-id="${id}" data-text="Forget this User" class="forget styled_button">Forget this User</button>
                         <button data-id="${id}" class="export styled_button">Export Data</button>
                         <button data-id="${id}" class="import styled_button">Import Data</button>
-                        <input type="file" hidden></input>
+                        <input data-id="${id}" class="import" type="file" hidden></input>
                     </div>
                     <div class="main">
                       <button data-id="${id}" data-limit="30" data-text="Trim History" title="Deletes all but the last 30 items" class="hforget styled_button">Trim History</button>
