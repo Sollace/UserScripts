@@ -110,9 +110,9 @@ function deAd() {
         all('#gruze-columns > .gruze-sidebar:first-child + .pad-left', a => a.classList.remove('pad-left'));
         all('#gruze-columns > .gruze-sidebar:first-child, #fake-col-left', a => a.parentNode.removeChild(a));
     }
-    all('.gruze-sidebar iframe', a => {
-        a = a.closest('.gruz-sidebar');
-        a.parentNode.removeChild(a);
+    all('.gruze-sidebar iframe, .gruze-sidebar .ad-wrapper', a => {
+        a = a.closest('.gruze-sidebar');
+        if (a.parentNode) a.parentNode.removeChild(a);
     });
     all('.withad', a => a.classList.remove('withad'));
 }
