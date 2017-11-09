@@ -264,11 +264,19 @@ function run() {
         new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs",
                  function(img) {
             switch (img) {
-                case 'sleep': return /*play*/'//fc09.deviantart.net/fs71/f/2013/111/c/c/octavia___cello_by_rj_p-d62jtu9.gif';
+                case 'sleep': return '//fc09.deviantart.net/fs71/f/2013/111/c/c/octavia___cello_by_rj_p-d62jtu9.gif';
                 case 'dash':
-                case 'trot': return /*trot*/'//fc07.deviantart.net/fs71/f/2013/111/1/a/octavia___trotting_by_rj_p-d62jtcw.gif';
-                case 'stand': return /*stand*/'//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
+                case 'trot': return '//fc07.deviantart.net/fs71/f/2013/111/1/a/octavia___trotting_by_rj_p-d62jtcw.gif';
+                case 'stand': return '//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
             }
+        }),
+        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition", function(img) {
+          switch (img) {
+            case 'sleep':
+            case 'stand': return '//orig00.deviantart.net/8097/f/2017/309/e/4/tempest_shadow_idle_by_botchan_mlp-dbswknj.gif';
+            case 'dash':
+            case 'trot': return '//orig00.deviantart.net/ecef/f/2017/309/1/2/tempest_shadow_trotting_by_botchan_mlp-dbswkrq.gif';
+          }
         }),
         sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", function(img) {
             switch (img) {
