@@ -89,7 +89,7 @@ function run() {
                 el.css('margin-top', '-25px');
             }
         }),
-        new SpecialPony('Princess Twilight', 'ptwi', 4, "Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img, pon) {
+        new SpecialPony('Princess Twilight', 'ptwi', 4, "Rainbow Dash, now is not the time for another... *music plays* ... Sing *facehoof*;Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img, pon) {
             switch (img) {
                 case 'sleep': return buildRef('twi', 'read');
                 case 'dash': return buildRef(pon, 'trot');
@@ -270,7 +270,7 @@ function run() {
                 case 'stand': return '//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
             }
         }),
-        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition", function(img) {
+        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition;Twilight IS the best snuggler!;Easy as pie;How about we start with your complete and total surrender?;All this power, wasted on parties;I saw the truth;I saw that!;Tempest is not my realy name. It's actually... Fizzlepop ... BerryTwist", function(img) {
           switch (img) {
             case 'sleep':
             case 'stand': return '//orig00.deviantart.net/8097/f/2017/309/e/4/tempest_shadow_idle_by_botchan_mlp-dbswknj.gif';
