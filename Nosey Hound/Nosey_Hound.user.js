@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name        Nosey Hound
 // @namespace   fimfiction-sollace
+// @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @version     2.2.6
