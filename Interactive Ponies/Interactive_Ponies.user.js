@@ -7,7 +7,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     3
+// @version     3.0.1
 // @grant       none
 // ==/UserScript==
 
@@ -46,7 +46,7 @@ function run() {
         'fly_rainbow_right.gif': 'fly','fly_rainbow_left.gif': 'fly',
         'trotcycle_rainbow_right.gif': 'trot','trotcycle_rainbow_left.gif': 'trot'
     };
-    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", function(img, pon) {
+    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", (img, pon) => {
         switch (img) {
             case 'sleep4': 
             case 'sleep': return buildRef(pon, 'sleep');
@@ -60,11 +60,11 @@ function run() {
             case 'fly': return buildRef(pon, 'fly');
             case 'fly1': return buildRef(pon, 'choppa');
             case 'trot2': return buildRef(pon, 'crown');
-            case 'sleep3': return /*chicken*/'//fc03.deviantart.net/fs71/f/2011/246/5/a/pinkie_pie_with_scootaloo_by_deathpwny-d48495a.gif';
+            case 'sleep3': return buildRef(pon, 'chicken');
             case 'fly3':
             case 'trot3':
             case 'dash3':
-            case 'stand3': return /*dance*/'//fc01.deviantart.net/fs70/f/2011/261/a/f/pinkie_pie_dancing_by_deathpwny-d4a46i0.gif';
+            case 'stand3': return buildRef(pon, 'dance');
         }
     }, { 3: "Oppan Pinkie Style;Pinkie Style;Eh~ Sexy Pony;Pinkie Pie Time;What does the Pony say? Chipi-chi-pow-chippy-cheep-chip-chip" });
     const Ponies = [
@@ -75,11 +75,11 @@ function run() {
                 case 'dash': return buildRef(pon, img);
                 case 'trot3':
                 case 'trot': return buildRef(pon, 'trot');
-                case 'trot5': return '//orig03.deviantart.net/97df/f/2016/103/e/8/twilight_sparkle__equestria_girls__trotting_by_botchan_mlp-d9ysgbi.gif';
+                case 'trot5': return  buildRef(pon, 'nerd');
                 case 'stand': return buildRef(pon, img);
                 case 'trot2': return buildRef(pon, 'owl');
                 case 'stand4': return buildRef(pon, 'snap');
-                case 'stand5': return /*eqg*/'//orig11.deviantart.net/5ef2/f/2016/103/8/a/twilight_sparkle__equestria_girls__idle_by_botchan_mlp-d9ysg33.gif';
+                case 'stand5': return buildRef(pon, 'nerd_stand');
             }
         }),(el, state) => {
             if (state == 'trot' && this.getState() == 1 || (state == 'stand' && this.getState() == 3)) {
@@ -89,12 +89,12 @@ function run() {
                 el.css('margin-top', '-25px');
             }
         }),
-        new SpecialPony('Princess Twilight', 'ptwi', 4, "Rainbow Dash, now is not the time for another... *music plays* ... Sing *facehoof*;Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!", function(img, pon) {
+        new SpecialPony('Princess Twilight', 'ptwi', 4, "Rainbow Dash, now is not the time for another... *music plays* ... Sing *facehoof*;Reading is something everypony can enjoy, if they just give it a try.;Wait a minute, I think I get it.;Huh? I'm pancake...I mean awake!;Just put the hay in the apple and then eat the candle, hm?;*books horse noises*;This is the game I am meant to play as a princess of Equestria!;Ah, hello;All the ponies in this town are crazy;Are you crazy?!;Dear Princess Celestia...;I don't get it;It's the perfect plan;Look out here comes Tom!;No really;Please don't hate me;This is my book and I'm gonna read it!;Tough love, baby;Yesyesyes;Your faithful student...;Books!;Spiiike!!;I've got to write a letter to the princes;For SCIENCE!!;[BUY OUR TOYS]", (img, pon) => {
             switch (img) {
                 case 'sleep': return buildRef('twi', 'read');
+                case 'trot':
                 case 'dash': return buildRef(pon, 'trot');
                 case 'fly':
-                case 'trot':
                 case 'stand': return buildRef(pon, img);
                 case 'trot2': return buildRef(pon, 'trot_w');
                 case 'fly3': return buildRef(pon, 'fly_d');
@@ -104,7 +104,7 @@ function run() {
                 case 'trot4': return buildRef(pon, 'trot_d_w');
             }
         }),
-        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", function(img, pon) {
+        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", (img, pon) => {
             switch (img) {
                 case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2012/215/a/1/applejack_sleeping_by_starsteppony-d59ovro.gif';
                 case 'dash': return /*dash*/'//fc01.deviantart.net/fs71/f/2013/111/d/a/applejack___galloping_by_rj_p-d62js4h.gif';
@@ -112,7 +112,7 @@ function run() {
                 case 'stand': return buildRef(pon, img);
             }
         }),
-        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", function(img, pon) {
+        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty?;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;You ruffians!;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'trot':
@@ -121,7 +121,7 @@ function run() {
                 case 'fly2': return buildRef(pon, 'fly');
             }
         }),
-        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*", function(img) {
+        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*", img => {
             switch(img) {
                 case 'stand': return /*stand*/'//fc04.deviantart.net/fs71/f/2014/100/3/3/farmpony_rarity_idle_by_botchan_mlp-d7dx8mn.gif';
                 case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2014/106/5/7/farmpony_rarity_scratching_her_head_by_botchan_mlp-d7ep6yl.gif';
@@ -130,7 +130,7 @@ function run() {
             }
         }),
         isOnDay(31, 10) ?
-        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!", function(img) {
+        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!", img => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//fc07.deviantart.net/fs71/f/2011/120/e/b/pinkamina_for_desktop_ponies_by_supersaiyanmikito-d3fagbu.gif';
@@ -143,7 +143,7 @@ function run() {
                     this.Speak("You're my besst friend;Hehehe;Hehehe slicey slicey;Pinkie Pie doesn't live here any more. He. He. He.");
                 }
             },
-            'tick': function (e) {
+            'tick': function(e) {
                 if (Math.random() * 40 <= 1) {
                     var old = this.ponyType;
                     var slave = attachEvents(pinkiePie, {
@@ -161,7 +161,7 @@ function run() {
                 }
             }
         }) : pinkiePie,
-        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~", function(img) {
+        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~", img => {
             switch (img) {
                 case 'sleep': return /*hang*/'http://orig11.deviantart.net/d520/f/2014/170/3/4/flutterbat_hanging_by_botchan_mlp-d7n1da6.gif';
                 case 'dash':
@@ -173,21 +173,14 @@ function run() {
             'mouseenter': function() {
                 if (Math.random() * 40 <= 5) this.Speak("...apples...;*bites*");
             }
-        }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*",
-                                   function(img, pon) {
-            switch (img) {
-                case 'sleep':
-                case 'dash':
-                case 'trot':
-                case 'stand':
-                case 'fly': return buildRef(pon, img);
-            }
+        }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*", (img, pon) => {
+          return buildRef(pon, img);
         }), {
             'mouseenter': function() {
                 if (Math.random() * 40 <= 5) this.Speak("*blushes*;Um, uh, oh my;...ow");
             }
         }),
-        Spacer('Secondary/Background Ponies', new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!", function(img, pon) {
+        Spacer('Secondary/Background Ponies', new Pony('Sunset Shimmer', 'sss', "Sorry it had to be this way... princess;This looks terrible!;There should be more streamers and fewer balloons;You country folk really aren't that bright;Where is this Twilight Sparkle?;Spoiler alert-;I'm sorry. I'm so sorry. I didn't know there was another way;A demon. I turned into a raging she-demon;It wasn't a fit of jealous rage!;I also play guitar;Dear Princess Twilight...;Hmpf. I have better things to do than socialize;I deserve to stand beside you and be your equal... if not your better. Make me a princess;Well, well, this is an interesting development;Believe me... I've got everything I need to know about you;I'm going to rule this school once I get that crown!", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -195,7 +188,7 @@ function run() {
                 case 'dash': return buildRef(pon, img);
             }
         })),
-        new Pony('Starlight Glimmer', 'sg', "That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", function(img) {
+        new Pony('Starlight Glimmer', 'sg', "That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", img => {
             switch (img) {
                 case 'sleep': return 'http://orig12.deviantart.net/9894/f/2016/129/0/5/starlight_glimmer_munching_popcorn_by_botchan_mlp-da1yivf.gif';
                 case 'stand': return 'http://orig00.deviantart.net/09be/f/2016/087/4/2/starlight_glimmer_idle_by_botchan_mlp-d9wrkr4.gif';
@@ -203,7 +196,7 @@ function run() {
                 case 'dash': return 'http://orig11.deviantart.net/b121/f/2016/087/5/d/starlight_glimmer_trotting_by_botchan_mlp-d9wrkqw.gif';
             }
         }),
-        attachMemory(attachEvents(new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", function(img, pon) {
+        attachMemory(attachEvents(new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'dash':
@@ -261,8 +254,7 @@ function run() {
                 
             }
         }), {special: 0, wubbing: 0}),
-        new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs",
-                 function(img) {
+        new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs", img => {
             switch (img) {
                 case 'sleep': return '//fc09.deviantart.net/fs71/f/2013/111/c/c/octavia___cello_by_rj_p-d62jtu9.gif';
                 case 'dash':
@@ -270,7 +262,7 @@ function run() {
                 case 'stand': return '//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
             }
         }),
-        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition;Twilight IS the best snuggler!;Easy as pie;How about we start with your complete and total surrender?;All this power, wasted on parties;I saw the truth;I saw that!;Tempest is not my realy name. It's actually... Fizzlepop ... BerryTwist", function(img) {
+        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition;Twilight IS the best snuggler!;Easy as pie;How about we start with your complete and total surrender?;All this power, wasted on parties;I saw the truth;I saw that!;Tempest is not my real name. It's actually..." + speechPause(10) + "Fizzlepop..." + speechPause(10) + "Berrytwist;It's so cold out... I should ask if Twilight wants to snuggle with me!;Let's start with your complete and total surrender, and THEN we can snuggle;*Blushes* Twilight? Can I, um... maybe snuggle with you tonight? I had a nightmare...;I love Twilight, but how can I show her? Hm... snuggles? Snuggles.;What can I do to gain Twilight's affection?;Twilight IS the best pony even though others call me their waifu... whatever that is;Can I have some belly rubs?;I will snuggle for belly rubs;Belly rubs?;Am I... really in love with Twilight?;What is this..." + speechPause(30) + "waifu everypony keeps talking about?", img => {
           switch (img) {
             case 'sleep':
             case 'stand': return '//orig00.deviantart.net/8097/f/2017/309/e/4/tempest_shadow_idle_by_botchan_mlp-dbswknj.gif';
@@ -278,7 +270,7 @@ function run() {
             case 'trot': return '//orig00.deviantart.net/ecef/f/2017/309/1/2/tempest_shadow_trotting_by_botchan_mlp-dbswkrq.gif';
           }
         }),
-        sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", function(img) {
+        sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", img => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/ '//orig07.deviantart.net/29ff/f/2016/174/d/b/zephyr_breeze_idle_by_botchan_mlp-da7cajg.gif';
@@ -287,7 +279,7 @@ function run() {
                 case 'fly': return /*fly*/ '//orig15.deviantart.net/22ee/f/2016/174/a/a/zephyr_breeze_flying_by_botchan_mlp-da7f3fw.gif';
             }
         })),
-        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?", function(img) {
+        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?;Oh my;Absolutely delectable", img => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return /*stand*/'//orig00.deviantart.net/e908/f/2016/166/f/8/saffron_masala_idle_by_botchan_mlp-da6dlwo.gif';
@@ -295,7 +287,7 @@ function run() {
                 case 'dash': return /*trot*/'//orig11.deviantart.net/179e/f/2016/166/6/d/saffron_masala_trotting_by_botchan_mlp-da6dlyr.gif';
             }
         })),
-        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', function(img) {
+        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', img => {
             switch (img) {
                 case 'stand': return /*stand*/ '//orig02.deviantart.net/17f2/f/2016/173/3/d/coriander_cumin_idle_by_botchan_mlp-da7ak7v.gif';
                 case 'trot':
@@ -303,7 +295,7 @@ function run() {
                 case 'dash': return /*trot*/ '//orig01.deviantart.net/22f0/f/2016/173/3/e/coriander_cumin_trotting_by_botchan_mlp-da7ak8k.gif';
             }
         })),
-        attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", function(img, pon) {
+        attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, img);
@@ -326,7 +318,7 @@ function run() {
                 }
             }
         }),
-        new Pony('Bon-Bon', 'bb', "Name's Drops, Agent, Sweetie Drops, but everypony around here just calls me Bon-Bon;I'm Bon-Bon. I make, uh, bon bons;Please tell me there's no bug bears here;Oh, Lyra~;Lyra!;I didn't put those in my bag;Is Fluttershy still here? We heard Fluttershy was here!;Go ahead, try one of your jokes out on me! I laugh at everything", function(img, pon) {
+        new Pony('Bon-Bon', 'bb', "Name's Drops, Agent, Sweetie Drops, but everypony around here just calls me Bon-Bon;I'm Bon-Bon. I make, uh, bon bons;Please tell me there's no bug bears here;Oh, Lyra~;Lyra!;I didn't put those in my bag;Is Fluttershy still here? We heard Fluttershy was here!;Go ahead, try one of your jokes out on me! I laugh at everything", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, img);
@@ -334,28 +326,28 @@ function run() {
                 case 'trot': return buildRef(pon, 'trot');
             }
         }),
-        attachMemory(attachEvents(new SpecialPony('Derpy Hooves', 'duh', 3, "I messed up big time in those invitions Doc;Muffins!;I messed up everything for Cranky's wedding...;Hi;Muffins...;*waves*;Muffins?;I just don't know what went wrong;Muffin!;Hi, I'm Ditzy;I'm Derpy;Derp;Ooh bubbles;What you talkin' about;Heehee;Oh, you;Ponies feel bad cause of my eyes;*squee*;I'm on the weather team you know;Ima Derp, Derp, Derp...;I'm confused;Doctor?", function(img) {
+        attachMemory(attachEvents(new SpecialPony('Derpy Hooves', 'duh', 3, "I messed up big time in those invitions Doc;Muffins!;I messed up everything for Cranky's wedding...;Hi;Muffins...;*waves*;Muffins?;I just don't know what went wrong;Muffin!;Hi, I'm Ditzy;I'm Derpy;Derp;Ooh bubbles;What you talkin' about;Heehee;Oh, you;Ponies feel bad cause of my eyes;*squee*;I'm on the weather team you know;Ima Derp, Derp, Derp...;I'm confused;Doctor?", (img, pon) => {
             switch (img) {
+                case 'sleep2':
                 case 'sleep3':
-                case 'sleep': return /*sleep*/'//fc06.deviantart.net/fs71/f/2013/111/7/0/derpy_hooves___sleeping_by_rj_p-d62jl7t.gif';
-                case 'stand': return /*stand*/'//fc03.deviantart.net/fs71/f/2013/111/2/9/derpy_hooves___standing_by_rj_p-d62jahk.gif';
+                case 'sleep': return buildRef(pon, 'sleep');
+                case 'stand': return buildRef(pon, img);
                 case 'dash3':
-                case 'dash': return /*dash*/'//fc08.deviantart.net/fs71/f/2013/111/c/4/derpy_hooves___walking_wing_by_rj_p-d62jg89.gif';
+                case 'dash': return buildRef(pon, 'dash');
                 case 'trot3':
-                case 'trot': return /*trot*/'//fc04.deviantart.net/fs70/f/2013/111/e/1/derpy_hooves___trotting_by_rj_p-d62jfcp.gif';
+                case 'trot': return buildRef(pon, 'trot');
                 case 'dash1': 
                 case 'fly3':
-                case 'fly': return /*fly*/'//fc02.deviantart.net/fs70/f/2013/111/2/f/derpy_hooves___flying_by_rj_p-d62jha8.gif';
-                case 'stand1': return /*hover*/'//fc08.deviantart.net/fs71/f/2013/111/8/3/derpy_hooves___hovering_by_rj_p-d62jiai.gif';
-                case 'stand2': return /*hover_inv*/'//fc08.deviantart.net/fs71/f/2013/111/9/7/derpy_hooves___hovering_upside_down_by_rj_p-d62jk4w.gif';
+                case 'fly': return buildRef(pon, 'fly');
+                case 'stand1': return buildRef(pon, 'hover');
+                case 'stand2': return buildRef(pon, 'hover_inv');
                 case 'dash2': 
-                case 'fly2': return /*sleep_inv*/'//fc01.deviantart.net/fs71/f/2013/111/b/f/derpy_hooves___flying_upside_down_by_rj_p-d62jj01.gif';
-                case 'sleep2': return /*sleep*/'//fc06.deviantart.net/fs71/f/2013/111/7/0/derpy_hooves___sleeping_by_rj_p-d62jl7t.gif';
-                case 'stand3': return /*muffin*/'//orig11.deviantart.net/c2cf/f/2013/111/9/9/derpy_hooves___muffin_by_rj_p-d62jprf.gif';
+                case 'fly2': return buildRef(pon, 'fly_inv');
+                case 'stand3': return buildRef(pon, 'muffin');
             }
         }, {
             1: "Rainbow Dash says I must be careful around clouds;Dark clouds make Derpy go ouchie;I'm on the weather team you know;Ahoy!;Nyan nyan nyan nyan Ni hao nyan;One... Two... Muffin! Four...;Squee!",
-            2: "Call me Dr. Derp;I have a PHD you know;My bubble theory saved Equestria 30,000 bits!;I derp, therefore I am;If a tree falls and nopony is there to hear it. Derp?;The meaning of life is.... ooh a MUFFIN!",
+            2: "Call me Dr. Derp;I have a PHD you know;My bubble theory saved Equestria 30,000 bits!;I derp, therefore I am;If a tree falls and nopony is there to hear it. Derp?;The meaning of life is.... ooh a MUFFIN!;I actually don't like muffins." + speechPause(100) + "Scones are where it's at.",
             effect: {
                 level: 2,
                 target: '.speech',
@@ -398,7 +390,7 @@ function run() {
                     if (!document.querySelector('input:focus, textarea:focus')) {
                         pony.setMemory('explode', false);
                         for (var i = 0; i < 20; i++) {
-                            new Particle('<div class="muffin" />', this.x, this.y, (Math.random() * 50) - 25, (Math.random() * 50) - 25);
+                            new Particle('<div class="muffin"></div>', this.x, this.y, (Math.random() * 50) - 25, (Math.random() * 50) - 25);
                         }
                         this.x = this.y = 0;
                         this.fadeOutText();
@@ -407,7 +399,7 @@ function run() {
                 }
             }
         }), {'explode': false}),
-        new SpecialPony('Doctor Hooves', 'dr', 10, "Great Wickering Stallions!;Did you know there was a spell for time travel? I wish I'd known that...;I'll try my hardest not to die, honest;Not impossible. Just... a bit unlikely;I'm always alright;Timey wimey, spacey wacey;Briliant! You are briliant!;Fantastic!;Allons-y!;Don't mind me, off to save time and space;Trust me. I'm the Doctor;Eh, no thanks;Would you please leave me alone!", function(img, pon) {
+        new SpecialPony('Doctor Hooves', 'dr', 10, "Great Wickering Stallions!;Did you know there was a spell for time travel? I wish I'd known that...;I'll try my hardest not to die, honest;Not impossible. Just... a bit unlikely;I'm always alright;Timey wimey, spacey wacey;Briliant! You are briliant!;Fantastic!;Allons-y!;Don't mind me, off to save time and space;Trust me. I'm the Doctor;Eh, no thanks;Would you please leave me alone!", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'tand': return buildRef(pon, img);
@@ -415,10 +407,10 @@ function run() {
                 case 'trot': return buildRef(pon, 'trot');
                 case 'stand8': return buildRef(pon, 'fez');
                 case 'dash8':
-                case 'trot8': return /*trot_fez*/'//fc00.deviantart.net/fs70/f/2014/058/5/4/dr_hooves__fez_walk_by_comeha-d786hmv.gif';
+                case 'trot8': return buildRef(pon, 'trot_fez');
             }
         }),
-        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", function(img, pon) {
+        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -450,37 +442,16 @@ function run() {
             };
             pony.cacheSprites = function(other) {
                 if (other == this) return null;
-                this.cache.cache(other.bakeSprite('sleep'));
-                this.cache.cache(other.bakeSprite('dash'));
-                this.cache.cache(other.bakeSprite('stand'));
-                this.cache.cache(other.bakeSprite('trot'));
-                this.cache.cache(other.bakeSprite('fly'));
+                ['sleep','dash','stand','trot','fly'].forEach(a => {
+                  this.cache.cache(other.bakeSprite(a));
+                })
                 return other;
             };
             return pony;
-        })(attachCache(attachMemory(attachEvents(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", function(img, pon) {
-            switch (img) {
-                case 'sleep0':  
-                case 'stand0': return 'http://orig07.deviantart.net/f1f0/f/2017/045/a/4/changeling__1_idle_by_botchan_mlp-daz1acl.gif';
-                case 'dash0':
-                case 'trot0': return 'http://orig15.deviantart.net/a5f3/f/2017/045/2/b/changeling__1_trotting_by_botchan_mlp-daz1ad2.gif';
-                case 'fly0': return 'http://orig01.deviantart.net/753d/f/2017/045/6/9/changeling__1_flying_by_botchan_mlp-daz1ade.gif';
-                case 'sleep1':  
-                case 'stand1': return 'http://orig08.deviantart.net/9f1a/f/2017/045/6/7/changeling__3_idle_by_botchan_mlp-daz1bqo.gif';
-                case 'dash1':
-                case 'trot1': return 'http://orig06.deviantart.net/f9e6/f/2017/045/c/7/changeling__3_trotting_by_botchan_mlp-daz1br4.gif';
-                case 'fly1': return 'http://orig10.deviantart.net/3a37/f/2017/045/d/6/changeling__3_flying_by_botchan_mlp-daz1brj.gif';
-                case 'sleep2':  
-                case 'stand2': return 'http://orig05.deviantart.net/b056/f/2017/045/e/9/changeling__4_idle_by_botchan_mlp-daz1c2t.gif';
-                case 'dash2':
-                case 'trot2': return 'http://orig00.deviantart.net/3487/f/2017/045/d/4/changeling__4_trotting_by_botchan_mlp-daz1c3c.gif';
-                case 'fly2': return 'http://orig13.deviantart.net/bb70/f/2017/045/c/f/changeling__4_flying_by_botchan_mlp-daz1c3p.gif';
-                case 'sleep3':  
-                case 'stand3': return 'http://orig07.deviantart.net/ff8a/f/2017/045/3/b/changeling__6_idle_by_botchan_mlp-daz1csz.gif';
-                case 'dash3':
-                case 'trot3': return 'http://orig13.deviantart.net/3fd0/f/2017/045/8/5/changeling__6_trotting_by_botchan_mlp-daz1ctt.gif';
-                case 'fly3': return 'http://orig10.deviantart.net/996b/f/2017/045/2/3/changeling__6_flying_by_botchan_mlp-daz1cuh.gif';
-            }
+        })(attachCache(attachMemory(attachEvents(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
+            let sprite = img.split(/([0-9]+)/g);
+            if (sprite[0] == 'sleep') sprite[0] = 'stand';
+            return buildRef(pon, sprite[1], sprite[0]);
         }), {
             'mouseover': function() {
                 if (!this.ponyType().cache.ready) return;
@@ -521,25 +492,25 @@ function run() {
             disguise: null,
             ticks_to_change: 900
         }))),
-        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..", function(img) {
+        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..;... .. .. . . .  . .  ..... . .... .", img => {
             switch (img) {
                 case 'stand':
+                case 'sleep': return buildRef(pon, 'float');
                 case 'trot':
-                case 'dash': return /*stand*/'//fc07.deviantart.net/fs70/f/2014/064/3/7/seabreeze_floating_by_botchan_mlp-d7939jq.gif';
-                case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif';
+                case 'dash': return buildRef(pon, 'fly');
             }
         }),
-        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", function(img) {
+        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", img => {
             switch (img) {
-                case 'sleep': return /*sleep*/'//orig02.deviantart.net/9ee0/f/2013/111/2/d/filly_rarity___sleeping_by_rj_p-d62kics.gif';
-                case 'stand': return /*stand*/'//orig13.deviantart.net/a968/f/2013/111/6/5/filly_rarity___standing_by_rj_p-d62keik.gif';
+                case 'trot':
+                case 'sleep':
+                case 'stand': return buildRef(pon, img);
                 case 'stand2':
-                case 'dash': return /*pull*/'//orig09.deviantart.net/14ca/f/2013/111/5/0/filly_rarity___magical_pull_by_rj_p-d62khjl.gif';
-                case 'dash3': return /*drag*/'//orig03.deviantart.net/ab3e/f/2013/111/a/f/filly_rarity___magical_drag_by_rj_p-d62khtp.gif';
-                case 'trot': return /*trot*/'//orig03.deviantart.net/449b/f/2013/111/b/f/filly_rarity___trotting_by_rj_p-d62kfh7.gif';
+                case 'dash': return buildRef(pon, 'pull');
+                case 'dash3': return buildRef(pon, 'drag');
             }
         })),
-        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!;Hey!", function(img, pon) {
+        extendOriginalSays(new Pony('Filly Dash', 'fdash', "Awesome!;See you boys at the finish line!;Hey!;I need an adult", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -548,23 +519,23 @@ function run() {
                 case 'fly': return buildRef(pon, img);
             }
         }), 0.3),
-        new SpecialPony('Apple Bloom', 'cmc1', 4, "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery.;Not the cupcakes!;Likely story.;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!", function(img, pon) {
+        new SpecialPony('Apple Bloom', 'cmc1', 4, "Howdy, I'm Apple Bloom;CUTIE MARK CRUSADERS INTERNET EXPLORERS YAY!!;Somepony needs to put this thing out of its misery;Not the cupcakes!;Likely story;I'm not a baby, I can take care of myself!;I am a big pony!;But ah want it now!;Apple Bloom, Apple Bloom!;[BUY SOME APPLES]!", (img, pon) => {
             switch (img) {
-                case 'stand': return buildRef(pon, img);
                 case 'trot2':
                 case 'trot': return buildRef(pon, 'trot');
-                case 'dash': return '//fc05.deviantart.net/fs70/f/2014/115/d/0/apple_bloom_galloping_by_botchan_mlp-d7fzyr9.gif';
+                case 'stand':
+                case 'dash':
                 case 'sleep': return buildRef(pon, img);
                 case 'trot1': return buildRef(pon, 'skip');
                 case 'stand2': return buildRef(pon, 'spin');
                 case 'stand4': return buildRef(pon, 'push_ups');
             }
         }),
-        new SpecialPony('Sweetie Belle', 'cmc2', 3, "I'm Sweeetiee Belle!;I wonder how that happened...;Stupid Horn!;Aww. That was such a sweet story;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.", function(img, pon) {
+        new SpecialPony('Sweetie Belle', 'cmc2', 3, "I'm Sweeetiee Belle!;I wonder how that happened...;Stupid Horn!;Aww. That was such a sweet story;Are you sure I can't help?;Hush now, quiet now.;I can help, big sis!;Oh, oh, oh! Maybe I could....just...stand....over here....and watch.;That's a great safe idea.", (img, pon) => {
             switch (img) {
                 case 'trot':
-                case 'stand': return buildRef(pon, img);
-                case 'dash': return '//fc03.deviantart.net/fs71/f/2014/115/6/6/sweetie_belle_galloping_by_botchan_mlp-d7fzz94.gif';
+                case 'stand':
+                case 'dash':
                 case 'sleep': return buildRef(pon, img);
                 case 'trot2': return buildRef(pon, 'skip');
                 case 'stand1': return buildRef(pon, 'sit');
@@ -574,7 +545,7 @@ function run() {
         }, {
             1: "Ughh! I'm so BORED!;Dumb fabric!",
             2: "I know this one!;Hammer!;You cannot run from me!;We could form our own secret society!;♪ We are the Cutie Mark Crusaders! ♫"}),
-        attachMemory(isOnDay(1, 4) ? new Pony('Scootaloo', 'chicken', "I'm a..." + speechPause(10) + "chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Bukka bukka;Bukka bukka;Bukka bukka;Bukka bukka, scoot- SCOOTALOO!!!;Bukka...", function(img, pon) {
+        attachMemory(isOnDay(1, 4) ? new Pony('Scootaloo', 'chicken', "I'm a..." + speechPause(10) + "chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Bukka bukka;Bukka bukka;Bukka bukka;Bukka bukka, scoot- SCOOTALOO!!!;Bukka...", (img, pon) => {
                 switch (img) {
                     case 'sleep':
                     case 'stand': return buildRef(pon, 'stand');
@@ -583,13 +554,13 @@ function run() {
                     case 'fly': return buildRef(pon, img);
                 }
             })
-            : attachEvents(new Pony('Scootaloo', 'cmc3', "I swear, they make one more chicken joke I'm gonna- Pequawk! *blushes*;I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh;Bukka bukka;That is not how you call a chicken;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks;I'm liking this idea.;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!", function(img, pon) {
+            : attachEvents(new Pony('Scootaloo', 'cmc3', "I swear, they make one more chicken joke I'm gonna- Pequawk! *blushes*;I'm Scootaloo! The most awesome one!;I'm a... chicken?;Scoot- Scoot- SCOOTALOO!!!;What am I? A chicken?;Wha...huh?;TLC as in Tender Loving Care or Totally Lost Cause?;That's so funny I forgot to laugh;Bukka bukka;That is not how you call a chicken;You've got a problem with blank flanks?;Never, never, never!;These namby-pamby stories aren't going to take us any closer to our cutie marks;I'm liking this idea;I'll do whatever you want, Rainbow Dash!;Ewwww!;The possibilities are, like, endless!;We were making a table?;I'm going to get my mark first!;Do you know where we can find a cannon at this hour?;Sup.;Dash! Dash! Over here, Dash!;Are you my mummy?", (img, pon) => {
                 switch (img) {
                     case 'sleep':
                     case 'stand': return buildRef(pon, 'stand');
-                    case 'trot': return buildRef(pon, 'trot');
-                    case 'dash': return '//fc07.deviantart.net/fs71/f/2014/115/4/8/scootaloo_galloping_by_botchan_mlp-d7fzz3l.gif';
-                    case 'fly': return buildRef(pon, 'fly');
+                    case 'trot':
+                    case 'dash':
+                    case 'fly': return buildRef(pon, img);
                 }
             }), {
                 'mouseenter': function () {
@@ -606,31 +577,31 @@ function run() {
                     }
                 })('Hey!;Leave him alone!;What are you doing to Pip!?'.split(';'))
             }), {'special': false}),
-        new SpecialPony('Babs Seed', 'cmc4', 1, "Hey! That's not how you talk to my friends!;See ya later, Cutie Mark Crybabies!;Looks like somepony's pumpkin just got squashed!;*pooft*;Sup;Welcome to the Babs side 'a town;~bad seed, bad seed~ What? It's a catchy tune;Eh, I've seen better", function(img) {
+        new SpecialPony('Babs Seed', 'cmc4', 1, "Hey! That's not how you talk to my friends!;See ya later, Cutie Mark Crybabies!;Looks like somepony's pumpkin just got squashed!;*pooft*;Sup;Welcome to the Babs side 'a town;~bad seed, bad seed~ What? It's a catchy tune;Eh, I've seen better", (img, pon) => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/'//fc01.deviantart.net/fs71/f/2014/081/f/8/babs_seed_idle_by_botchan_mlp-d7ba68n.gif';
+                case 'stand': return buildRef(pon, 'stand');
                 case 'trot':
-                case 'dash': return /*trot*/'//fc06.deviantart.net/fs71/f/2014/081/b/e/babs_seed_trotting_by_botchan_mlp-d7ba5zz.gif';
+                case 'dash': return buildRef(pon, 'trot');
                 case 'sleep1':
-                case 'stand1': return /*smug*/'//fc02.deviantart.net/fs70/f/2014/081/a/c/babs_seed_idle__smug__by_botchan_mlp-d7ba6iw.gif';
+                case 'stand1': return buildRef(pon, 'smug');
                 case 'trot1':
-                case 'dash1': return /*trot_smug*/'//fc06.deviantart.net/fs71/f/2014/081/d/0/babs_seed_trotting__smug__by_botchan_mlp-d7ba6ch.gif';
+                case 'dash1': return buildRef(pon, 'trot_smug');
             }
         }),
-        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate", function(img) {
+        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate;Have you seen my peggy bank?", img => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/'//orig09.deviantart.net/bb27/f/2015/158/d/4/pipsqueak_idle_by_botchan_mlp-d8wftlv.gif';
+                case 'stand': return buildRef(pon, 'stand');
                 case 'dash':
-                case 'trot': return /*trot*/'//orig03.deviantart.net/ec72/f/2015/158/0/7/pipsqueak_trotting_by_botchan_mlp-d8wfto8.gif';
+                case 'trot': return buildRef(pon, 'trot');
                 case 'sleep2':
-                case 'stand2': return /*stand_pirate*/'//orig14.deviantart.net/c0dd/f/2015/158/f/2/pipsqueak_idle__pirate_costume__by_botchan_mlp-d8wftpl.gif';
+                case 'stand2': return buildRef(pon, 'stand_pirate');
                 case 'dash2':
-                case 'trot2': return /*trot_pirate*/'//orig09.deviantart.net/7399/f/2015/158/d/3/pipsqueak_trotting__pirate_costume__by_botchan_mlp-d8wftro.gif';
+                case 'trot2': return buildRef(pon, 'trot_pirate');
             }
         }, {
-            1: 'Ever since I lost my eye, I\'ve been craving nothing but candy!;Pipsqueak the pirate, at your service;Pipsqueak the pirate, at your service. Arrg;Arrrg matey;Scary, but fun;I be pirate Pip at yer service'})), {
+            1: "Ever since I lost my eye, I've been craving nothing but candy!;Pipsqueak the pirate, at your service;Pipsqueak the pirate, at your service. Arrg;Arrrg matey;Scary, but fun;I be pirate Pip at yer service"})), {
             'anger': 0
         }), {
             'mouseenter': function() {
@@ -669,24 +640,25 @@ function run() {
                 return null;
             }
         }),
-        offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^', function(img) {
+        offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^', (img, pon) => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/ '//orig01.deviantart.net/e24e/f/2016/091/7/7/flurry_heart_idle_by_botchan_mlp-d9x9ptq.gif';
+                case 'stand': return buildRef(pon, 'sit');
                 case 'dash':
-                case 'trot': return /*trot*/ '//orig12.deviantart.net/4a86/f/2016/091/e/9/flurry_heart_flying_by_botchan_mlp-d9x9puh.gif';
+                case 'trot':
+                case 'fly': return buildRef(pon, 'fly');
             }
         })), function(el, state) {
             if (state == 'stand' || state == 'sleep') el.css('margin-top', '-20px');
         }),
-        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P", function(img) {
+        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P", img => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/'//fc08.deviantart.net/fs71/f/2014/157/1/0/fluffle_puff_phbbt_by_botchan_mlp-d7lcggr.gif';
+                case 'stand': return buildRef(pon, 'phbbt');
                 case 'sleep2':
-                case 'stand2': return /*gasp*/'//fc06.deviantart.net/fs71/f/2014/157/b/e/fluffle_puff_gasping_by_botchan_mlp-d7lcgh9.gif';
+                case 'stand2': return buildRef(pon, 'gasp');
                 case 'trot':
-                case 'dash': return /*trot*/'//fc07.deviantart.net/fs71/f/2014/157/7/d/fluffle_puff_trotting_by_botchan_mlp-d7lcfve.gif';
+                case 'dash': return buildRef(pon, 'trot');
             }
         }))
     ];
@@ -768,9 +740,7 @@ function run() {
     }
 
     function speechPause(length) {
-        var result = '';
-        while (result.length < length) result += ' ';
-        return result;
+        return Array(length + 1).join(' ');
     }
 
     function extendOriginalSays(pony, ratio) {
@@ -1282,8 +1252,8 @@ function run() {
         }
     }
 
-    function buildRef(pon, img) {
-        return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img}.gif`;
+    function buildRef(pon, ...img) {
+        return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
     }
 
     function playSong(ytid, loaded) {
