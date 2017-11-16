@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.6
+// @version     2.2.7
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -12,15 +12,20 @@
 // ==/UserScript==
 
 const settingsMan = {
-    __gm: (key, parse, def) => {
-      let val = parse(GM_getValue(key) || String(def));
+    __gm: (key, parse) => {
+      let val = GM_getValue(key);
+      if (val == undefined) return null;
+      localStorage[key] = val;
       GM_deleteValue(key);
-      return localStorage[key] = val;
+      alert(key);
+      return parse(key);
     },
-    __get: (key, parse, def) => settingsMan.has(key) ? parse(localStorage[key]) : this.__gm(key, def),
-    has: key => localStorage[key] !== undefined,
+    get: (key, parse) => settingsMan.has(key) ? parse(localStorage[key]) : settingsMan.__gm(key, parse),
+    has: key => {
+      key = String(localStorage[key]);
+      return key != 'undefined' && key != 'null';
+    },
     remove: key => localStorage.removeItem(key),
-    get: (key, def) => settingsMan.__get(key, a => a, def),
     set: (key, val, def) => {
         if (def === undefined) def = '';
         if (val === def) return settingsMan.remove(key);
@@ -587,14 +592,15 @@ try {
         }
 
         function setFollowers(id, val) {
-            const result = settingsMan.get(`followers_${id}`) != null;
+            const result = settingsMan.get(`followers_${id}`, a => a != null);
             settingsMan.set(`followers_${id}`, JSON.stringify(val));
             return result;
         }
 
         function getFollowers(id) {
-            const result = settingsMan.get(`followers_${id}`);
-            return result == null ? [] : JSON.parse(result);
+            return settingsMan.get(`followers_${id}`, a => {
+              return JSON.parse(a);
+            }) || [];
         }
 
         function clearFollowers(id) {
@@ -610,8 +616,9 @@ try {
         }
 
         function getHistory(id) {
-            const result = settingsMan.get('changes_' + id);
-            return (result == null ? [] : JSON.parse(result)).filter(h => !!h);
+            return settingsMan.get(`changes_${id}`, a => {
+              return JSON.parse(a).filter(h => !!h);
+            }) || [];
         }
 
         function list(arr) {
