@@ -7,7 +7,7 @@
 // @include     http://justsitback.deviantart*
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     3.0.2
+// @version     3.0.1
 // @grant       none
 // ==/UserScript==
 
@@ -684,8 +684,9 @@ function run() {
         pony.bakeSprite = img => CustomPony.sprites[img];
         pony.args = () => CustomPony;
         pony.Name = CustomPony.name;
+        pony.getLevel = _ => CustomPony.level || 0;
         return pony;
-    })(new Pony('Custom', 'custom', '', function(img) {
+    })(new SpecialPony('Custom', 'custom', 0, '', img => {
         return CustomPony.sprites[img];
     })));
     
@@ -843,6 +844,7 @@ function run() {
                 }
                 return parent.getSay(a);
             },
+            getLevel: _ => level,
             getState: _ => Active,
             setState: a => Active = a < 0 ? 0 : a,
             getSprite: function(ip, face, base, url) {
@@ -860,7 +862,7 @@ function run() {
             bakeSprite: _ => parent.bakeSprite(img),
             getAccess: function(ip, face, base, url) {
                 next_active_timer = (next_active_timer + 1) % 11;
-                if (next_active_timer == 0) Active = Math.floor(Math.random() * (level + 1));
+                if (next_active_timer == 0) Active = Math.floor(Math.random() * (this.getLevel() + 1));
                 url = parent.resolveUrl(face, url);
                 var result = null;
                 for (var looked = Active; looked > 0; looked--) {
@@ -885,7 +887,21 @@ function run() {
                     ip.dom_element.dataset.label = keys.join(';');
                 }
             },
-            toJson: _ => parent.toJson()
+            toJson: function() {
+              let json = parent.toJson();
+              json.level = this.getLevel();
+              fillSpritesObj(fillSpritesObj(json.sprites, ''), '_ac');
+              return json;
+            },
+            fillSpritesObj: function(obj, suffex) {
+              ['sleep','dash','stand','fly','trot'].forEach(a => {
+                for (let looked = 1; looked <= level; looked++) {
+                  let sprite = giffactory(a + suffex + looked, key);
+                  if (sprite) obj[a + suffex + looked] = sprite;
+                }
+              });
+              return obj;
+            }
         };
     }
 
@@ -928,10 +944,10 @@ function run() {
             cssImages: function(ip, face) {
                 this.internal__cssImages(ip, face);
                 args = this.args();
-                var anim_target = ip.dom_element.dataset.target;
+                let anim_target = ip.dom_element.dataset.target;
                 if (anim_target && anim_target != '') {
                     anim_target = (anim_target === 'self' ? ip.dom_element : ip.dom_element.querySelector(anim_target));
-                    ip.dom_element.dataset.label.split(';').forEach(a => {
+                    if (ip.dom_element.dataset.label) ip.dom_element.dataset.label.split(';').forEach(a => {
                         anim_target.style[a] = '';
                     });
                 }
@@ -940,7 +956,7 @@ function run() {
                     ip.dom_element.dataset.target = args.effect.target;
                     const keys = Object.keys(args.effect.css);
                     keys.forEach(a => {
-                        anim_target.style[a] = args.effects.css[a];
+                        anim_target.style[a] = args.effect.css[a];
                     });
                     ip.dom_element.dataset.label = keys.join(';');
                 }
@@ -950,12 +966,14 @@ function run() {
               json.name = name;
               json.sayings = sayings;
               json.sprites = this.fillSpritesObj(this.fillSpritesObj({}, ''), '_ac');
+              return json;
             },
             fillSpritesObj: function(obj, suffex) {
               ['sleep','dash','stand','fly','trot'].forEach(a => {
                 let sprite = giffactory(a + suffex, key);
-                if (sprite) obj.sprites[a + suffex] = sprite;
+                if (sprite) obj[a + suffex] = sprite;
               });
+              return obj;
             }
         };
     }
@@ -1162,6 +1180,15 @@ function run() {
         }
 
         makeStyle(`
+            #custom_pony_sprites select, #custom_pony_sprites input, #custom_pony_base {
+                display: inline-block;}
+            #custom_pony_sprites select {
+                width: 20%;}
+            #custom_pony_sprites input {
+                width: 57%;}
+            #custom_pony_base {
+                width: 90%;
+                width: calc(100% - 42px);}
             .interactive_pony .speech {
                 transition: opacity 0.5s linear;
                 opacity: 0;}
@@ -1246,34 +1273,158 @@ function run() {
         </tr>
         <tr id="custom_pony_field" style="${GlobalPonyType != 'Custom' ? 'display:none' : ''}">
             <td class="label">Custom interactive Pony</td>
-            <td><div id="pony_customDiv"><textarea style="resize:vertical;min-height:500px;">${JSON.stringify(CustomPony, null, 4)}</textarea></div></td>
+            <td>
+              <table style="width:100%">
+                <tr>
+                  <td class="label">Reset</td>
+                  <td>
+                    <select id="custom_pony_base">${Ponies.map(optItem).join('')}</select>
+                    <a id="custom_pony_reset" class="styled_button styled_button_blue button-icon-only"><i class="fa fa-undo"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Name</td>
+                  <td>
+                    <input type="text" id="custom_pony_name" placeholder="Rainbow Dash"></input>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Sayings</td>
+                  <td>
+                    <ul id="custom_pony_sayings" class="auto-list"></ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Sprites</td>
+                  <td>
+                    <ul id="custom_pony_sprites" class="auto-list"></ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Advanced</td>
+                  <td id="pony_customDiv">
+                    <textarea style="resize:vertical;min-height:500px;"></textarea>
+                  </td>
+                </tr>
+              </table>
+            </td>
         </tr>`);
 
         const InteractivePonyType = document.querySelector('#ponyTypeDiv select');
         InteractivePonyType.value = GlobalPonyType;
-
-        const field = document.querySelector('#custom_pony_field');
+        
+        const customPonyUI = {
+          root: document.querySelector('#custom_pony_field'),
+          base: document.querySelector('#custom_pony_base'),
+          name: document.querySelector('#custom_pony_name'),
+          sayings: document.querySelector('#custom_pony_sayings'),
+          sprites: document.querySelector('#custom_pony_sprites'),
+          advanced: document.querySelector('#pony_customDiv textarea')
+        };
+        
+        document.querySelector('#custom_pony_reset').addEventListener('click', event => {
+          resetCustomPony();
+          ponyToUI(customPonyUI, CustomPony, true);
+          paintCustomPonyNames();
+        });
+        
         InteractivePonyType.addEventListener('change', e => {
             setPonyType(InteractivePonyType.value);
-            field.style.display = InteractivePonyType.value == 'Custom' ? '' : 'none';
+            customPonyUI.root.style.display = InteractivePonyType.value == 'Custom' ? '' : 'none';
         });
         const customOption = document.querySelector('option#custom_option');
         customOption.innerText = `Custom (${CustomPony.name})`;
-
-        const ponyCustom = document.querySelector('#pony_customDiv textarea');
-        ponyCustom.addEventListener('change', ponyChanged);
-        ponyCustom.addEventListener('keyup', ponyChanged);
-
-        function ponyChanged() {
-            try {
-                CustomPony = JSON.parse(localStorage['custom_pony'] = this.value);
-                PoniesRegister.Custom.Name = CustomPony.name;
-                customOption.innerText = `Custom (${CustomPony.name})`;
-            } catch (e) {}
-            if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
+        
+        customPonyUI.root.addEventListener('change', ponyChanged);
+        customPonyUI.advanced.addEventListener('change', ponyQuickChanged);
+        customPonyUI.advanced.addEventListener('keyup', ponyQuickChanged);
+        ponyToUI(customPonyUI, CustomPony, true);
+        
+        function resetCustomPony() {
+          let pony = PoniesRegister[customPonyUI.base.value];
+          if (pony == PoniesRegister.Custom) pony = PoniesRegister["Rainbow Dash"];
+          CustomPony = pony.toJson();
+        }
+      
+        function paintCustomPonyNames() {
+          PoniesRegister.Custom.Name = CustomPony.name;
+          customOption.innerText = `Custom (${CustomPony.name})`;
+          if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
+        }
+        
+        function ponyQuickChanged(event) {
+          if (!event.target.closest('#pony_customDiv')) return;
+          
+          let reload = false;
+          try {
+            CustomPony = JSON.parse(event.target.value);
+          } catch (e) {
+            resetCustomPony();
+            reload = event.target.value.trim().length == 0;
+          }
+          
+          ponyToUI(customPonyUI, CustomPony, reload);
+          paintCustomPonyNames();
+        }
+        
+        function ponyChanged(event) {
+          if (!event.target.closest('input, select')) return;
+          
+          if (event.target.closest('ul.auto-list') && event.target.closest('input')) {
+            const template = event.target.closest('.template');
+            if (template && (event.target.value || '').length > 0) {
+              template.insertAdjacentHTML('afterend', template.outerHTML);
+              template.classList.remove('template');
+            } else if ((event.target.value || '').length == 0) {
+              let item = event.target.closest('li');
+              item.parentNode.removeChild(item);
+            }
+          }
+          
+          uiToPony(customPonyUI, CustomPony);
+          paintCustomPonyNames();
         }
     }
-
+    
+    function spriteUiElement(state, type, url) {
+      return `<li ${state == '' ? 'class="template"' : ''}>
+                <select name="state">
+                  ${['','sleep','stand','trot','fly','dash'].map(a => `
+                  <option ${a == state ? 'selected="true"' : ''} value="${a}">${a}</option>`)}
+                </select>
+                <select name="type">
+                  ${['','sprite', 'accessory'].map((a, i) => `
+                  <option ${a == type ? 'selected="true"' : ''} value="${i}">${a}</option>`)}
+                </select>
+                <input type="text" name="url" placeholder="url" value="${url}"></input>
+             </li>`
+    }
+    
+    function ponyToUI(ui, customPony, full) {
+      ui.name.value = customPony.name;
+      ui.sayings.innerHTML = `${customPony.sayings.map(a => `<li><input type="text" placeholder="..." value="${a}"></input></li>`).join('')}
+                              <li class="template"><input type="text" placeholder="..."></input></li>`;
+      ui.sprites.innerHTML = `${Object.keys(customPony.sprites).map(a => spriteUiElement(a.split('_')[0], a.split('_').length > 1 ? 'accessory' : 'sprite', customPony.sprites[a])).join('')}
+                              ${spriteUiElement('', '', '')}`;
+      if (full) ui.advanced.value = JSON.stringify(customPony, null, 4);
+      localStorage['custom_pony'] = JSON.stringify(customPony);
+    }
+  
+    function uiToPony(ui, customPony) {
+      customPony.name = ui.name.value;
+      customPony.sayings = [].map.call(ui.sayings.querySelectorAll('li:not(.template) input'), a => (a.value || '').trim()).filter(a => a.length > 0);
+      customPony.sprites = [].reduce.call(ui.sprites.querySelectorAll('li'), itemToSprite, {});
+      ui.advanced.value = JSON.stringify(customPony, null, 4);
+      localStorage['custom_pony'] = JSON.stringify(customPony);
+    }
+    
+    function itemToSprite(reduce, item) {
+      if (!item.children[2].value) return reduce;
+      let key = item.children[0].value + (item.children[1].value == '2' ? '_ac' : '');
+      reduce[key] = item.children[2].value;
+      return reduce;
+    }
+    
     function buildRef(pon, ...img) {
         return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
     }
