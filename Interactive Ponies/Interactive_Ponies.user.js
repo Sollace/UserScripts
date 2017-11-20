@@ -11,22 +11,20 @@
 // @grant       none
 // ==/UserScript==
 
-var docCookies={
-getItem: function(sKey){return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=\\s*([^;]*).*$)|^.*$"),"$1")) || null;},
-setItem: function(sKey,sValue,vEnd,sPath,sDomain,bSecure){if(!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey))return false;var sExpires = "";if(vEnd){switch(vEnd.constructor){case Number: sExpires=vEnd === Infinity ?"; expires=Fri, 31 Dec 9999 23:59:59 GMT":"; max-age="+vEnd;break;case String: sExpires="; expires="+vEnd;break;case Date: sExpires="; expires="+vEnd.toUTCString();break;}}document.cookie=encodeURIComponent(sKey)+"="+encodeURIComponent(sValue)+sExpires+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"")+(bSecure ?"; secure":"");return true;},
-removeItem: function(sKey,sPath,sDomain){if(!sKey || !this.hasItem(sKey))return false;document.cookie=encodeURIComponent(sKey)+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT"+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"");return true;},
-hasItem: function(sKey){return(new RegExp("(?:^|;\\s*)"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=")).test(document.cookie);}};
-//----------------------------------------------------------------------------------------------------
+const UPDATE_CHANNEL = 'Dev';
+
 function pickOne(arr, rare){
-    if(rare != null && rare != undefined && Math.random() == 0.5)return rare[Math.floor(Math.random()*rare.length)];
-    return arr[Math.floor(Math.random()*arr.length)];}
+    arr = rare && Math.random() == 0.5 ? rare : arr;
+    return arr[Math.floor(Math.random() * arr.length)];
+}
 function makeStyle(input, id) {
-    while (input.indexOf('  ') != -1) input = input.replace(/  /g, ' ');
-    document.head.insertAdjacentHTML('beforeend', '<style id="' + id + '" type="text/css">' + input + '</style>');
+    document.head.insertAdjacentHTML('beforeend', `<style id="${id}" type="text/css">${input}</style>`);
 }
 function setDocCookie(name, val) {
-    docCookies.removeItem(name, "/", "/", "fimfiction.net");
-    docCookies.setItem(name, val, Infinity, "/", "fimfiction.net");
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; domain=fimfiction.net; path=/`;
+}
+function getDocCookie(name) {
+    return decodeURIComponent(document.cookie.replace(new RegExp(`(?:(?:^|.*;)\\s*${encodeURIComponent(name).replace(/[\-\.\+\*]/g,"\\$&")}\\s*\\=\\s*([^;]*).*$)|^.*$`), '$1')) || null;
 }
 
 if (window.top != window) {
@@ -174,7 +172,12 @@ function run() {
                 if (Math.random() * 40 <= 5) this.Speak("...apples...;*bites*");
             }
         }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*", (img, pon) => {
-          return buildRef(pon, img);
+          switch (img) {
+            case 'sleep':
+            case 'stand':
+            case 'trot':
+            case 'dash': return buildRef(pon, img);
+          }
         }), {
             'mouseenter': function() {
                 if (Math.random() * 40 <= 5) this.Speak("*blushes*;Um, uh, oh my;...ow");
@@ -420,36 +423,31 @@ function run() {
         //Soarin
         //Thunderlane
         //Fleetfoot
-        (function(pony) {
-            var Mode = Math.floor((Math.random() * 100) % 4);
-            pony.__getSprite = pony.getSprite;
-            pony.getSprite = function(ip, face, base, url) {
-                var other = this.getMemory('disguise');
-                if (other && this.cache.ready) return other.getSprite(ip, face, base, url);
-                return this.__getSprite(ip, face, base, url);
-            };
-            pony.__cssImages = pony.cssImages;
-            pony.cssImages = function(elem, face) {
-                var other = this.getMemory('disguise');
-                if (other) return other.cssImages(elem, face);
-                return this.__cssImages(elem, face);
-            }
-            pony.__bakeGif = pony.bakeGif;
-            pony.bakeGif = function(url, suffex, cache) {
-                return this.__bakeGif(url, suffex == '' ? Mode : suffex, cache);
-            };
-            pony.cacheSprites = function(other) {
-                if (other == this) return null;
-                ['sleep','dash','stand','trot','fly'].forEach(a => {
-                  this.cache.cache(other.bakeSprite(a));
-                })
-                return other;
-            };
-            return pony;
-        })(attachCache(attachMemory(attachEvents(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
+        attachCache(attachMemory(attachEvents(extend(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
             let sprite = img.split(/([0-9]+)/g);
             if (sprite[0] == 'sleep') sprite[0] = 'stand';
             return buildRef(pon, sprite[1], sprite[0]);
+        }), {
+          getSprite: function(ip, face, base, url) {
+            var other = this.getMemory('disguise');
+            if (other && this.cache.ready) return other.getSprite(ip, face, base, url);
+            return this.super.getSprite(ip, face, base, url);
+          },
+          cssImages: function(elem, face) {
+            var other = this.getMemory('disguise');
+            if (other) return other.cssImages(elem, face);
+            return this.super.cssImages(elem, face);
+          },
+          bakeGif: function(url, suffex, cache) {
+            return this.super.bakeGif(url, suffex == '' ? this.getMemory('mode') : suffex, cache);
+          },
+          cacheSprites: function(other) {
+            if (other == this) return null;
+            ['sleep','dash','stand','trot','fly'].forEach(a => {
+              this.cache.cache(other.bakeSprite(a));
+            })
+            return other;
+          }
         }), {
             'mouseover': function() {
                 if (!this.ponyType().cache.ready) return;
@@ -487,9 +485,10 @@ function run() {
                 return null;
             }
         }), {
+            mode: Math.floor((Math.random() * 100) % 4),
             disguise: null,
             ticks_to_change: 900
-        }))),
+        })),
         new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..;... .. .. . . .  . .  ..... . .... .", (img, pon) => {
             switch (img) {
                 case 'stand':
@@ -661,38 +660,13 @@ function run() {
         }))
     ];
 
-    let CustomPony = {
-        "name": "Rainbow Dash",
-        "sayings": dash_sayings,
-        "sprites": {
-            "sleep": "https://static.fimfiction.net/images/interactive_pony/dash/cloud_sleep_right.gif",
-            "stand": "https://static.fimfiction.net/images/interactive_pony/dash/stand_rainbow_right.gif",
-            "trot": "https://static.fimfiction.net/images/interactive_pony/dash/trotcycle_rainbow_right.gif",
-            "dash": "https://static.fimfiction.net/images/interactive_pony/dash/dashing_right.gif",
-            "fly": "https://static.fimfiction.net/images/interactive_pony/dash/fly_rainbow_right.gif"
-        }
-    };
-    try {
-        if (localStorage['custom_pony']) {
-            CustomPony = JSON.parse(localStorage['custom_pony']);
-        }
-    } catch (e) {}
-    
-    Ponies.push((function(pony) {
-        pony.getSay = () => CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...";
-        pony.bakeGif = (url, suffex, cache) => pony.bakeSprite(stateMap[url] + suffex);
-        pony.bakeSprite = img => CustomPony.sprites[img];
-        pony.args = () => CustomPony;
-        pony.Name = CustomPony.name;
-        pony.getLevel = _ => CustomPony.level || 0;
-        return pony;
-    })(new SpecialPony('Custom', 'custom', 0, '', img => {
-        return CustomPony.sprites[img];
-    })));
+    let CustomPony = loadCustomPonyJSON();
+    Ponies.push(createCustomPony());
     
     const PoniesRegister = {};
     Ponies.forEach(a => PoniesRegister[a.Id] = a);
     var GlobalInteractivePony = null, GlobalPonyType = getPonyType();
+    
     addOptionsSelect();
     setupMorePonies();
 
@@ -709,7 +683,7 @@ function run() {
     }
 
     function getPonyType() {
-        var result = docCookies.getItem("interactive_pony_type");
+        const result = getDocCookie("interactive_pony_type");
         return PoniesRegister[result] ? result : Ponies[0].Id;
     }
 
@@ -722,18 +696,15 @@ function run() {
     }
 
     function alias(name, pony) {
-        pony.Name = name;
-        return pony;
+        return merge(pony, {Name: name});
     }
 
     function sleepless(pony) {
-        pony.Sleepless = true;
-        return pony;
+        return merge(pony, {Sleepless: true});
     }
 
     function offset(pony, func) {
-        pony.offset = func;
-        return pony;
+        return merge(pony, {offset: func});
     }
 
     function speechPause(length) {
@@ -741,59 +712,63 @@ function run() {
     }
 
     function extendOriginalSays(pony, ratio) {
-        const s = pony.getSay;
-        pony.getSay = a => Math.random() < ratio ? s.call(pony, a) : a;
-        return pony;
+        return extend(pony, {
+          getSay: function(a) {
+            return Math.random() < ratio ? this.super.getSay(a) : a;
+          }
+        });
     }
 
     function attachCache(pony) {
-        const record = {};
-        let loading = 0;
-        pony.cache = {
-            ready: true,
-            cache: img => {
-                if (record[img] === undefined) {
-                    record[img] = false;
-                    pony.cache.ready = false;
-                    loading++;
-                    document.body.insertAdjacentHTML('beforeend', `<img style="display:none;" src="${img}"></img>`)
-                    const image = document.body.lastChild;
-                    image.addEventListener('load', () => {
-                        image.parentNode.removeChild(image);
-                        record[img] = true;
-                        loading--;
-                        pony.cache.ready = loading <= 0;
-                    });
-                    image.addEventListsner('error', () => {
-                        image.parentNode.removeChild(image);
-                        loading--;
-                        pony.cache.ready = loading <= 0;
-                    });
-                }
-                return img;
+      const record = {};
+      let loading = 0;
+      return merge(pony, {
+        cache: {
+          ready: true,
+          cache: img => {
+            if (record[img] === undefined) {
+              record[img] = false;
+              pony.cache.ready = false;
+              loading++;
+              document.body.insertAdjacentHTML('beforeend', `<img style="display:none;" src="${img}"></img>`)
+              const image = document.body.lastChild;
+              image.addEventListener('load', () => {
+                image.parentNode.removeChild(image);
+                record[img] = true;
+                loading--;
+                pony.cache.ready = loading <= 0;
+              });
+              image.addEventListsner('error', () => {
+                image.parentNode.removeChild(image);
+                loading--;
+                pony.cache.ready = loading <= 0;
+              });
             }
+            return img;
+          }
         }
-        return pony;
+      });
     }
 
     function attachMemory(pony, memory) {
-        pony.getMemory = key => memory[key],
-        pony.setMemory = (key, val) => memory[key] = val;
-        return pony;
+        return merge(pony, {
+          getMemory: key => memory[key],
+          setMemory: (key, val) => memory[key] = val
+        });
     }
 
     function attachEvents(pony, eventObject) {
-        eventObject.Trigger = (interactivePony, e) => {
-            if (typeof e === 'string') e = {type: e};
-            return eventObject[e.type] ? eventObject[e.type].call(interactivePony, e) : null;
-        };
-        pony.Events = eventObject;
-        return pony;
+        return merge(pony, {
+          Events: eventObject,
+          Trigger: function(interactivePony, e) {
+              if (typeof e === 'string') e = {type: e};
+              return this.Events[e.type] ? this.Events[e.type].call(interactivePony, e) : null;
+          }
+        });
     }
 
     function Spacer(name, pony) {
-        pony.section = name;
-        return pony;
+        return merge(pony, {section: name});
     }
 
     function DummyPony(name) {
@@ -819,6 +794,32 @@ function run() {
         };
     }
     
+    function loadCustomPonyJSON() {
+      try {
+        if (localStorage['custom_pony']) {
+          return JSON.parse(localStorage['custom_pony']);
+        }
+      } catch (e) {
+        return Ponies[0].toJson();
+      }
+    }
+    
+    function createCustomPony() {
+      return merge(new SpecialPony('Custom', 'custom', 0, '', img => {
+        return CustomPony.sprites[img];
+      }), {
+        getSay: _ => CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...",
+        bakeGif: function(url, suffex, cache) {
+          return this.bakeSprite(stateMap[url] + suffex);
+        },
+        bakeSprite: img => CustomPony.sprites[img] || '',
+        args: _ => CustomPony,
+        getLevel: _ => CustomPony.level || 0,
+        Name: CustomPony.name,
+        toJson: _ => CustomPony
+      });
+    }
+    
     function SpecialPony(name, key, level, sayings, giffactory, args) {
         if (!args) {
             args = {};
@@ -830,53 +831,50 @@ function run() {
             }
         }
 
-        const parent = new Pony(name, key, sayings, giffactory, args);
         let Active = -1;
         let next_active_timer = 10;
         let Specials = {};
         let SpecialAccess = {};
         
-        return {
-            Id: name, Name: name,
+        return extend(new Pony(name, key, sayings, giffactory, args), {
             getSay: function(a) {
                 if (Active > -1 && args[Active + 1] != null) {
                     return pickOne(args[Active + 1]);
                 }
-                return parent.getSay(a);
+                return this.super.getSay(a);
             },
             getLevel: _ => level,
             getState: _ => Active,
             setState: a => Active = a < 0 ? 0 : a,
             getSprite: function(ip, face, base, url) {
-                url = parent.resolveUrl(face, url);
+                url = this.resolveUrl(face, url);
                 var result = null;
                 for (var looked = Active; looked > 0; looked--) {
                     if (!Specials[looked]) Specials[looked] = {};
-                    result = parent.bakeGif(url, looked, Specials[looked]);
+                    result = this.bakeGif(url, looked, Specials[looked]);
                     if (result) return result;
-                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
+                    result = this.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
                     if (result) return result;
                 }
-                return parent.getSprite(ip, face, base, url);
+                return this.super.getSprite(ip, face, base, url);
             },
-            bakeSprite: _ => parent.bakeSprite(img),
             getAccess: function(ip, face, base, url) {
                 next_active_timer = (next_active_timer + 1) % 11;
                 if (next_active_timer == 0) Active = Math.floor(Math.random() * (this.getLevel() + 1));
-                url = parent.resolveUrl(face, url);
-                var result = null;
-                for (var looked = Active; looked > 0; looked--) {
+                url = this.resolveUrl(face, url);
+                let result = null;
+                for (let looked = Active; looked > 0; looked--) {
                     if (!SpecialAccess[looked]) SpecialAccess[looked] = {};
-                    result = parent.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
+                    result = this.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
                     if (result) return result;
-                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
+                    result = this.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
                     if (result) return result;
                 }
-                return parent.getAccess(ip, face, base, url);
+                return this.super.getAccess(ip, face, base, url);
             },
             cssImages: function(ip, face) {
-                parent.internal__cssImages(ip, face);
-                args = parent.args();
+                this.internal__cssImages(ip, face);
+                args = this.args();
                 if (args.effect && (args.effect.level == undefined || args.effect.level == Active)) {
                     const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
                     ip.dom_element.dataset.target = args.effect.target;
@@ -888,12 +886,12 @@ function run() {
                 }
             },
             toJson: function() {
-              let json = parent.toJson();
+              let json = this.super.toJson();
               json.level = this.getLevel();
-              fillSpritesObj(fillSpritesObj(json.sprites, ''), '_ac');
               return json;
             },
             fillSpritesObj: function(obj, suffex) {
+              this.super.fillSpritesObj(obj, suffex);
               ['sleep','dash','stand','fly','trot'].forEach(a => {
                 for (let looked = 1; looked <= level; looked++) {
                   let sprite = giffactory(a + suffex + looked, key);
@@ -902,14 +900,14 @@ function run() {
               });
               return obj;
             }
-        };
+        });
     }
-
+    
     function Pony(name, key, sayings, giffactory, args) {
         if (!args) args = {};
         sayings = sayings.split(';');
-        var Images = {};
-        var Accessories = {};
+        const Images = {};
+        const Accessories = {};
         return {
             Id: name, Name: name,
             args: _ => args,
@@ -926,24 +924,15 @@ function run() {
             },
             bakeGif: function(url, suffex, cache) {
                 if (cache[url] === undefined) cache[url] = this.bakeSprite(stateMap[url] + suffex, key);
-                return cache[url];
+                return cache[url] || '';
             },
             bakeSprite: function(img) {
                 return giffactory(img, key) || null;
             },
             internal__cssImages: function(ip, face) {
                 ip.pony_element.style.transform = ip.accessory_element.style.transform = face == 'left' ? 'scaleX(-1)' : '';
-                if (face == 'left') {
-                    ip.accessory_element.style.left = '-30px';
-                    ip.accessory_element.style.right = '';
-                } else {
-                    ip.accessory_element.style.left = '';
-                    ip.accessory_element.style.right = '-30px';
-                }
-            },
-            cssImages: function(ip, face) {
-                this.internal__cssImages(ip, face);
-                args = this.args();
+                ip.accessory_element.style[face] = '-30px';
+                ip.accessory_element.style[face == 'left' ? 'right' : 'left'] = '';
                 let anim_target = ip.dom_element.dataset.target;
                 if (anim_target && anim_target != '') {
                     anim_target = (anim_target === 'self' ? ip.dom_element : ip.dom_element.querySelector(anim_target));
@@ -951,6 +940,10 @@ function run() {
                         anim_target.style[a] = '';
                     });
                 }
+            },
+            cssImages: function(ip, face) {
+                this.internal__cssImages(ip, face);
+                args = this.args();
                 if (args.effect) {
                     const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
                     ip.dom_element.dataset.target = args.effect.target;
@@ -1026,7 +1019,23 @@ function run() {
             this.element.style.transform = `rotate(${this.rotation}deg)`;
         }
     }
-
+    
+    function merge(parent, child) {
+      Object.keys(child).forEach(key => {
+        parent[key] = child[key];
+      });
+      return parent;
+    }
+    
+    function extend(parent, child) {
+      parent.super = {};
+      Object.keys(child).forEach(key => {
+        if (parent[key]) parent.super[key] = parent[key].bind(parent);
+        parent[key] = child[key];
+      });
+      return parent;
+    }
+    
     function setupMorePonies() {
         var register = [];
 
@@ -1056,7 +1065,7 @@ function run() {
             if (!this.forceSleep) {
                 var pone = this.ponyType();
                 if (pone.Events) {
-                    return pone.Events.Trigger(this, e);
+                    return pone.Trigger(this, e);
                 }
             }
             return null;
@@ -1089,9 +1098,9 @@ function run() {
                 this.sprite = a;
                 var pone = this.ponyType();
                 pone.cssImages(this, this.facing);
-                var access = pone.getAccess(this, this.facing, this.base_url, a);
+                let access = pone.getAccess(this, this.facing, this.base_url, a);
                 this.accessory_element.src = access;
-                this.accessory_element.style.display = access == '' ? 'none' : '';
+                this.accessory_element.style.opacity = access == '' ? '0' : '1';
                 this.pony_element.src = pone.getSprite(this, this.facing, this.base_url, a);
                 this.dom_element.style.margin = '';
                 if (pone.offset) pone.offset(stateMap[a]);
@@ -1180,60 +1189,67 @@ function run() {
         }
 
         makeStyle(`
-            #custom_pony_sprites select, #custom_pony_sprites input, #custom_pony_base {
-                display: inline-block;}
-            #custom_pony_sprites select {
-                width: 20%;}
-            #custom_pony_sprites input {
-                width: 57%;}
-            #custom_pony_base {
-                width: 90%;
-                width: calc(100% - 42px);}
-            .interactive_pony .speech {
-                transition: opacity 0.5s linear;
-                opacity: 0;}
-            .interactive_pony .speech_container {pointer-events: none;}
-            div.interactive_pony div.speech {font-size: 0.844em !important;}
-            .muffin {
-                z-index: 10;
-                pointer-events: none;
-                width:20px;
-                height:20px;
-                background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;
-                background-size:fit;
-                border-radius:30px;}
-            .wubadub {animation: wub 1.5s infinite alternate, acid 1.5s infinite alternate;}
-            .wubadub.bass {
-                animation: bass 1.5s infinite alternate, acid 1.5s infinite alternate;}
-            ${expand(['@-webkit-', '@'], `keyframes bass {
-                0% {transform: scale(1,1), translate(0,0);}
-                10% {transform: scale(1.00125,1.00125) translate(5%,-5%);}
-                20% {transform: scale(1.0125,1.0125) translate(-5%,5%);}
-                30% {transform: scale(1.00125,1.00125);}
-                40% {transform: scale(1.0125,1.0125);}
-                50% {transform: scale(1.00125,1.00125) translate(-5%,5%);}
-                60% {transform: scale(1,1);}
-                70% {transform: scale(0.99985,0.99985) translate(-5%,5%);}
-                80% {transform: scale(1,1) translate(-5%,5%);}
-                90% {transform: scale(1.0125,1.0125) translate(5%,5%);}
-                100% {transform: scale(1.00125,1.00125) translate(5%,-5%);}}`)}
-            ${expand(['@-webkit-', '@'], `keyframes acid {
-                0%: {filter: hue-rotate(0deg);}
-                33% {filter: hue-rotate(180deg);}
-                66% {filter: hue-rotate(270deg);}
-                100%: {filter: hue-rotate(0deg);}}`)}
-            ${expand(['@-webkit-', '@'], `keyframes wub {
-                0% {transform: scale(1,1);}
-                10% {transform: scale(1.00125,1.00125);}
-                20% {transform: scale(1.0125,1.0125);}
-                30% {transform: scale(1.00125,1.00125);}
-                40% {transform: scale(1.0125,1.0125);}
-                50% {transform: scale(1.00125,1.00125);}
-                60% {transform: scale(1,1);}
-                70% {transform: scale(0.99985,0.99985);}
-                80% {transform: scale(1,1);}
-                90% {transform: scale(1.0125,1.0125);}
-                100% {transform: scale(1.00125,1.00125);}}`)}`);
+#custom_pony_base {
+    display: inline-block;}
+#custom_pony_sprites li {
+    display: flex;}
+#custom_pony_sprites select {
+    max-width: 20%;
+    min-width: 80px;}
+#custom_pony_sprites input[type=number] {
+    max-width: 10%;
+    min-width: 50px;}
+#custom_pony_sprites input[type=text] {
+    width: initial;
+    flex-grow: 3;}
+#custom_pony_base {
+    width: 90%;
+    width: calc(100% - 42px);}
+.interactive_pony .speech {
+    transition: opacity 0.5s linear;
+    opacity: 0;}
+.interactive_pony .speech_container {pointer-events: none;}
+div.interactive_pony div.speech {font-size: 0.844em !important;}
+.muffin {
+    z-index: 10;
+    pointer-events: none;
+    width:20px;
+    height:20px;
+    background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;
+    background-size:fit;
+    border-radius:30px;}
+.wubadub {animation: wub 1.5s infinite alternate, acid 1.5s infinite alternate;}
+.wubadub.bass {
+    animation: bass 1.5s infinite alternate, acid 1.5s infinite alternate;}
+${expand(['@-webkit-', '@'], `keyframes bass {
+    0% {transform: scale(1,1), translate(0,0);}
+    10% {transform: scale(1.00125,1.00125) translate(5%,-5%);}
+    20% {transform: scale(1.0125,1.0125) translate(-5%,5%);}
+    30% {transform: scale(1.00125,1.00125);}
+    40% {transform: scale(1.0125,1.0125);}
+    50% {transform: scale(1.00125,1.00125) translate(-5%,5%);}
+    60% {transform: scale(1,1);}
+    70% {transform: scale(0.99985,0.99985) translate(-5%,5%);}
+    80% {transform: scale(1,1) translate(-5%,5%);}
+    90% {transform: scale(1.0125,1.0125) translate(5%,5%);}
+    100% {transform: scale(1.00125,1.00125) translate(5%,-5%);}}`)}
+${expand(['@-webkit-', '@'], `keyframes acid {
+    0%: {filter: hue-rotate(0deg);}
+    33% {filter: hue-rotate(180deg);}
+    66% {filter: hue-rotate(270deg);}
+    100%: {filter: hue-rotate(0deg);}}`)}
+${expand(['@-webkit-', '@'], `keyframes wub {
+    0% {transform: scale(1,1);}
+    10% {transform: scale(1.00125,1.00125);}
+    20% {transform: scale(1.0125,1.0125);}
+    30% {transform: scale(1.00125,1.00125);}
+    40% {transform: scale(1.0125,1.0125);}
+    50% {transform: scale(1.00125,1.00125);}
+    60% {transform: scale(1,1);}
+    70% {transform: scale(0.99985,0.99985);}
+    80% {transform: scale(1,1);}
+    90% {transform: scale(1.0125,1.0125);}
+    100% {transform: scale(1.00125,1.00125);}}`)}`);
 
         function expand(arr, block) {
             arr.push('');
@@ -1370,7 +1386,7 @@ function run() {
         function ponyChanged(event) {
           if (!event.target.closest('input, select')) return;
           
-          if (event.target.closest('ul.auto-list') && event.target.closest('input')) {
+          if (event.target.closest('ul.auto-list') && event.target.closest('input[type="text"]')) {
             const template = event.target.closest('.template');
             if (template && (event.target.value || '').length > 0) {
               template.insertAdjacentHTML('afterend', template.outerHTML);
@@ -1386,26 +1402,30 @@ function run() {
         }
     }
     
-    function spriteUiElement(state, type, url) {
+    function spriteUiElement(state, type, y, url) {
       return `<li ${state == '' ? 'class="template"' : ''}>
                 <select name="state">
                   ${['','sleep','stand','trot','fly','dash'].map(a => `
                   <option ${a == state ? 'selected="true"' : ''} value="${a}">${a}</option>`)}
                 </select>
+                <input type="number" min="0" name="level" placeholder="0" value="${y}"></input>
                 <select name="type">
                   ${['','sprite', 'accessory'].map((a, i) => `
                   <option ${a == type ? 'selected="true"' : ''} value="${i}">${a}</option>`)}
                 </select>
                 <input type="text" name="url" placeholder="url" value="${url}"></input>
-             </li>`
+             </li>`;
     }
     
     function ponyToUI(ui, customPony, full) {
       ui.name.value = customPony.name;
       ui.sayings.innerHTML = `${customPony.sayings.map(a => `<li><input type="text" placeholder="..." value="${a}"></input></li>`).join('')}
                               <li class="template"><input type="text" placeholder="..."></input></li>`;
-      ui.sprites.innerHTML = `${Object.keys(customPony.sprites).map(a => spriteUiElement(a.split('_')[0], a.split('_').length > 1 ? 'accessory' : 'sprite', customPony.sprites[a])).join('')}
-                              ${spriteUiElement('', '', '')}`;
+      ui.sprites.innerHTML = `${Object.keys(customPony.sprites).map(a => {
+        let y = a.match(/[0-9]+/) || '';
+        return spriteUiElement(a.split(/[0-9]|_/)[0], a.split('_').length > 1 ? 'accessory' : 'sprite', y, customPony.sprites[a]);
+      }).join('')}
+                              ${spriteUiElement('', '', '', '')}`;
       if (full) ui.advanced.value = JSON.stringify(customPony, null, 4);
       localStorage['custom_pony'] = JSON.stringify(customPony);
     }
@@ -1419,14 +1439,14 @@ function run() {
     }
     
     function itemToSprite(reduce, item) {
-      if (!item.children[2].value) return reduce;
-      let key = item.children[0].value + (item.children[1].value == '2' ? '_ac' : '');
-      reduce[key] = item.children[2].value;
+      if (!item.children[3].value) return reduce;
+      let key = item.children[0].value + (item.children[2].value == '2' ? '_ac' : '') + item.children[1].value;
+      reduce[key] = item.children[3].value;
       return reduce;
     }
     
     function buildRef(pon, ...img) {
-        return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
+        return `//raw.githubusercontent.com/Sollace/UserScripts/${UPDATE_CHANNEL}/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
     }
 
     function playSong(ytid, loaded) {
