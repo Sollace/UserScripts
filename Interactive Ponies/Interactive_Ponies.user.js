@@ -4,9 +4,8 @@
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
-// @include     http://justsitback.deviantart*
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @include     /^http?[s]://justsitback.deviantart.*/
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @version     3.0.1
 // @grant       none
 // ==/UserScript==
@@ -44,8 +43,9 @@ function run() {
         'fly_rainbow_right.gif': 'fly','fly_rainbow_left.gif': 'fly',
         'trotcycle_rainbow_right.gif': 'trot','trotcycle_rainbow_left.gif': 'trot'
     };
-    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", (img, pon) => {
+    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more;I've got a stamp for that!;[long high-pitched squeal, rapidly];Ghastly Gorge may have rocks, but our gem cave rocks!", (img, pon) => {
         switch (img) {
+            case 'sleep3': return buildRef(pon, 'sit');
             case 'sleep4': 
             case 'sleep': return buildRef(pon, 'sleep');
             case 'dash4': return buildRef(pon, 'bounce_n_n');
@@ -91,7 +91,7 @@ function run() {
             switch (img) {
                 case 'sleep': return buildRef('twi', 'read');
                 case 'trot':
-                case 'dash': return buildRef(pon, 'trot');
+                case 'dash':
                 case 'fly':
                 case 'stand': return buildRef(pon, img);
                 case 'trot2': return buildRef(pon, 'trot_w');
@@ -102,15 +102,18 @@ function run() {
                 case 'trot4': return buildRef(pon, 'trot_d_w');
             }
         }),
-        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", (img, pon) => {
+        new SpecialPony('Applejack', 'aj', 2, "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", (img, pon) => {
             switch (img) {
+                case 'dash2': return buildRef(pon, 'dash_tired');
                 case 'sleep':
                 case 'dash':
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
+                case 'stand2': return buildRef(pon, 'banjo');
+                case 'stand3': return buildRef(pon, 'pose');
             }
         }),
-        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty?;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;You ruffians!;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", (img, pon) => {
+        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty?;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;You ruffians!;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*;Oh, you're an absolute darling!", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'trot':
@@ -197,6 +200,16 @@ function run() {
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
                 case 'dash': return buildRef(pon, 'trot');
+            }
+        }),
+        new SpecialPony('Sunburst', 'sub', 2, "So... the Princess of Friendship wants Star and I to be friends again?;No rest for the wizardly;Solving a thousands-year-old mystery could take forever! Think of the research!;S-Starlight!", (img, pon) => {
+            switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'stand2': return buildRef(pon, 'stand_robe');
+                case 'dash':
+                case 'trot': return buildRef(pon, 'trot');
+                case 'trot2': return buildRef(pon, 'trot_robe');
             }
         }),
         attachMemory(attachEvents(new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", (img, pon) => {
@@ -411,18 +424,16 @@ function run() {
                 case 'trot8': return buildRef(pon, 'trot_fez');
             }
         }),
-        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", (img, pon) => {
-            switch (img) {
-                case 'sleep':
-                case 'stand': return buildRef(pon, 'stand');
-                case 'dash':
-                case 'trot':
-                case 'fly': return buildRef(pon, img);
-            }
+        new SpecialPony('Bulk Biceps', 'blk', 2, "YEEEAAAHHH!;I'm all muscles! YEAH!;'P' is for 'Rainbow Dash'!;Let's do this, little dragon!;Aaah!! I'm late for my other job!!;I wear many hats;You! Are you ready to buff up?!;Fimfit.net looks totally different right now;Just 500 more reps, then time for squats!;Never skip leg day!;YEAH!;YYYEEEAAHH!!", (img, pon) => {
+          switch (img) {
+              case 'stand2': return buildRef(pon, 'yeah');
+              case 'sleep': return buildRef(pon, 'lift');
+              case 'stand':
+              case 'dash':
+              case 'trot':
+              case 'fly': return buildRef(pon, img);
+          }
         }),
-        //Soarin
-        //Thunderlane
-        //Fleetfoot
         attachCache(attachMemory(attachEvents(extend(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
             let sprite = img.split(/([0-9]+)/g);
             if (sprite[0] == 'sleep') sprite[0] = 'stand';
@@ -495,6 +506,26 @@ function run() {
                 case 'sleep': return buildRef(pon, 'float');
                 case 'trot':
                 case 'dash': return buildRef(pon, 'fly');
+            }
+        }),
+        Spacer('Wonderbolts', new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", (img, pon) => {
+            switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'dash':
+                case 'trot':
+                case 'fly': return buildRef(pon, img);
+            }
+        })),
+        //Soarin
+        //Thunderlane
+        new Pony('Fleetfoot', 'wbff', "Ha, looks like we won a little TOO hard!;Oh dear! I'm so sorry!;Call me Flatfoot. Actually, no, don't;Uh, seriously though, I hope that doesn't leave a mark...", (img, pon) => {
+          switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'dash':
+                case 'trot':
+                case 'fly': return buildRef(pon, img);
             }
         }),
         Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", (img, pon) => {
