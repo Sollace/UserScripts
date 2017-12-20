@@ -4,29 +4,26 @@
 // @author      Sollace
 // @namespace   fimfiction-sollace
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
-// @include     http://justsitback.deviantart*
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @include     /^http?[s]://justsitback.deviantart.*/
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @version     3.0.1
 // @grant       none
 // ==/UserScript==
 
-var docCookies={
-getItem: function(sKey){return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=\\s*([^;]*).*$)|^.*$"),"$1")) || null;},
-setItem: function(sKey,sValue,vEnd,sPath,sDomain,bSecure){if(!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey))return false;var sExpires = "";if(vEnd){switch(vEnd.constructor){case Number: sExpires=vEnd === Infinity ?"; expires=Fri, 31 Dec 9999 23:59:59 GMT":"; max-age="+vEnd;break;case String: sExpires="; expires="+vEnd;break;case Date: sExpires="; expires="+vEnd.toUTCString();break;}}document.cookie=encodeURIComponent(sKey)+"="+encodeURIComponent(sValue)+sExpires+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"")+(bSecure ?"; secure":"");return true;},
-removeItem: function(sKey,sPath,sDomain){if(!sKey || !this.hasItem(sKey))return false;document.cookie=encodeURIComponent(sKey)+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT"+(sDomain ?"; domain="+sDomain:"")+(sPath ?"; path="+sPath:"");return true;},
-hasItem: function(sKey){return(new RegExp("(?:^|;\\s*)"+encodeURIComponent(sKey).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=")).test(document.cookie);}};
-//----------------------------------------------------------------------------------------------------
+const UPDATE_CHANNEL = 'Dev';
+
 function pickOne(arr, rare){
-    if(rare != null && rare != undefined && Math.random() == 0.5)return rare[Math.floor(Math.random()*rare.length)];
-    return arr[Math.floor(Math.random()*arr.length)];}
+    arr = rare && Math.random() == 0.5 ? rare : arr;
+    return arr[Math.floor(Math.random() * arr.length)];
+}
 function makeStyle(input, id) {
-    while (input.indexOf('  ') != -1) input = input.replace(/  /g, ' ');
-    document.head.insertAdjacentHTML('beforeend', '<style id="' + id + '" type="text/css">' + input + '</style>');
+    document.head.insertAdjacentHTML('beforeend', `<style id="${id}" type="text/css">${input}</style>`);
 }
 function setDocCookie(name, val) {
-    docCookies.removeItem(name, "/", "/", "fimfiction.net");
-    docCookies.setItem(name, val, Infinity, "/", "fimfiction.net");
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; domain=fimfiction.net; path=/`;
+}
+function getDocCookie(name) {
+    return decodeURIComponent(document.cookie.replace(new RegExp(`(?:(?:^|.*;)\\s*${encodeURIComponent(name).replace(/[\-\.\+\*]/g,"\\$&")}\\s*\\=\\s*([^;]*).*$)|^.*$`), '$1')) || null;
 }
 
 if (window.top != window) {
@@ -46,8 +43,9 @@ function run() {
         'fly_rainbow_right.gif': 'fly','fly_rainbow_left.gif': 'fly',
         'trotcycle_rainbow_right.gif': 'trot','trotcycle_rainbow_left.gif': 'trot'
     };
-    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more", (img, pon) => {
+    const pinkiePie = new SpecialPony('Pinkie Pie', 'pp', 4,"Are you loco in the coco?;Boring;Forevaah!;*ghasp*;*giggle*;Hey, that's what I said!;Hey, that's what she said!;Hi, I'm Pinkie Pie!;...and that, is how Equestria was made;I never felt joy like this before;Oatmeal, are you crazy?;Is there any good storie about me here?;I heard there was cupcakes here but I don't see any;How do you read cupcakes anyway?;Oki doki loki;Pinkie Pie style;This may look like it's fun but it's not;You really need to get out more;I've got a stamp for that!;[long high-pitched squeal, rapidly];Ghastly Gorge may have rocks, but our gem cave rocks!", (img, pon) => {
         switch (img) {
+            case 'sleep3': return buildRef(pon, 'sit');
             case 'sleep4': 
             case 'sleep': return buildRef(pon, 'sleep');
             case 'dash4': return buildRef(pon, 'bounce_n_n');
@@ -93,7 +91,7 @@ function run() {
             switch (img) {
                 case 'sleep': return buildRef('twi', 'read');
                 case 'trot':
-                case 'dash': return buildRef(pon, 'trot');
+                case 'dash':
                 case 'fly':
                 case 'stand': return buildRef(pon, img);
                 case 'trot2': return buildRef(pon, 'trot_w');
@@ -104,15 +102,18 @@ function run() {
                 case 'trot4': return buildRef(pon, 'trot_d_w');
             }
         }),
-        new Pony('Applejack', 'aj', "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", (img, pon) => {
+        new SpecialPony('Applejack', 'aj', 2, "All yours partner;Be ready for a ride;Can you ever forgive me?;Can't hear you, I'm asleep;Cock-a-doodle-doo;Don't you use your fancy mathematics to muddle the issue;Helping the ponyfolks;Hmmmm, nah;Hoho there lover boy.;I'm Applejack;That's what all the fuss is about?;We don't normally wear clothes;What in tarnation!?;What in the hay is that supposed to mean?;You're welcome;Yeehaw!!;Ama buck, ama buck, ama buck some apples all day;Ah got mah hat in an apple eatin' competition;Ah can't tell a lie... so no", (img, pon) => {
             switch (img) {
-                case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2012/215/a/1/applejack_sleeping_by_starsteppony-d59ovro.gif';
-                case 'dash': return /*dash*/'//fc01.deviantart.net/fs71/f/2013/111/d/a/applejack___galloping_by_rj_p-d62js4h.gif';
+                case 'dash2': return buildRef(pon, 'dash_tired');
+                case 'sleep':
+                case 'dash':
                 case 'trot':
                 case 'stand': return buildRef(pon, img);
+                case 'stand2': return buildRef(pon, 'banjo');
+                case 'stand3': return buildRef(pon, 'pose');
             }
         }),
-        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty?;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;You ruffians!;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*", (img, pon) => {
+        new SpecialPony('Rarity', 'rar', 1, "Darling, would you bend over please?;Afraid to get dirty?;But I thought you wanted whining!;Crime against fabulosity;Doesn't even make sense;You ruffians!;Gently please;How can you be so insensitive?;I'm so pathetic;It. Is. On.;Ooooooooooooooooooooooooooo;Pruney Hooves!!;Take that, you ruffian;You look smashing;This, is whining;EMERALDS?! What was I thinking? Let me get you some rubies!;Look upon me Equestria, for I am Rarity!;Why do I have to pull it?;Isn't friendship magic?!;Mules are ugly. Are you saying that I too am ugly? *cries*;Oh, you're an absolute darling!", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'trot':
@@ -121,21 +122,21 @@ function run() {
                 case 'fly2': return buildRef(pon, 'fly');
             }
         }),
-        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*", img => {
+        new Pony('Rari-hic', 'fpr', "I love mud!!!;I luv bein' covered in mud!!!!! *splat*;Come on, ram thing!!;Why, hello, yaal!;I do declare-;Grumble grumble;I don't know what youra gettin' aht.;I have a hootinani of a festival ta put ta gether.;Moar is moar is like I say.;Gewd fer you.;I coudn't care less how I look, long as I get there chores done.;Yes in deedi doodle.;Mah mane is fulla dust an split ends.;Mah hoofs is cracked an dry from dem fields.;I wear droopy drawers!;*donkey sounds*", (img, pon) => {
             switch(img) {
-                case 'stand': return /*stand*/'//fc04.deviantart.net/fs71/f/2014/100/3/3/farmpony_rarity_idle_by_botchan_mlp-d7dx8mn.gif';
-                case 'sleep': return /*sleep*/'//fc01.deviantart.net/fs71/f/2014/106/5/7/farmpony_rarity_scratching_her_head_by_botchan_mlp-d7ep6yl.gif';
+                case 'stand': return buildRef(pon, img);
+                case 'sleep': return buildRef(pon, 'scratch');
                 case 'trot':
-                case 'dash': return /*trot*/'//fc06.deviantart.net/fs71/f/2014/099/5/8/farmpony_rarity_trotting_by_botchan_mlp-d7dskt9.gif';
+                case 'dash': return buildRef(pon, 'trot');
             }
         }),
         isOnDay(31, 10) ?
-        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!", img => {
+        attachEvents(alias('Pinkamena', sleepless(new SpecialPony('Pinkie Pie', 'pm', 1, "I'm so happy to meet you! Rainbow Dash has been oh, so lonely. Hehe;Can we be friendss?;I only make cupcakes with my...    Very.   Besst   friendss...;Hehehe...;Happy Nightmare Night.;*sneer*;I don't need my friends... *twitch*;My friends don't like my parties and they don't wanna be my friends anymore...;Oui! Zhat is correct, madame.;I know how it goes, all right!;I'm just glad none ah them ponies showed up!", (img, pon) => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/'//fc07.deviantart.net/fs71/f/2011/120/e/b/pinkamina_for_desktop_ponies_by_supersaiyanmikito-d3fagbu.gif';
+                case 'stand': return buildRef(pon, 'stand');
                 case 'dash':
-                case 'trot': return /*trot*/'//fc04.deviantart.net/fs70/f/2012/176/8/b/pinkamina_trotting_sprite_by_supersaiyanmikito-d54vpvw.gif';
+                case 'trot': return buildRef(pon, 'trot');
             }
         }))), {
             'mouseenter': function () {
@@ -161,20 +162,25 @@ function run() {
                 }
             }
         }) : pinkiePie,
-        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~", img => {
+        isOnDay(31, 10) ? attachEvents(alias('Flutterbat', sleepless(new Pony('Fluttershy', 'flutb', "Hiss~", (img, pon) => {
             switch (img) {
-                case 'sleep': return /*hang*/'http://orig11.deviantart.net/d520/f/2014/170/3/4/flutterbat_hanging_by_botchan_mlp-d7n1da6.gif';
+                case 'sleep': return buildRef(pon, 'hang');
                 case 'dash':
-                case 'trot': return /*trot*/'//fc09.deviantart.net/fs71/f/2014/170/2/f/flutterbat_trotting_by_botchan_mlp-d7n10eg.gif';
-                case 'stand': return /*stand*/'//fc01.deviantart.net/fs70/f/2014/170/3/1/flutterbat_idle_by_botchan_mlp-d7n1d8m.gif';
-                case 'fly': return /*fly*/'//fc04.deviantart.net/fs70/f/2014/170/d/8/flutterbat_flying_by_botchan_mlp-d7n10fa.gif';
+                case 'trot':
+                case 'stand':
+                case 'fly': return buildRef(pon, img);
             }
         }))), {
             'mouseenter': function() {
                 if (Math.random() * 40 <= 5) this.Speak("...apples...;*bites*");
             }
         }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*", (img, pon) => {
-          return buildRef(pon, img);
+          switch (img) {
+            case 'sleep':
+            case 'stand':
+            case 'trot':
+            case 'dash': return buildRef(pon, img);
+          }
         }), {
             'mouseenter': function() {
                 if (Math.random() * 40 <= 5) this.Speak("*blushes*;Um, uh, oh my;...ow");
@@ -188,12 +194,22 @@ function run() {
                 case 'dash': return buildRef(pon, img);
             }
         })),
-        new Pony('Starlight Glimmer', 'sg', "That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", img => {
+        new Pony('Starlight Glimmer', 'sg', "That seems a bit extreme;QUIET! :starlightrage:;New friends!?;Maybe I'll just force friendships by magically enslaving the entire population of Ponyville! ... That was a joke;Ugh, I am never gonna find my way around this place!;How many other ponies can boast being Twilight's apprentice?;Stop stressing... Stop stressing!;Goddammit Trixie;All adventures are equal to all other adventures;Please enjoy our little corner of Equestria. We're all quite fond of it;In sameness, there is peace;Exceptionalism is a lie;Difference is frustration;Choose equality as your special talent", (img, pon) => {
             switch (img) {
-                case 'sleep': return 'http://orig12.deviantart.net/9894/f/2016/129/0/5/starlight_glimmer_munching_popcorn_by_botchan_mlp-da1yivf.gif';
-                case 'stand': return 'http://orig00.deviantart.net/09be/f/2016/087/4/2/starlight_glimmer_idle_by_botchan_mlp-d9wrkr4.gif';
+                case 'sleep': return buildRef(pon, 'munch');
                 case 'trot':
-                case 'dash': return 'http://orig11.deviantart.net/b121/f/2016/087/5/d/starlight_glimmer_trotting_by_botchan_mlp-d9wrkqw.gif';
+                case 'stand': return buildRef(pon, img);
+                case 'dash': return buildRef(pon, 'trot');
+            }
+        }),
+        new SpecialPony('Sunburst', 'sub', 2, "So... the Princess of Friendship wants Star and I to be friends again?;No rest for the wizardly;Solving a thousands-year-old mystery could take forever! Think of the research!;S-Starlight!", (img, pon) => {
+            switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'stand2': return buildRef(pon, 'stand_robe');
+                case 'dash':
+                case 'trot': return buildRef(pon, 'trot');
+                case 'trot2': return buildRef(pon, 'trot_robe');
             }
         }),
         attachMemory(attachEvents(new SpecialPony('Vinyl Scratch', 'vs', 1, "Catch the beat!;Let's party!;*UNTS UNTS UNTS UNTS*;Feel the beat!;Wait till you see my bass cannon!", (img, pon) => {
@@ -254,45 +270,45 @@ function run() {
                 
             }
         }), {special: 0, wubbing: 0}),
-        new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs", img => {
+        new Pony('Octavia', 'oc', "...;......;........;I am Octavia;Hmph;Practice, practice, practice;*yawn* Oh, my. I'm so terribly sorry. Vinyl has kept me up all night long with her incessant wubs", (img, pon) => {
             switch (img) {
-                case 'sleep': return '//fc09.deviantart.net/fs71/f/2013/111/c/c/octavia___cello_by_rj_p-d62jtu9.gif';
                 case 'dash':
-                case 'trot': return '//fc07.deviantart.net/fs71/f/2013/111/1/a/octavia___trotting_by_rj_p-d62jtcw.gif';
-                case 'stand': return '//fc03.deviantart.net/fs71/f/2013/111/0/7/octavia___standing_by_rj_p-d62jsvr.gif';
+                case 'trot': return buildRef(pon, 'trot');
+                case 'sleep':
+                case 'stand': return buildRef(pon, img);
             }
         }),
-        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition;Twilight IS the best snuggler!;Easy as pie;How about we start with your complete and total surrender?;All this power, wasted on parties;I saw the truth;I saw that!;Tempest is not my real name. It's actually..." + speechPause(10) + "Fizzlepop..." + speechPause(10) + "Berrytwist;It's so cold out... I should ask if Twilight wants to snuggle with me!;Let's start with your complete and total surrender, and THEN we can snuggle;*Blushes* Twilight? Can I, um... maybe snuggle with you tonight? I had a nightmare...;I love Twilight, but how can I show her? Hm... snuggles? Snuggles.;What can I do to gain Twilight's affection?;Twilight IS the best pony even though others call me their waifu... whatever that is;Can I have some belly rubs?;I will snuggle for belly rubs;Belly rubs?;Am I... really in love with Twilight?;What is this..." + speechPause(30) + "waifu everypony keeps talking about?", img => {
+        new Pony('Tempest (Fizzlepop) Shadow', 'fizz', "Here's the deal, ladies. I need your magic;Silly little ponies;I think 'bad luck' is superstition;Twilight IS the best snuggler!;Easy as pie;How about we start with your complete and total surrender?;All this power, wasted on parties;I saw the truth;I saw that!;Tempest is not my real name. It's actually..." + speechPause(10) + "Fizzlepop..." + speechPause(10) + "Berrytwist;It's so cold out... I should ask if Twilight wants to snuggle with me!;Let's start with your complete and total surrender, and THEN we can snuggle;*Blushes* Twilight? Can I, um... maybe snuggle with you tonight? I had a nightmare...;I love Twilight, but how can I show her? Hm... snuggles? Snuggles.;What can I do to gain Twilight's affection?;Twilight IS the best pony even though others call me their waifu... whatever that is;Can I have some belly rubs?;I will snuggle for belly rubs;Belly rubs?;Am I... really in love with Twilight?;What is this..." + speechPause(30) + "waifu everypony keeps talking about?", (img, pon) => {
           switch (img) {
             case 'sleep':
-            case 'stand': return '//orig00.deviantart.net/8097/f/2017/309/e/4/tempest_shadow_idle_by_botchan_mlp-dbswknj.gif';
+            case 'stand': return buildRef(pon, 'stand');
             case 'dash':
-            case 'trot': return '//orig00.deviantart.net/ecef/f/2017/309/1/2/tempest_shadow_trotting_by_botchan_mlp-dbswkrq.gif';
+            case 'trot': return buildRef(pon, 'trot');
           }
         }),
-        sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", img => {
+        sleepless(new Pony('Zephyr Breeze', 'zb', "Stupid sticks...;Name's Zephyr Breeze. It's an honour to meet me;Ponies see me. They hating;You know you love me;My big sis is so gullab- Adorable;What a chump;Guess who's home!;Ponies say I must shave. But I don't listen;You don't have to come up with some excuse to hang out with me", (img, pon) => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/ '//orig07.deviantart.net/29ff/f/2016/174/d/b/zephyr_breeze_idle_by_botchan_mlp-da7cajg.gif';
+                case 'stand': return buildRef(pon, 'stand');
                 case 'dash':
-                case 'trot': return /*trot*/ '//orig04.deviantart.net/a010/f/2016/174/c/6/zephyr_breeze_trotting_by_botchan_mlp-da7calp.gif';
-                case 'fly': return /*fly*/ '//orig15.deviantart.net/22ee/f/2016/174/a/a/zephyr_breeze_flying_by_botchan_mlp-da7f3fw.gif';
+                case 'trot': return buildRef(pon, 'trot');
+                case 'fly': return buildRef(pon, img);
             }
         })),
-        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?;Oh my;Absolutely delectable", img => {
+        sleepless(new Pony('Saffron Masala', 'sm', "I'm Saffron Masala, the chef at The Tasty Treat, the most exotic cuisine in Canterlot;Would you like to hear about the specials?;Oh my;Absolutely delectable", (img, pon) => {
             switch (img) {
                 case 'sleep':
-                case 'stand': return /*stand*/'//orig00.deviantart.net/e908/f/2016/166/f/8/saffron_masala_idle_by_botchan_mlp-da6dlwo.gif';
+                case 'stand': return buildRef(pon, 'stand');
                 case 'trot':
-                case 'dash': return /*trot*/'//orig11.deviantart.net/179e/f/2016/166/6/d/saffron_masala_trotting_by_botchan_mlp-da6dlyr.gif';
+                case 'dash': return buildRef(pon, 'trot');
             }
         })),
-        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', img => {
+        sleepless(new Pony('Coriander Cumin', 'cuc', 'Ishktabible;[unenthusiastic] Welcome to The Tasty Treat. You can eat here if you want. Or not. Who cares? ', (img, pon) => {
             switch (img) {
-                case 'stand': return /*stand*/ '//orig02.deviantart.net/17f2/f/2016/173/3/d/coriander_cumin_idle_by_botchan_mlp-da7ak7v.gif';
-                case 'trot':
                 case 'sleep':
-                case 'dash': return /*trot*/ '//orig01.deviantart.net/22f0/f/2016/173/3/e/coriander_cumin_trotting_by_botchan_mlp-da7ak8k.gif';
+                case 'stand': return buildRef(pon, 'stand');
+                case 'trot':
+                case 'dash': return buildRef(pon, 'trot');
             }
         })),
         attachEvents(new SpecialPony('Lyra Heartstrings', 'lh', 2, "Where's Bon-Bon?;Bon-Bon~;Ponies say I'm strange, but that's just because they don't understand;I just know humans exist;This would be so much easier if only I had hands;Ugh, this hair is so itchy...;*humming* My Little Human, My Little Human...", (img, pon) => {
@@ -307,9 +323,7 @@ function run() {
         }, {
             effect: {
                 target: 'self',
-                css: {
-                    cursor: 'pointer'
-                }
+                css: { cursor: 'pointer' }
             }
         }), {
             'mouseover': function() {
@@ -410,48 +424,41 @@ function run() {
                 case 'trot8': return buildRef(pon, 'trot_fez');
             }
         }),
-        new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", (img, pon) => {
-            switch (img) {
-                case 'sleep':
-                case 'stand': return buildRef(pon, 'stand');
-                case 'dash':
-                case 'trot':
-                case 'fly': return buildRef(pon, img);
-            }
+        new SpecialPony('Bulk Biceps', 'blk', 2, "YEEEAAAHHH!;I'm all muscles! YEAH!;'P' is for 'Rainbow Dash'!;Let's do this, little dragon!;Aaah!! I'm late for my other job!!;I wear many hats;You! Are you ready to buff up?!;Fimfit.net looks totally different right now;Just 500 more reps, then time for squats!;Never skip leg day!;YEAH!;YYYEEEAAHH!!", (img, pon) => {
+          switch (img) {
+              case 'stand2': return buildRef(pon, 'yeah');
+              case 'sleep': return buildRef(pon, 'lift');
+              case 'stand':
+              case 'dash':
+              case 'trot':
+              case 'fly': return buildRef(pon, img);
+          }
         }),
-        //Soarin
-        //Thunderlane
-        //Fleetfoot
-        (function(pony) {
-            var Mode = Math.floor((Math.random() * 100) % 4);
-            pony.__getSprite = pony.getSprite;
-            pony.getSprite = function(ip, face, base, url) {
-                var other = this.getMemory('disguise');
-                if (other && this.cache.ready) return other.getSprite(ip, face, base, url);
-                return this.__getSprite(ip, face, base, url);
-            };
-            pony.__cssImages = pony.cssImages;
-            pony.cssImages = function(elem, face) {
-                var other = this.getMemory('disguise');
-                if (other) return other.cssImages(elem, face);
-                return this.__cssImages(elem, face);
-            }
-            pony.__bakeGif = pony.bakeGif;
-            pony.bakeGif = function(url, suffex, cache) {
-                return this.__bakeGif(url, suffex == '' ? Mode : suffex, cache);
-            };
-            pony.cacheSprites = function(other) {
-                if (other == this) return null;
-                ['sleep','dash','stand','trot','fly'].forEach(a => {
-                  this.cache.cache(other.bakeSprite(a));
-                })
-                return other;
-            };
-            return pony;
-        })(attachCache(attachMemory(attachEvents(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
+        attachCache(attachMemory(attachEvents(extend(new Pony('Changeling', 'chng', "Hisssss...!;...Hhhhungry...;[laughing];Hi! I'm <insert generic pony name here>!", (img, pon) => {
             let sprite = img.split(/([0-9]+)/g);
             if (sprite[0] == 'sleep') sprite[0] = 'stand';
             return buildRef(pon, sprite[1], sprite[0]);
+        }), {
+          getSprite: function(ip, face, base, url) {
+            var other = this.getMemory('disguise');
+            if (other && this.cache.ready) return other.getSprite(ip, face, base, url);
+            return this.super.getSprite(ip, face, base, url);
+          },
+          cssImages: function(elem, face) {
+            var other = this.getMemory('disguise');
+            if (other) return other.cssImages(elem, face);
+            return this.super.cssImages(elem, face);
+          },
+          bakeGif: function(url, suffex, cache) {
+            return this.super.bakeGif(url, suffex == '' ? this.getMemory('mode') : suffex, cache);
+          },
+          cacheSprites: function(other) {
+            if (other == this) return null;
+            ['sleep','dash','stand','trot','fly'].forEach(a => {
+              this.cache.cache(other.bakeSprite(a));
+            })
+            return other;
+          }
         }), {
             'mouseover': function() {
                 if (!this.ponyType().cache.ready) return;
@@ -483,16 +490,17 @@ function run() {
                             var says = "Do you like /{n}/?;Hi, I'm... /{n}/!;You do like /{n}/, don't you?".split(';');
                             return pickOne(says).replace('{n}', other.Name);
                         }
-                        return '~' + other.getSay(a) + '~';
+                        return `~${other.getSay(a)}~`;
                     }
                 }
                 return null;
             }
         }), {
+            mode: Math.floor((Math.random() * 100) % 4),
             disguise: null,
             ticks_to_change: 900
-        }))),
-        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..;... .. .. . . .  . .  ..... . .... .", img => {
+        })),
+        new Pony('Sea Breeze', 'sb', ".. ...;.. .. .. ..;.... .. .;... . ... .  .... . . . ...;.... . .... . ... .. .;.;...;.... ..... ..;... .. .. . . .  . .  ..... . .... .", (img, pon) => {
             switch (img) {
                 case 'stand':
                 case 'sleep': return buildRef(pon, 'float');
@@ -500,7 +508,27 @@ function run() {
                 case 'dash': return buildRef(pon, 'fly');
             }
         }),
-        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", img => {
+        Spacer('Wonderbolts', new Pony('Spitfire', 'wbsf', "Lets go, Wonderbolts!;Wanna come hang out with us?;Hey, I know you!;Looks like your skill saved us again;Rainbow Dash has heart and determination. I have no doubt she'll get in some day;*SWAG*;Please, no autographs;Dash thinks she's fast, we'll have to see about that;I'll give it to ya straight kid...;Why yes, I am a WonderBolt;I'm Spitfire™;Only the best-of-the-best make it out alive;I like ya kid;Lose? Pfft, this me you're talkin' to;Leave it to the professionals", (img, pon) => {
+            switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'dash':
+                case 'trot':
+                case 'fly': return buildRef(pon, img);
+            }
+        })),
+        //Soarin
+        //Thunderlane
+        new Pony('Fleetfoot', 'wbff', "Ha, looks like we won a little TOO hard!;Oh dear! I'm so sorry!;Call me Flatfoot. Actually, no, don't;Uh, seriously though, I hope that doesn't leave a mark...", (img, pon) => {
+          switch (img) {
+                case 'sleep':
+                case 'stand': return buildRef(pon, 'stand');
+                case 'dash':
+                case 'trot':
+                case 'fly': return buildRef(pon, img);
+            }
+        }),
+        Spacer('Fillies', new SpecialPony('Filly Rarity', 'frar', 4, "A ROCK!?;I. Don't Even...;I'm adorable and you can't stop me;Gently please;How can you be so insensitive?;Ooooooooooooooooooooooooooo;Pruney Hooves!!;This, is whining", (img, pon) => {
             switch (img) {
                 case 'trot':
                 case 'sleep':
@@ -568,7 +596,7 @@ function run() {
                         this.Speak("What?;Watch it! That thing's sharp!;Ow!;Quit it!;BAD TOUCH! BAD TOUCH!");
                     }
                 },
-                'say': (function(angrySays) {
+                'say': (angrySays => {
                     return function() {
                         if (this.ponyType().getMemory('special')) {
                             return pickOne(angrySays);
@@ -589,7 +617,7 @@ function run() {
                 case 'dash1': return buildRef(pon, 'trot_smug');
             }
         }),
-        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate;Have you seen my peggy bank?", img => {
+        attachEvents(attachMemory(sleepless(new SpecialPony('Pipqueak', 'pip', 2, "Onward to adventure!;Cheerio;Me first!;I want to learn how to become a Cutie Mark Crusader!;When I grow up I wanne be jus' like ma cap'n;*sneezes*" + speechPause(10) + "Sorry...;*whispers* When 'm 'lone I like to preten' t' be a pirate;Have you seen my peggy bank?", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'stand');
@@ -651,7 +679,7 @@ function run() {
         })), function(el, state) {
             if (state == 'stand' || state == 'sleep') el.css('margin-top', '-20px');
         }),
-        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P", img => {
+        Spacer('Other', new SpecialPony('Fluffle Puff', 'flf', 2, "Pfftt.;Pffft pfftt;Pfffffffffffffffffftttttt;:P", (img, pon) => {
             switch (img) {
                 case 'sleep':
                 case 'stand': return buildRef(pon, 'phbbt');
@@ -663,39 +691,13 @@ function run() {
         }))
     ];
 
-    let CustomPony = {
-        "name": "Rainbow Dash",
-        "sayings": dash_sayings,
-        "sprites": {
-            "sleep": "https://static.fimfiction.net/images/interactive_pony/dash/cloud_sleep_right.gif",
-            "stand": "https://static.fimfiction.net/images/interactive_pony/dash/stand_rainbow_right.gif",
-            "trot": "https://static.fimfiction.net/images/interactive_pony/dash/trotcycle_rainbow_right.gif",
-            "dash": "https://static.fimfiction.net/images/interactive_pony/dash/dashing_right.gif",
-            "fly": "https://static.fimfiction.net/images/interactive_pony/dash/fly_rainbow_right.gif"
-        }
-    };
-    try {
-        if (localStorage['custom_pony']) {
-            CustomPony = JSON.parse(localStorage['custom_pony']);
-        }
-    } catch (e) {}
-    
-    Ponies.push((function(pony) {
-        pony.getSay = () => CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...";
-        pony.bakeGif = (url, suffex, cache) => pony.bakeSprite(stateMap[url] + suffex);
-        pony.bakeSprite = img => CustomPony.sprites[img];
-        pony.args = () => CustomPony;
-        pony.Name = CustomPony.name;
-        return pony;
-    })(new Pony('Custom', 'custom', '', function(img) {
-        return CustomPony.sprites[img];
-    })));
+    let CustomPony = loadCustomPonyJSON();
+    Ponies.push(createCustomPony());
     
     const PoniesRegister = {};
-    Ponies.forEach(a => {
-        PoniesRegister[a.Id] = a;
-    });
+    Ponies.forEach(a => PoniesRegister[a.Id] = a);
     var GlobalInteractivePony = null, GlobalPonyType = getPonyType();
+    
     addOptionsSelect();
     setupMorePonies();
 
@@ -712,7 +714,7 @@ function run() {
     }
 
     function getPonyType() {
-        var result = docCookies.getItem("interactive_pony_type");
+        const result = getDocCookie("interactive_pony_type");
         return PoniesRegister[result] ? result : Ponies[0].Id;
     }
 
@@ -725,18 +727,15 @@ function run() {
     }
 
     function alias(name, pony) {
-        pony.Name = name;
-        return pony;
+        return merge(pony, {Name: name});
     }
 
     function sleepless(pony) {
-        pony.Sleepless = true;
-        return pony;
+        return merge(pony, {Sleepless: true});
     }
 
     function offset(pony, func) {
-        pony.offset = func;
-        return pony;
+        return merge(pony, {offset: func});
     }
 
     function speechPause(length) {
@@ -744,59 +743,63 @@ function run() {
     }
 
     function extendOriginalSays(pony, ratio) {
-        const s = pony.getSay;
-        pony.getSay = a => Math.random() < ratio ? s.call(pony, a) : a;
-        return pony;
+        return extend(pony, {
+          getSay: function(a) {
+            return Math.random() < ratio ? this.super.getSay(a) : a;
+          }
+        });
     }
 
     function attachCache(pony) {
-        const record = {};
-        let loading = 0;
-        pony.cache = {
-            ready: true,
-            cache: img => {
-                if (record[img] === undefined) {
-                    record[img] = false;
-                    pony.cache.ready = false;
-                    loading++;
-                    document.body.insertAdjacentHTML('beforeend', `<img style="display:none;" src="${img}"></img>`)
-                    const image = document.body.lastChild;
-                    image.addEventListener('load', () => {
-                        image.parentNode.removeChild(image);
-                        record[img] = true;
-                        loading--;
-                        pony.cache.ready = loading <= 0;
-                    });
-                    image.addEventListsner('error', () => {
-                        image.parentNode.removeChild(image);
-                        loading--;
-                        pony.cache.ready = loading <= 0;
-                    });
-                }
-                return img;
+      const record = {};
+      let loading = 0;
+      return merge(pony, {
+        cache: {
+          ready: true,
+          cache: img => {
+            if (record[img] === undefined) {
+              record[img] = false;
+              pony.cache.ready = false;
+              loading++;
+              document.body.insertAdjacentHTML('beforeend', `<img style="display:none;" src="${img}"></img>`)
+              const image = document.body.lastChild;
+              image.addEventListener('load', () => {
+                image.parentNode.removeChild(image);
+                record[img] = true;
+                loading--;
+                pony.cache.ready = loading <= 0;
+              });
+              image.addEventListsner('error', () => {
+                image.parentNode.removeChild(image);
+                loading--;
+                pony.cache.ready = loading <= 0;
+              });
             }
+            return img;
+          }
         }
-        return pony;
+      });
     }
 
     function attachMemory(pony, memory) {
-        pony.getMemory = key => memory[key],
-        pony.setMemory = (key, val) => memory[key] = val;
-        return pony;
+        return merge(pony, {
+          getMemory: key => memory[key],
+          setMemory: (key, val) => memory[key] = val
+        });
     }
 
     function attachEvents(pony, eventObject) {
-        eventObject.Trigger = (interactivePony, e) => {
-            if (typeof e === 'string') e = {type: e};
-            return eventObject[e.type] ? eventObject[e.type].call(interactivePony, e) : null;
-        };
-        pony.Events = eventObject;
-        return pony;
+        return merge(pony, {
+          Events: eventObject,
+          Trigger: function(interactivePony, e) {
+              if (typeof e === 'string') e = {type: e};
+              return this.Events[e.type] ? this.Events[e.type].call(interactivePony, e) : null;
+          }
+        });
     }
 
     function Spacer(name, pony) {
-        pony.section = name;
-        return pony;
+        return merge(pony, {section: name});
     }
 
     function DummyPony(name) {
@@ -805,10 +808,49 @@ function run() {
             getSay: a => a,
             getSprite: (ip, face, base, url) => base + url,
             getAccess: _ => '',
-            cssImages: (ip, face) => ip.pony_element.style.transform = ''
+            cssImages: (ip, face) => ip.pony_element.style.transform = '',
+            toJson: function() {
+              return {
+                name: name,
+                sayings: dash_sayings,
+                sprites: {
+                  "sleep": "https://static.fimfiction.net/images/interactive_pony/dash/cloud_sleep_right.gif",
+                  "stand": "https://static.fimfiction.net/images/interactive_pony/dash/stand_rainbow_right.gif",
+                  "trot": "https://static.fimfiction.net/images/interactive_pony/dash/trotcycle_rainbow_right.gif",
+                  "dash": "https://static.fimfiction.net/images/interactive_pony/dash/dashing_right.gif",
+                  "fly": "https://static.fimfiction.net/images/interactive_pony/dash/fly_rainbow_right.gif"
+                }
+              }
+            }
         };
     }
-
+    
+    function loadCustomPonyJSON() {
+      try {
+        if (localStorage['custom_pony']) {
+          return JSON.parse(localStorage['custom_pony']);
+        }
+      } catch (e) {
+        return Ponies[0].toJson();
+      }
+    }
+    
+    function createCustomPony() {
+      return merge(new SpecialPony('Custom', 'custom', 0, '', img => {
+        return CustomPony.sprites[img];
+      }), {
+        getSay: _ => CustomPony.sayings[Math.floor(Math.random() * (CustomPony.sayings.length - 1))] || "...",
+        bakeGif: function(url, suffex, cache) {
+          return this.bakeSprite(stateMap[url] + suffex);
+        },
+        bakeSprite: img => CustomPony.sprites[img] || '',
+        args: _ => CustomPony,
+        getLevel: _ => CustomPony.level || 0,
+        Name: CustomPony.name,
+        toJson: _ => CustomPony
+      });
+    }
+    
     function SpecialPony(name, key, level, sayings, giffactory, args) {
         if (!args) {
             args = {};
@@ -820,52 +862,50 @@ function run() {
             }
         }
 
-        const parent = new Pony(name, key, sayings, giffactory, args);
         let Active = -1;
         let next_active_timer = 10;
         let Specials = {};
         let SpecialAccess = {};
-
-        return {
-            Id: name, Name: name,
+        
+        return extend(new Pony(name, key, sayings, giffactory, args), {
             getSay: function(a) {
                 if (Active > -1 && args[Active + 1] != null) {
                     return pickOne(args[Active + 1]);
                 }
-                return parent.getSay(a);
+                return this.super.getSay(a);
             },
+            getLevel: _ => level,
             getState: _ => Active,
             setState: a => Active = a < 0 ? 0 : a,
             getSprite: function(ip, face, base, url) {
-                url = parent.resolveUrl(face, url);
+                url = this.resolveUrl(face, url);
                 var result = null;
                 for (var looked = Active; looked > 0; looked--) {
                     if (!Specials[looked]) Specials[looked] = {};
-                    result = parent.bakeGif(url, looked, Specials[looked]);
+                    result = this.bakeGif(url, looked, Specials[looked]);
                     if (result) return result;
-                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
+                    result = this.bakeGif(url.replace('fly', 'trotcycle'), looked, Specials[looked]);
                     if (result) return result;
                 }
-                return parent.getSprite(ip, face, base, url);
+                return this.super.getSprite(ip, face, base, url);
             },
-            bakeSprite: _ => parent.bakeSprite(img),
             getAccess: function(ip, face, base, url) {
                 next_active_timer = (next_active_timer + 1) % 11;
-                if (next_active_timer == 0) Active = Math.floor(Math.random() * (level + 1));
-                url = parent.resolveUrl(face, url);
-                var result = null;
-                for (var looked = Active; looked > 0; looked--) {
+                if (next_active_timer == 0) Active = Math.floor(Math.random() * (this.getLevel() + 1));
+                url = this.resolveUrl(face, url);
+                let result = null;
+                for (let looked = Active; looked > 0; looked--) {
                     if (!SpecialAccess[looked]) SpecialAccess[looked] = {};
-                    result = parent.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
+                    result = this.bakeGif(url, '_ac' + looked, SpecialAccess[looked]);
                     if (result) return result;
-                    result = parent.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
+                    result = this.bakeGif(url.replace('fly', 'trotcycle'), '_ac' + looked, SpecialAccess[looked]);
                     if (result) return result;
                 }
-                return parent.getAccess(ip, face, base, url);
+                return this.super.getAccess(ip, face, base, url);
             },
             cssImages: function(ip, face) {
-                parent.internal__cssImages(ip, face);
-                args = parent.args();
+                this.internal__cssImages(ip, face);
+                args = this.args();
                 if (args.effect && (args.effect.level == undefined || args.effect.level == Active)) {
                     const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
                     ip.dom_element.dataset.target = args.effect.target;
@@ -875,15 +915,30 @@ function run() {
                     });
                     ip.dom_element.dataset.label = keys.join(';');
                 }
+            },
+            toJson: function() {
+              let json = this.super.toJson();
+              json.level = this.getLevel();
+              return json;
+            },
+            fillSpritesObj: function(obj, suffex) {
+              this.super.fillSpritesObj(obj, suffex);
+              ['sleep','dash','stand','fly','trot'].forEach(a => {
+                for (let looked = 1; looked <= level; looked++) {
+                  let sprite = giffactory(a + suffex + looked, key);
+                  if (sprite) obj[a + suffex + looked] = sprite;
+                }
+              });
+              return obj;
             }
-        };
+        });
     }
-
+    
     function Pony(name, key, sayings, giffactory, args) {
         if (!args) args = {};
         sayings = sayings.split(';');
-        var Images = {};
-        var Accessories = {};
+        const Images = {};
+        const Accessories = {};
         return {
             Id: name, Name: name,
             args: _ => args,
@@ -900,40 +955,49 @@ function run() {
             },
             bakeGif: function(url, suffex, cache) {
                 if (cache[url] === undefined) cache[url] = this.bakeSprite(stateMap[url] + suffex, key);
-                return cache[url];
+                return cache[url] || '';
             },
             bakeSprite: function(img) {
                 return giffactory(img, key) || null;
             },
             internal__cssImages: function(ip, face) {
                 ip.pony_element.style.transform = ip.accessory_element.style.transform = face == 'left' ? 'scaleX(-1)' : '';
-                if (face == 'left') {
-                    ip.accessory_element.style.left = '-30px';
-                    ip.accessory_element.style.right = '';
-                } else {
-                    ip.accessory_element.style.left = '';
-                    ip.accessory_element.style.right = '-30px';
+                ip.accessory_element.style[face] = '-30px';
+                ip.accessory_element.style[face == 'left' ? 'right' : 'left'] = '';
+                let anim_target = ip.dom_element.dataset.target;
+                if (anim_target && anim_target != '') {
+                    anim_target = (anim_target === 'self' ? ip.dom_element : ip.dom_element.querySelector(anim_target));
+                    if (ip.dom_element.dataset.label) ip.dom_element.dataset.label.split(';').forEach(a => {
+                        anim_target.style[a] = '';
+                    });
                 }
             },
             cssImages: function(ip, face) {
                 this.internal__cssImages(ip, face);
                 args = this.args();
-                var anim_target = ip.dom_element.dataset.target;
-                if (anim_target && anim_target != '') {
-                    anim_target = (anim_target === 'self' ? ip.dom_element : ip.dom_element.querySelector(anim_target));
-                    ip.dom_element.dataset.label.split(';').forEach(a => {
-                        anim_target.style[a] = '';
-                    });
-                }
                 if (args.effect) {
                     const anim_target = (args.effect.target === 'self' ? ip.dom_element : ip.dom_element.querySelector(args.effect.target));
                     ip.dom_element.dataset.target = args.effect.target;
                     const keys = Object.keys(args.effect.css);
                     keys.forEach(a => {
-                        anim_target.style[a] = args.effects.css[a];
+                        anim_target.style[a] = args.effect.css[a];
                     });
                     ip.dom_element.dataset.label = keys.join(';');
                 }
+            },
+            toJson: function() {
+              const json = this.args();
+              json.name = name;
+              json.sayings = sayings;
+              json.sprites = this.fillSpritesObj(this.fillSpritesObj({}, ''), '_ac');
+              return json;
+            },
+            fillSpritesObj: function(obj, suffex) {
+              ['sleep','dash','stand','fly','trot'].forEach(a => {
+                let sprite = giffactory(a + suffex, key);
+                if (sprite) obj[a + suffex] = sprite;
+              });
+              return obj;
             }
         };
     }
@@ -983,10 +1047,26 @@ function run() {
         Render: function() {
             this.element.style.left = (this.x - (this.particleWidth/2)) + 'px';
             this.element.style.top = (this.y - (this.particleHeight/2)) + 'px';
-            this.element.style.transform = 'rotate(' + this.rotation + 'deg)';
+            this.element.style.transform = `rotate(${this.rotation}deg)`;
         }
     }
-
+    
+    function merge(parent, child) {
+      Object.keys(child).forEach(key => {
+        parent[key] = child[key];
+      });
+      return parent;
+    }
+    
+    function extend(parent, child) {
+      parent.super = {};
+      Object.keys(child).forEach(key => {
+        if (parent[key]) parent.super[key] = parent[key].bind(parent);
+        parent[key] = child[key];
+      });
+      return parent;
+    }
+    
     function setupMorePonies() {
         var register = [];
 
@@ -1016,7 +1096,7 @@ function run() {
             if (!this.forceSleep) {
                 var pone = this.ponyType();
                 if (pone.Events) {
-                    return pone.Events.Trigger(this, e);
+                    return pone.Trigger(this, e);
                 }
             }
             return null;
@@ -1049,9 +1129,9 @@ function run() {
                 this.sprite = a;
                 var pone = this.ponyType();
                 pone.cssImages(this, this.facing);
-                var access = pone.getAccess(this, this.facing, this.base_url, a);
+                let access = pone.getAccess(this, this.facing, this.base_url, a);
                 this.accessory_element.src = access;
-                this.accessory_element.style.display = access == '' ? 'none' : '';
+                this.accessory_element.style.opacity = access == '' ? '0' : '1';
                 this.pony_element.src = pone.getSprite(this, this.facing, this.base_url, a);
                 this.dom_element.style.margin = '';
                 if (pone.offset) pone.offset(stateMap[a]);
@@ -1140,51 +1220,67 @@ function run() {
         }
 
         makeStyle(`
-            .interactive_pony .speech {
-                transition: opacity 0.5s linear;
-                opacity: 0;}
-            .interactive_pony .speech_container {pointer-events: none;}
-            div.interactive_pony div.speech {font-size: 0.844em !important;}
-            .muffin {
-                z-index: 10;
-                pointer-events: none;
-                width:20px;
-                height:20px;
-                background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;
-                background-size:fit;
-                border-radius:30px;}
-            .wubadub {animation: wub 1.5s infinite alternate, acid 1.5s infinite alternate;}
-            .wubadub.bass {
-                animation: bass 1.5s infinite alternate, acid 1.5s infinite alternate;}
-            ${expand(['@-webkit-', '@'], `keyframes bass {
-                0% {transform: scale(1,1), translate(0,0);}
-                10% {transform: scale(1.00125,1.00125) translate(5%,-5%);}
-                20% {transform: scale(1.0125,1.0125) translate(-5%,5%);}
-                30% {transform: scale(1.00125,1.00125);}
-                40% {transform: scale(1.0125,1.0125);}
-                50% {transform: scale(1.00125,1.00125) translate(-5%,5%);}
-                60% {transform: scale(1,1);}
-                70% {transform: scale(0.99985,0.99985) translate(-5%,5%);}
-                80% {transform: scale(1,1) translate(-5%,5%);}
-                90% {transform: scale(1.0125,1.0125) translate(5%,5%);}
-                100% {transform: scale(1.00125,1.00125) translate(5%,-5%);}}`)}
-            ${expand(['@-webkit-', '@'], `keyframes acid {
-                0%: {filter: hue-rotate(0deg);}
-                33% {filter: hue-rotate(180deg);}
-                66% {filter: hue-rotate(270deg);}
-                100%: {filter: hue-rotate(0deg);}}`)}
-            ${expand(['@-webkit-', '@'], `keyframes wub {
-                0% {transform: scale(1,1);}
-                10% {transform: scale(1.00125,1.00125);}
-                20% {transform: scale(1.0125,1.0125);}
-                30% {transform: scale(1.00125,1.00125);}
-                40% {transform: scale(1.0125,1.0125);}
-                50% {transform: scale(1.00125,1.00125);}
-                60% {transform: scale(1,1);}
-                70% {transform: scale(0.99985,0.99985);}
-                80% {transform: scale(1,1);}
-                90% {transform: scale(1.0125,1.0125);}
-                100% {transform: scale(1.00125,1.00125);}}`)}`);
+#custom_pony_base {
+    display: inline-block;}
+#custom_pony_sprites li {
+    display: flex;}
+#custom_pony_sprites select {
+    max-width: 20%;
+    min-width: 80px;}
+#custom_pony_sprites input[type=number] {
+    max-width: 10%;
+    min-width: 50px;}
+#custom_pony_sprites input[type=text] {
+    width: initial;
+    flex-grow: 3;}
+#custom_pony_base {
+    width: 90%;
+    width: calc(100% - 42px);}
+.interactive_pony .speech {
+    transition: opacity 0.5s linear;
+    opacity: 0;}
+.interactive_pony .speech_container {pointer-events: none;}
+div.interactive_pony div.speech {font-size: 0.844em !important;}
+.muffin {
+    z-index: 10;
+    pointer-events: none;
+    width:20px;
+    height:20px;
+    background:url("//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/muffin.png") center no-repeat;
+    background-size:fit;
+    border-radius:30px;}
+.wubadub {animation: wub 1.5s infinite alternate, acid 1.5s infinite alternate;}
+.wubadub.bass {
+    animation: bass 1.5s infinite alternate, acid 1.5s infinite alternate;}
+${expand(['@-webkit-', '@'], `keyframes bass {
+    0% {transform: scale(1,1), translate(0,0);}
+    10% {transform: scale(1.00125,1.00125) translate(5%,-5%);}
+    20% {transform: scale(1.0125,1.0125) translate(-5%,5%);}
+    30% {transform: scale(1.00125,1.00125);}
+    40% {transform: scale(1.0125,1.0125);}
+    50% {transform: scale(1.00125,1.00125) translate(-5%,5%);}
+    60% {transform: scale(1,1);}
+    70% {transform: scale(0.99985,0.99985) translate(-5%,5%);}
+    80% {transform: scale(1,1) translate(-5%,5%);}
+    90% {transform: scale(1.0125,1.0125) translate(5%,5%);}
+    100% {transform: scale(1.00125,1.00125) translate(5%,-5%);}}`)}
+${expand(['@-webkit-', '@'], `keyframes acid {
+    0%: {filter: hue-rotate(0deg);}
+    33% {filter: hue-rotate(180deg);}
+    66% {filter: hue-rotate(270deg);}
+    100%: {filter: hue-rotate(0deg);}}`)}
+${expand(['@-webkit-', '@'], `keyframes wub {
+    0% {transform: scale(1,1);}
+    10% {transform: scale(1.00125,1.00125);}
+    20% {transform: scale(1.0125,1.0125);}
+    30% {transform: scale(1.00125,1.00125);}
+    40% {transform: scale(1.0125,1.0125);}
+    50% {transform: scale(1.00125,1.00125);}
+    60% {transform: scale(1,1);}
+    70% {transform: scale(0.99985,0.99985);}
+    80% {transform: scale(1,1);}
+    90% {transform: scale(1.0125,1.0125);}
+    100% {transform: scale(1.00125,1.00125);}}`)}`);
 
         function expand(arr, block) {
             arr.push('');
@@ -1224,36 +1320,164 @@ function run() {
         </tr>
         <tr id="custom_pony_field" style="${GlobalPonyType != 'Custom' ? 'display:none' : ''}">
             <td class="label">Custom interactive Pony</td>
-            <td><div id="pony_customDiv"><textarea style="resize:vertical;min-height:500px;">${JSON.stringify(CustomPony, null, 4)}</textarea></div></td>
+            <td>
+              <table style="width:100%">
+                <tr>
+                  <td class="label">Reset</td>
+                  <td>
+                    <select id="custom_pony_base">${Ponies.map(optItem).join('')}</select>
+                    <a id="custom_pony_reset" class="styled_button styled_button_blue button-icon-only"><i class="fa fa-undo"></i></a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Name</td>
+                  <td>
+                    <input type="text" id="custom_pony_name" placeholder="Rainbow Dash"></input>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Sayings</td>
+                  <td>
+                    <ul id="custom_pony_sayings" class="auto-list"></ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Sprites</td>
+                  <td>
+                    <ul id="custom_pony_sprites" class="auto-list"></ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Advanced</td>
+                  <td id="pony_customDiv">
+                    <textarea style="resize:vertical;min-height:500px;"></textarea>
+                  </td>
+                </tr>
+              </table>
+            </td>
         </tr>`);
 
         const InteractivePonyType = document.querySelector('#ponyTypeDiv select');
         InteractivePonyType.value = GlobalPonyType;
-
-        const field = document.querySelector('#custom_pony_field');
+        
+        const customPonyUI = {
+          root: document.querySelector('#custom_pony_field'),
+          base: document.querySelector('#custom_pony_base'),
+          name: document.querySelector('#custom_pony_name'),
+          sayings: document.querySelector('#custom_pony_sayings'),
+          sprites: document.querySelector('#custom_pony_sprites'),
+          advanced: document.querySelector('#pony_customDiv textarea')
+        };
+        
+        document.querySelector('#custom_pony_reset').addEventListener('click', event => {
+          resetCustomPony();
+          ponyToUI(customPonyUI, CustomPony, true);
+          paintCustomPonyNames();
+        });
+        
         InteractivePonyType.addEventListener('change', e => {
             setPonyType(InteractivePonyType.value);
-            field.style.display = InteractivePonyType.value == 'Custom' ? '' : 'none';
+            customPonyUI.root.style.display = InteractivePonyType.value == 'Custom' ? '' : 'none';
         });
         const customOption = document.querySelector('option#custom_option');
         customOption.innerText = `Custom (${CustomPony.name})`;
-
-        const ponyCustom = document.querySelector('#pony_customDiv textarea');
-        ponyCustom.addEventListener('change', ponyChanged);
-        ponyCustom.addEventListener('keyup', ponyChanged);
-
-        function ponyChanged() {
-            try {
-                CustomPony = JSON.parse(localStorage['custom_pony'] = this.value);
-                PoniesRegister.Custom.Name = CustomPony.name;
-                customOption.innerText = `Custom (${CustomPony.name})`;
-            } catch (e) {}
-            if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
+        
+        customPonyUI.root.addEventListener('change', ponyChanged);
+        customPonyUI.advanced.addEventListener('change', ponyQuickChanged);
+        customPonyUI.advanced.addEventListener('keyup', ponyQuickChanged);
+        ponyToUI(customPonyUI, CustomPony, true);
+        
+        function resetCustomPony() {
+          let pony = PoniesRegister[customPonyUI.base.value];
+          if (pony == PoniesRegister.Custom) pony = PoniesRegister["Rainbow Dash"];
+          CustomPony = pony.toJson();
+        }
+      
+        function paintCustomPonyNames() {
+          PoniesRegister.Custom.Name = CustomPony.name;
+          customOption.innerText = `Custom (${CustomPony.name})`;
+          if (GlobalInteractivePony) GlobalInteractivePony.ponySwitched();
+        }
+        
+        function ponyQuickChanged(event) {
+          if (!event.target.closest('#pony_customDiv')) return;
+          
+          let reload = false;
+          try {
+            CustomPony = JSON.parse(event.target.value);
+          } catch (e) {
+            resetCustomPony();
+            reload = event.target.value.trim().length == 0;
+          }
+          
+          ponyToUI(customPonyUI, CustomPony, reload);
+          paintCustomPonyNames();
+        }
+        
+        function ponyChanged(event) {
+          if (!event.target.closest('input, select')) return;
+          
+          if (event.target.closest('ul.auto-list') && event.target.closest('input[type="text"]')) {
+            const template = event.target.closest('.template');
+            if (template && (event.target.value || '').length > 0) {
+              template.insertAdjacentHTML('afterend', template.outerHTML);
+              template.classList.remove('template');
+            } else if ((event.target.value || '').length == 0) {
+              let item = event.target.closest('li');
+              item.parentNode.removeChild(item);
+            }
+          }
+          
+          uiToPony(customPonyUI, CustomPony);
+          paintCustomPonyNames();
         }
     }
-
+    
+    function spriteUiElement(state, type, y, url) {
+      return `<li ${state == '' ? 'class="template"' : ''}>
+                <select name="state">
+                  ${['','sleep','stand','trot','fly','dash'].map(a => `
+                  <option ${a == state ? 'selected="true"' : ''} value="${a}">${a}</option>`)}
+                </select>
+                <input type="number" min="0" name="level" placeholder="0" value="${y}"></input>
+                <select name="type">
+                  ${['','sprite', 'accessory'].map((a, i) => `
+                  <option ${a == type ? 'selected="true"' : ''} value="${i}">${a}</option>`)}
+                </select>
+                <input type="text" name="url" placeholder="url" value="${url}"></input>
+             </li>`;
+    }
+    
+    function ponyToUI(ui, customPony, full) {
+      ui.name.value = customPony.name;
+      ui.sayings.innerHTML = `${customPony.sayings.map(a => `<li><input type="text" placeholder="..." value="${a}"></input></li>`).join('')}
+                              <li class="template"><input type="text" placeholder="..."></input></li>`;
+      ui.sprites.innerHTML = `${Object.keys(customPony.sprites).map(a => {
+        let y = a.match(/[0-9]+/) || '';
+        return spriteUiElement(a.split(/[0-9]|_/)[0], a.split('_').length > 1 ? 'accessory' : 'sprite', y, customPony.sprites[a]);
+      }).join('')}
+                              ${spriteUiElement('', '', '', '')}`;
+      if (full) ui.advanced.value = JSON.stringify(customPony, null, 4);
+      localStorage['custom_pony'] = JSON.stringify(customPony);
+    }
+  
+    function uiToPony(ui, customPony) {
+      customPony.name = ui.name.value;
+      customPony.sayings = [].map.call(ui.sayings.querySelectorAll('li:not(.template) input'), a => (a.value || '').trim()).filter(a => a.length > 0);
+      customPony.sprites = [].reduce.call(ui.sprites.querySelectorAll('li'), itemToSprite, {});
+      ui.advanced.value = JSON.stringify(customPony, null, 4);
+      localStorage['custom_pony'] = JSON.stringify(customPony);
+    }
+    
+    function itemToSprite(reduce, item) {
+      if (!item.children[3].value) return reduce;
+      let key = item.children[0].value + (item.children[2].value == '2' ? '_ac' : '') + item.children[1].value;
+      reduce[key] = item.children[3].value;
+      return reduce;
+    }
+    
     function buildRef(pon, ...img) {
-        return `//raw.githubusercontent.com/Sollace/UserScripts/master/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
+        return `//raw.githubusercontent.com/Sollace/UserScripts/${UPDATE_CHANNEL}/Interactive Ponies/Sprites/${pon}/${img.join('/')}.gif`;
     }
 
     function playSong(ytid, loaded) {

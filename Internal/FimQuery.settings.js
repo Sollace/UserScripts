@@ -5,7 +5,7 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
-// @version     1.1.1
+// @version     1.1.2
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
@@ -300,7 +300,7 @@ div.colour_pick {
           if (buildFunc) try {buildFunc = buildFunc(tab);}catch(e){alert(e.stack);}
           const s = document.querySelector('.tab.tab_selected');
           if (s) s.classList.remove('tab_selected');
-          e.target.addClass('tab_selected');
+          e.target.classList.add('tab_selected');
         });
       }
       return tab;
