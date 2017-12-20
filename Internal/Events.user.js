@@ -1,10 +1,9 @@
 // ==UserScript==
-// @name        Fimfiction Events API
+// @name        Fimfiction Events API (ref FimfictionAdvanced, Nosey Hound)
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4.1
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @version     4.1.3
+// @include     /^http?[s]://www.fimfiction.net/.*/
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -32,7 +31,7 @@ RunScript.build = (functionText, params) => {
 (_ => {
 	function initialise() {
 		const win = this['unsafeWindow'] || window;
-		const VERSION = 4.1;
+		const VERSION = 4.13;
 		
 		if (window !== win && (!window.FimFicEvents || window.FimFicEvents.version() < VERSION)) {
 			window.FimFicEvents = {
@@ -88,7 +87,7 @@ RunScript.build = (functionText, params) => {
 					eventName: url.split('/').length == 5 ? 'editcomment' : 'pagechange'
 				})
 			}, {
-				test: /^\/ajax\/([^\/]+)\/(0-9+)\/comments/, func: match => some({
+				test: /\/ajax\/([^\/]+)\/([0-9]+)\/comments/, func: match => some({
 					eventName: 'addcomment', type: match[1], id: match[2]
 				})
 			}, {
@@ -170,7 +169,9 @@ RunScript.build = (functionText, params) => {
 			return window.FimFicEvents.PROXY(this, window.AjaxRequest.super, arguments, false);
 		});
 		
-		if (!window.AjaxRequest) return window.addEventListener('DOMContentLoaded', inject);
+		if (!window.AjaxRequest) return window.addEventListener('DOMContentLoaded', () => {
+      if (window.AjaxRequest) inject();
+    });
 		inject();
 	}
 })();
