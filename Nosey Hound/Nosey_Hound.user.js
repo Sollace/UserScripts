@@ -4,9 +4,9 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.8
-// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/Events.user.js
-// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
+// @version     2.2.9
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
 // @grant       GM_deleteValue
 // ==/UserScript==
@@ -178,20 +178,20 @@ a:hover + .open-pin:after, .open-pin:hover:after {border-color: #609734 transpar
 const settingsMan = {
   __gm: (key, parse) => {
     let val = GM_getValue(key);
-    if (val == undefined) return null;
+    if (val === undefined) return null;
     localStorage[key] = val;
     GM_deleteValue(key);
-    return parse(key);
+    return parse(val);
   },
   get: (key, parse) => settingsMan.has(key) ? parse(localStorage[key]) : settingsMan.__gm(key, parse),
   has: key => {
     key = String(localStorage[key]);
     return key != 'undefined' && key != 'null';
   },
-  remove: key => localStorage.removeItem(key),
+  delete: key => localStorage.removeItem(key),
   set: (key, val, def) => {
     if (def === undefined) def = '';
-    if (val === def) return settingsMan.remove(key);
+    if (val === def) return settingsMan.delete(key);
     localStorage[key] = val;}
 };
 const followerMapping = (_ => {
@@ -281,7 +281,7 @@ const infoCards = (_ => {
   const events = stealHovercardEvents();
 
   function stealHovercardEvents() {
-    const hovercardBinder = App.binders.find(a => a.toSource().indexOf("a[href*='/user/']") > -1);
+    const hovercardBinder = App.binders.find(a => a.toString().indexOf("a[href*='/user/']") > -1);
     const stolen = {};
     hovercardBinder({
       querySelectorAll: () => [
@@ -435,7 +435,7 @@ function run() {
       ], pop);
     },
     initTabs: function(tabs, pop) {
-      pop.insertAdjacentHTML('afterbegin', `<div class="tabs">${tabs.map((a, id) => 
+      pop.insertAdjacentHTML('afterbegin', `<div class="tabs">${tabs.map((a, id) =>
                                                 `<div data-tab="${id}" class="button${a.selected ? ' selected' : ''}${a.hide ? ' hidden' : ''}">${a.title}</div>`).join('')}
                                             </div>`);
     },
@@ -729,7 +729,7 @@ ${totalSection('Name Changes', localeN, named, 4)}
     if (userPageHeader) {
       const h3 = document.querySelector('.bio_followers .watching-header');
       if (h3) {
-        if (h3.innerText.indexOf(`${name} follows`) == 0) {
+        if (h3.innerText.indexOf(`${name} follows`) === 0) {
           h3.insertAdjacentHTML('afterbegin', `<h3 style="border-bottom:none"><b>${document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText}</b> members follow ${name}</h3>`);
         }
         h3.insertAdjacentHTML('beforeend', ' - <a class="sniffer">Sniff</a>');
@@ -775,7 +775,7 @@ ${totalSection('Name Changes', localeN, named, 4)}
   }
 
   function setFollowers(id, val) {
-    const result = settingsMan.get(`followers_${id}`, a => a != null);
+    const result = settingsMan.get(`followers_${id}`, a => a !== null);
     settingsMan.set(`followers_${id}`, JSON.stringify(val));
     return result;
   }
@@ -897,7 +897,7 @@ function round(n, decimals) {
 
 function named(numb) {
   const units = ['', 'thousand','million','billion'];
-  const sign = numb < 0 ? '-' : numb == 0 ? '' : '+';
+  const sign = numb < 0 ? '-' : numb === 0 ? '' : '+';
   numb = Math.abs(numb);
   let index = 0;
   while (index < units.length && numb >= 1000) {
@@ -916,11 +916,11 @@ function parseImperial(amount) {
     result += 'negative ';
   }
   if (amount < units[0][1]) return `${round(amount, 2).toLocaleString('en')}${units[0][2]}`;
-  
+
   let data = 0, step = 1, index = units.length - 1;
-  
+
   for (let i = units.length; i--;) step *= units[i][1];
-  
+
   const next = () => {
     if (amount >= step) return true;
     if (data) {
@@ -941,7 +941,7 @@ function parseImperial(amount) {
     data++;
     amount -= step;
   };
-  
+
   while (next()) tick();
   return result;
 }
