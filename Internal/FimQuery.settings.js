@@ -1,14 +1,17 @@
 // ==UserScript==
-// @name        FimQuery.Settings
+// @name        FimQuery.Settings (ref FimfictionAdvanced)
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
-// @version     1.1.2
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
+// @run-at      document-start
+// @version     1.1.4
 // @grant       none
 // ==/UserScript==
 var FimFicSettings = {};
+window.FimFicSettings = unsafeWindow.FimFicSettings = FimFicSettings;
 (() => {
   const addGenericInput = (me, id, name, type, clas) => me.AddOption(id, name, `<div><input${clas ? ` class="${clas}"` : ''} inputID="${id}" type="${type}"></input></div>`).firstChild;
   const all = (selector, holder, func) => func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);
@@ -297,7 +300,7 @@ div.colour_pick {
           reference.style.display = 'none';
           all('.user-cp-content.generated', a => a.parentNode.removeChild(a));
 					reference.insertAdjacentElement('beforebegin', canvas);
-          if (buildFunc) try {buildFunc = buildFunc(tab);}catch(e){alert(e.stack);}
+          if (buildFunc) buildFunc(tab);
           const s = document.querySelector('.tab.tab_selected');
           if (s) s.classList.remove('tab_selected');
           e.target.classList.add('tab_selected');
@@ -309,9 +312,10 @@ div.colour_pick {
   
   function newTabSwitcher(tab, name, img, title, click) {
     tab.lastElementChild.insertAdjacentHTML('beforeend', `<li class="tag" pageName="${name}">
-			<a href="#"><i class="${img}"></i><span>${title}</span></a>
+			<a href="#${name}"><i class="${img}"></i><span>${title}</span></a>
 		</li>`);
     tab.querySelector(`[pageName="${name}"]`).addEventListener('click', click);
+    if (document.location.hash.replace('#', '') == name) click();
   }
   
   function newCanvas(img, description) {
@@ -356,7 +360,6 @@ div.colour_pick {
     
 		userCpContentBox.insertAdjacentHTML('beforebegin', `<div class="content mobile-no-margin">
 			<div class="user_cp">
-				<div class="user-cp-content"></div>
 				<div class="tabs">
 					<div class="sidebar-shadow">
 						<div class="light-gradient"></div>
@@ -372,6 +375,7 @@ div.colour_pick {
 						</ul>
 					</div>
 				</div>
+        <div class="user-cp-content"></div>
 			</div>
 		</div>`);
 		const root = document.querySelector('.user-cp-content');

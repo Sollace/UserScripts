@@ -1,16 +1,18 @@
 // ==UserScript==
-// @name        FimQuery.Core
+// @name        FimQuery.Core (ref FimfictionAdvanced, Nosey Hound)
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
-// @version     1.2.1
+// @run-at      document-start
+// @version     1.2.2
 // @grant       none
 // ==/UserScript==
 
 const win = () => this['unsafeWindow'] || window['unsafeWindow'] || window;
 const isJQuery = () => !!win()['$'];
+const getUserId = () => {const w = win()['logged_in_user'];return w ? w.id : -1;};
 const getSafe = (name, defaultValue) => {let w = win();return w[name] || (w[name] = defaultValue);}
 const brightness = (r,g,b) => Math.sqrt((0.241 * r * r) + (0.691 * g * g) + (0.068 * b * b));
 const getIsLoggedIn = () => !!win()['logged_in_user'];
@@ -24,21 +26,28 @@ const getUserName = () => getUserNameUrlSafe().replace(/\+/g,' ');
 const getUserButton = () => document.querySelector('.user_toolbar a.button[href^="/user/"]');
 const getDefaultAvatar = size => `${staticFimFicDomain()}/images/none_${size > 64 ? 64 : size}.png`;
 const urlSafe = me => me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');
+const all = (selector, holder, func) => {return func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);};
+
+function addDelegatedEvent(node, selector, event, func, capture) {
+  const k = ev => {
+    const target = ev.target.closest(selector);
+    if (!target) return;
+    if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) return;
+    func.call(target, ev, target);
+  };
+  node.addEventListener(event, k, capture);
+  return k;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-    var id = getUserId();
+    const id = getUserId();
     if (id > -1) {
-        var possibleAvatar = document.querySelector(`img[src*="cdn-img.fimfiction.net/user/"][src*="-${id}-"]`);
+        const possibleAvatar = document.querySelector(`img[src*="cdn-img.fimfiction.net/user/"][src*="-${id}-"]`);
         if (possibleAvatar) {
-            localStorage['user_avatar'] = possibleAvatar.getAttribute('src').split(id)[0] + id + '-';
+            localStorage['user_avatar'] = `${possibleAvatar.getAttribute('src').split(id)[0]}${id}-`;
         }
     }
 });
-
-function getUserId() {
-	const w = win()['logged_in_user'];
-	return w ? w.id : -1;
-}
 
 function getUserAvatar(size) {
     const id = getUserId();
@@ -184,23 +193,23 @@ function inbounds(el, buff) {
     var scrollX = document.body.scrollLeft;
     var scrollY = document.body.scrollTop;
     
-    var os = offset(el);
+    const os = offset(el);
     
     var left = os.left - scrollX;
     var top = os.top - scrollY;
     
     var st = window.getComputedStyle(el);
     
-    var margL = parseFloat(st.marginLeft) || 0;
-    var margT = parseFloat(st.marginTop) || 0;
-    var margR = parseFloat(st.marginRight) || 0;
-    var margB = parseFloat(st.marginBottom) || 0;
+    let margL = parseFloat(st.marginLeft) || 0;
+    let margT = parseFloat(st.marginTop) || 0;
+    let margR = parseFloat(st.marginRight) || 0;
+    let margB = parseFloat(st.marginBottom) || 0;
     
-    var width = el.offsetWidth;
-    var height = el.offsetHeight;
+    let width = el.offsetWidth;
+    let height = el.offsetHeight;
     
-    var winW = document.body.offsetWidth;
-    var winH = document.body.offsetHeight;
+    let winW = document.body.offsetWidth;
+    let winH = document.body.offsetHeight;
     
     if (top - margT + height + margB > winH + buff) top = winH - height;
     if (left - margL + width + margR > winW + buff) left = winW - width;
