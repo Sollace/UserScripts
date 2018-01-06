@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.9
+// @version     2.2.10
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -17,7 +17,7 @@ const STYLESHEET = `
 .drop-down-pop-up-content.dog {position: relative;}
 .dog .button {
     display: inline-block;
-    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);
+    background: linear-gradient(to bottom, rgba(170,170,170,0.2) 0%, rgba(120,120,120,0.2) 100%);
     line-height: 20px;
     margin-top: 4px;
     padding: 5px 5px 0 5px;
@@ -25,7 +25,7 @@ const STYLESHEET = `
     border: solid 1px rgba(0, 0, 0, 0.6);
     border-bottom: none;
     cursor: pointer;}
-.dog .button:not(.selected) {background: linear-gradient(to bottom, #ddd 0%, #ccc 100%);}
+.dog .button:not(.selected) {background: linear-gradient(to bottom, rgba(120,120,120,0.2) 0%, rgba(70,70,70,0.2) 100%);}
 .dog .tabs {
     width: 100%;
     height: 100%;
@@ -38,7 +38,7 @@ const STYLESHEET = `
     top: 30px;
     left: 0px;
     right: 0px;
-    background: #ddd;
+    background: rgba(120,120,120,0.2);
     min-height: 270px;
     overflow-y: auto;
     padding: 10px;}
@@ -171,6 +171,17 @@ a:hover + .open-pin:after, .open-pin:hover:after {border-color: #609734 transpar
     right: 0;
     border-bottom: solid 2px;
     border-right: solid 2px;}
+
+a.sniffer {
+    border-bottom-right-radius: 0 !important;
+}
+a.sniffer:hover {
+    background: #258bd4;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 1px 1px 0 #b58bbc inset;
+}
+
 .info-card-container {
   z-index: 99999999;
 }`;
@@ -727,13 +738,8 @@ ${totalSection('Name Changes', localeN, named, 4)}
   function addButtonsAndStuff() {
     const userPageHeader = document.querySelector('.user-page-header');
     if (userPageHeader) {
-      const h3 = document.querySelector('.bio_followers .watching-header');
-      if (h3) {
-        if (h3.innerText.indexOf(`${name} follows`) === 0) {
-          h3.insertAdjacentHTML('afterbegin', `<h3 style="border-bottom:none"><b>${document.querySelector('.user_sub_info .fa-eye').nextSibling.innerText}</b> members follow ${name}</h3>`);
-        }
-        h3.insertAdjacentHTML('beforeend', ' - <a class="sniffer">Sniff</a>');
-      }
+      const h3 = document.querySelector('.module-watching .sidebar-header');
+      if (h3) h3.insertAdjacentHTML('beforeend', `<a class="count sniffer"><i class="fa fa-fw fa-paw"></i></a>`);
       userPageHeader.querySelector('.tab-followers').insertAdjacentHTML('afterend', '<li class="tab nosey"><a class="sniffer"><span class="number"><i class="fa fa-fw fa-paw" ></i></span>Sniff Followers</a></li>');
       document.body.dispatchEvent(new Event('resize', {bubbling: true}));
     }
@@ -872,17 +878,6 @@ function ajax(method, url, complete, error) {
   request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   request.send();
 };
-function all(selector, holder, func) {return func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);}
-function addDelegatedEvent(node, selector, event, func, capture) {
-  const k = ev => {
-    const target = ev.target.closest(selector);
-    if (!target) return;
-    if (('mouseout' == event || 'mouseover' == event) && target.contains(ev.relatedTarget)) return;
-    func.call(target, ev, target);
-  };
-  node.addEventListener(event, k, capture);
-  return k;
-}
 
 function makeGlobalPopup(title, fafaText, darken, close) {
   const p = makePopup(title, fafaText, darken, close);
