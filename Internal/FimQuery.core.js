@@ -136,7 +136,7 @@ function addOption(list, title) {
   return list.lastChild.firstChild;
 }
 function addDropList(list, title, func) {
-  list.insertAdjacentHTML('beforeend', `<li><a>${title}</a><div class="drop-down"><ul></ul></div></li>`)
+  list.insertAdjacentHTML('beforeend', `<li><div class="drop-down"><ul></ul></div><a>${title}</a></li>`)
   func(list.lastChild.querySelector('.drop-down ul'));
 }
 function getListItemWidth(list) {return [].map.call(list.children, a => a.offsetWidth).reduce(Math.max, 0);}
