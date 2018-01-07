@@ -6,7 +6,7 @@
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
 // @include     /^http?[s]://justsitback.deviantart.*/
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @version     3.0.1
+// @version     3.0.2
 // @grant       none
 // ==/UserScript==
 
@@ -868,12 +868,13 @@ function run() {
 
   function loadCustomPonyJSON() {
     try {
+      let res = undefined;
       if (localStorage['custom_pony']) {
-        return JSON.parse(localStorage['custom_pony']);
+        res JSON.parse(localStorage['custom_pony']);
       }
     } catch (e) {
-      return Ponies[0].toJson();
     }
+    return res || Ponies[0].toJson();
   }
 
   function createCustomPony() {
