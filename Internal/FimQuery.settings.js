@@ -39,17 +39,17 @@ a.premade_settings {
     display: inline-block;
     width: 100px;
     height: 100px;
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    border: 1px solid #394558;
     margin: 5px;
     cursor: pointer;
     transition: box-shadow 0.25s ease 0s;
     vertical-align: middle;
     border-radius: 12px;
+    overflow: hidden;
     text-decoration: none;}
 a.premade_settings_selected { box-shadow: 0px 0px 4px #302fff;}
 a.premade_settings:hover { box-shadow: 0px 0px 4px rgb(196, 111, 111);}
-a.premade_settings div.toolbar {
-    height: 24px;}
+a.premade_settings div.toolbar { height: 24px; }
 a.premade_settings span {
     display: block;
     font-weight: bold;
@@ -136,20 +136,20 @@ div.colour_pick {
 				const components = ['Red','Green','Blue'];
 				if (alpha) components.push('Alpha');
         container.innerHTML = `<div class="color-selector">
-					${components.map(key => `<div class="${key.toLowerCase()}" data-key="${key}">
-						<input class="color" type="text" placeholder="${key == 'Alpha' ? 'Opacity' : key}"></input>
-						<input value="${key == 'alpha' ? 128 : 0.5}" type="range" max="${key == 'Alpha' ? 1 : 255}" ${key == 'Alpha' ? 'step="0.1"' : ''}></input>
+					${components.map(key => `<div class="${key.toLowerCase()}">
+						<input data-key="${key.toLowerCase()}" class="color" type="text" placeholder="${key == 'Alpha' ? 'Opacity' : key}"></input>
+						<input data-key="${key.toLowerCase()}" value="${key == 'Alpha' ? 0.5 : 128}" type="range" max="${key == 'Alpha' ? 1 : 255}" step="${key == 'Alpha' ? 0.05 : 1}"></input>
 					</div>`).join('')}
 				</div>`;
         const div = container.firstChild;
         const result = {};
-				[].forEach.call(div.querySelectorAll('div'), c => {
-					result[c.dataset.key.toLowerCase()] = Array.call(null, c.querySelectorAll('input'));
+				all('input[data-key]', div, input => {
+					result[input.dataset.key] = result[input.dataset.key] || [];
+          result[input.dataset.key].push(input);
 				});
-        const up = e => {
-					result[target.parentNode.dataset.key].forEach(a => {
-						a.value = parseFloat(target.value);
-					});
+        const up = (e, target) => {
+          const val = parseFloat(target.value);
+          all(`input[data-key="${target.dataset.key}"]`, target.parentNode, a => a.value = val);
           if (func) func(target, e, e.target);
         };
 				addDelegatedEvent(div, 'input', 'input', up);
@@ -220,7 +220,7 @@ div.colour_pick {
         return {
 					element: container,
 					add: func => {
-						container.insertAdjacentHTML('beforeend', `<a class="premade_settings" style="margin-bottom:10px" data-index="${i++}"><div class="toolbar"></div><span></span></a>`);
+						container.insertAdjacentHTML('beforeend', `<a class="premade_settings" data-index="${i++}"><div class="toolbar"></div><span></span></a>`);
 						func(container.lastChild);
 					}
 				};
@@ -251,7 +251,6 @@ div.colour_pick {
       return holder.lastChild;
     },
     AppendResetButton: function(control, defaultIndex) {
-			control.parentNode.insertAdjacentHTML('beforeend', `<br><br>`);
       const rev = this.AppendButton(control, '<i class="fa fa-undo"></i> Revert to default');
       if (defaultIndex !== undefined) rev.dataset.revertIndex = defaultIndex;
       return rev;
