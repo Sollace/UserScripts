@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name        FimQuery.Core (ref FimfictionAdvanced, Nosey Hound)
+// @name        FimQuery.Core (ref FimfictionAdvanced, Nosey Hound, EE)
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.2
+// @version     1.3.2b
 // @grant       none
 // ==/UserScript==
 
@@ -86,7 +86,7 @@ function getVendorPrefix() {
 
 function updateStyle(style, id) {
   const el = document.getElementById(id);
-  if (el) return el.innerHTML = style.replace(/-\{0\}-/g, getVendorPrefix().css;
+  if (el) return el.innerHTML = style.replace(/-\{0\}-/g, getVendorPrefix().css);
   makeStyle(style, id);
 }
 function makeStyle(input, id) {
