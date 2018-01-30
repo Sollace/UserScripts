@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API (ref FimfictionAdvanced, Nosey Hound)
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4.1.3
+// @version     4.1.4
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @grant       none
 // @run-at      document-start
@@ -59,7 +59,7 @@ RunScript.build = (functionText, params) => {
 	function scriptBody(ver) {
 		const some = a => a;
 		const eventMap = {
-			'/ajax/comments/preview': 'previewcomment',
+			'/ajax/bbcode/html': 'previewcontent',
 			'/ajax/notifications/mark-all-read': 'note_markread',
 			'/ajax/private-messages/mark-all-read': 'pm_markread',
 			'/ajax/notifications/list/drop-down': 'listnotes',
