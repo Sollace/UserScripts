@@ -6,7 +6,7 @@
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3
+// @version     1.3.1
 // @grant       none
 // ==/UserScript==
 
@@ -38,6 +38,12 @@ function addDelegatedEvent(node, selector, event, func, capture) {
   };
   node.addEventListener(event, k, capture);
   return k;
+}
+
+function newEl(html) {
+  const div = document.createElement('DIV');
+  div.innerHTML = html;
+  return div.firstChild;
 }
 
 if (getIsLoggedIn()) document.addEventListener('DOMContentLoaded', () => {
