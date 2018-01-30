@@ -6,7 +6,7 @@
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.1
+// @version     1.3.2
 // @grant       none
 // ==/UserScript==
 
@@ -84,6 +84,11 @@ function getVendorPrefix() {
   return vendor;
 }
 
+function updateStyle(style, id) {
+  const el = document.getElementById(id);
+  if (el) return el.innerHTML = style.replace(/-\{0\}-/g, getVendorPrefix().css;
+  makeStyle(style, id);
+}
 function makeStyle(input, id) {
   document.head.insertAdjacentHTML('beforeend', styleSheet(input.replace(/-\{0\}-/g, getVendorPrefix().css), id));
 }
