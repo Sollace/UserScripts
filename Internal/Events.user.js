@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API (ref FimfictionAdvanced, Nosey Hound)
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4.1.4
+// @version     4.2
 // @include     /^http?[s]://www.fimfiction.net/.*/
 // @grant       none
 // @run-at      document-start
@@ -31,7 +31,7 @@ RunScript.build = (functionText, params) => {
 (_ => {
 	function initialise() {
 		const win = this['unsafeWindow'] || window;
-		const VERSION = 4.13;
+		const VERSION = 4.2;
 		
 		if (window !== win && (!window.FimFicEvents || window.FimFicEvents.version() < VERSION)) {
 			window.FimFicEvents = {
@@ -138,9 +138,12 @@ RunScript.build = (functionText, params) => {
 				eventRegister = url => evFunc(url) || old(url);
 			},
 			PROXY: function(sender, func, args, m) {
+				let prevented = false;
 				let a = args[0];
 				if (typeof a === 'string') a = args[0] = {url: a};
 				getEventObject(a, event => {
+					event.preventDefault = _ => prevented = true;
+					this.trigger(`early${event.eventName}`, event);
 					override(a, 'success', (self, pars, sup) => {
 						let result = undefined;
 						event.result = pars[0];
@@ -153,6 +156,7 @@ RunScript.build = (functionText, params) => {
 						return result;
 					});
 				});
+				if (prevented) return;
 				return func.apply(sender, args);
 			},
 			getEventObject: getEventObject,
