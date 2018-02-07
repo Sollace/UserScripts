@@ -6,7 +6,7 @@
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.2b
+// @version     1.3.3
 // @grant       none
 // ==/UserScript==
 
@@ -28,6 +28,10 @@ const getDefaultAvatar = size => `${staticFimFicDomain()}/images/none_${size > 6
 const urlSafe = me => me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');
 const all = (selector, holder, func) => {return func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);};
 const currentTheme = () => document.querySelector('#stylesheetMain').href.split('/').reverse()[0].split('.')[0];
+const tryRun = func => function() {
+  try {return func.apply(this, arguments);
+      } catch (e) {console.error(e);}
+};
 
 function addDelegatedEvent(node, selector, event, func, capture) {
   const k = ev => {
