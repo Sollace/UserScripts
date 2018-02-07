@@ -127,6 +127,13 @@ RunScript.build = (functionText, params) => {
 				name.split(' ').forEach(a => document.addEventListener(a, func));
 				return func;
 			},
+      one: (name, func) => {
+        const f = window.FimFicEvents.on(name, function() {
+          window.FimFicEvents.off(name, f);
+          return func.apply(this, arguments);
+        });
+        return f;
+      },
 			off: (name, func) => name.split(' ').forEach(a => document.removeEventListener(a, func)),
 			trigger: (name, event) => {
 				name = new CustomEvent(name);
@@ -138,12 +145,12 @@ RunScript.build = (functionText, params) => {
 				eventRegister = url => evFunc(url) || old(url);
 			},
 			PROXY: function(sender, func, args, m) {
-				let prevented = false;
+        let prevented = false;
 				let a = args[0];
 				if (typeof a === 'string') a = args[0] = {url: a};
 				getEventObject(a, event => {
-					event.preventDefault = _ => prevented = true;
-					this.trigger(`early${event.eventName}`, event);
+          event.preventDefault = _ => prevented = true;
+          this.trigger(`early${event.eventName}`, event);
 					override(a, 'success', (self, pars, sup) => {
 						let result = undefined;
 						event.result = pars[0];
@@ -156,7 +163,7 @@ RunScript.build = (functionText, params) => {
 						return result;
 					});
 				});
-				if (prevented) return;
+        if (prevented) return;
 				return func.apply(sender, args);
 			},
 			getEventObject: getEventObject,
