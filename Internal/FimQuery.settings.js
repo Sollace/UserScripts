@@ -1,14 +1,18 @@
 // ==UserScript==
-// @name        FimQuery.Settings
+// @name        FimQuery.Settings (ref FimfictionAdvanced)
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
-// @version     1.1.2
+// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
+// @run-at      document-start
+// @version     1.2
 // @grant       none
 // ==/UserScript==
+
 var FimFicSettings = {};
+window.FimFicSettings = unsafeWindow.FimFicSettings = FimFicSettings;
 (() => {
   const addGenericInput = (me, id, name, type, clas) => me.AddOption(id, name, `<div><input${clas ? ` class="${clas}"` : ''} inputID="${id}" type="${type}"></input></div>`).firstChild;
   const all = (selector, holder, func) => func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);
@@ -28,41 +32,46 @@ var FimFicSettings = {};
     return k;
 	}
   function addPresetStyle() {
+    const light = currentTheme() == 'light';
+    const setting_foreground = light ? '#333' : '#a3abc3';
     makeStyle(`
 a.premade_settings {
     display: inline-block;
     width: 100px;
     height: 100px;
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    margin-right: 10px;
+    border: 1px solid #394558;
+    margin: 5px;
     cursor: pointer;
     transition: box-shadow 0.25s ease 0s;
     vertical-align: middle;
+    border-radius: 12px;
+    overflow: hidden;
     text-decoration: none;}
-a.premade_settings_selected { box-shadow: 0px 0px 10px #302FFF;}
-a.premade_settings:hover { box-shadow: 0px 0px 10px rgb(196, 111, 111);}
-a.premade_settings div.toolbar {
-    height: 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset;}
+a.premade_settings_selected { box-shadow: 0px 0px 4px #302fff;}
+a.premade_settings:hover { box-shadow: 0px 0px 4px rgb(196, 111, 111);}
+a.premade_settings div.toolbar { height: 24px; }
 a.premade_settings span {
     display: block;
     font-weight: bold;
     font-size: 0.8em;
-    color: rgb(51, 51, 51);
+    color: ${setting_foreground};
     padding: 8px;}`, "settingsTab_presetStyle");
   }
   function addPickerStyle() {
+    const light = currentTheme() == 'light';
+    const picker_background = light ? '#f8f8f8' : '#303949',
+          picker_border = light ? '#bbb' : '#354052';
+    
     makeStyle(`
 div.colour_pick_selected {
-    outline: 2px solid rgb(221, 85, 0);
+    outline: 2px solid #d50;
     position: relative;
     z-index: 1;}
 div.colour_picker_box {
     display: inline-block;
     vertical-align: middle;
-    background-color: rgb(248, 248, 248);
-    border: 1px solid rgb(187, 187, 187);
+    background-color: ${picker_background};
+    border: 1px solid ${picker_border};
     margin-left: 10px;
     line-height: 0px;
     padding-bottom: 1px;}
@@ -127,20 +136,21 @@ div.colour_pick {
 				const components = ['Red','Green','Blue'];
 				if (alpha) components.push('Alpha');
         container.innerHTML = `<div class="color-selector">
-					${items.map(key => `<div class="${key.toLowerCase()}" data-key="${key}">
-						<input class="color" type="text" placeholder="${key == 'Alpha' ? 'Opacity' : key}"></input>
-						<input value="${key == 'alpha' ? 128 : 0.5}" type="range" max="${key == 'Alpha' ? 1 : 255}" ${key == 'Alpha' ? 'step="0.1"' : ''}></input>
+					${components.map(key => `<div class="${key.toLowerCase()}">
+						<input data-key="${key.toLowerCase()}" class="color" type="text" placeholder="${key == 'Alpha' ? 'Opacity' : key}"></input>
+						<input data-key="${key.toLowerCase()}" value="${key == 'Alpha' ? 0.5 : 128}" type="range" max="${key == 'Alpha' ? 1 : 255}" step="${key == 'Alpha' ? 0.05 : 1}"></input>
 					</div>`).join('')}
 				</div>`;
         const div = container.firstChild;
-				const result = Array.prototype.reduce.call(div.querySelectorAll('div'), c => {
-					result[c.dataset.key.toLowerCase()] = Array.call(null, c.querySelectorAll('input'));
-				}, {});
+        const result = {};
+				all('input[data-key]', div, input => {
+					result[input.dataset.key] = result[input.dataset.key] || [];
+          result[input.dataset.key].push(input);
+				});
         const up = (e, target) => {
-					result[target.parentNode.dataset.key].forEach(a => {
-						a.value = parseFloat(target.value);
-					});
-          if (func) func(target, e, target);
+          const val = parseFloat(target.value);
+          all(`input[data-key="${target.dataset.key}"]`, target.parentNode, a => a.value = val);
+          if (func) func(target, e, e.target);
         };
 				addDelegatedEvent(div, 'input', 'input', up);
 				addDelegatedEvent(div, 'keyup', 'input', up);
@@ -210,7 +220,7 @@ div.colour_pick {
         return {
 					element: container,
 					add: func => {
-						container.insertAdjacentHTML('beforeend', `<a class="premade_settings" style="margin-bottom:10px" data-index="${i++}"><div class="toolbar"></div><span></span></a>`);
+						container.insertAdjacentHTML('beforeend', `<a class="premade_settings" data-index="${i++}"><div class="toolbar"></div><span></span></a>`);
 						func(container.lastChild);
 					}
 				};
@@ -241,7 +251,6 @@ div.colour_pick {
       return holder.lastChild;
     },
     AppendResetButton: function(control, defaultIndex) {
-			control.parentNode.insertAdjacentHTML('beforeend', `<br><br>`);
       const rev = this.AppendButton(control, '<i class="fa fa-undo"></i> Revert to default');
       if (defaultIndex !== undefined) rev.dataset.revertIndex = defaultIndex;
       return rev;
@@ -297,7 +306,7 @@ div.colour_pick {
           reference.style.display = 'none';
           all('.user-cp-content.generated', a => a.parentNode.removeChild(a));
 					reference.insertAdjacentElement('beforebegin', canvas);
-          if (buildFunc) try {buildFunc = buildFunc(tab);}catch(e){alert(e.stack);}
+          if (buildFunc) buildFunc(tab);
           const s = document.querySelector('.tab.tab_selected');
           if (s) s.classList.remove('tab_selected');
           e.target.classList.add('tab_selected');
@@ -309,9 +318,12 @@ div.colour_pick {
   
   function newTabSwitcher(tab, name, img, title, click) {
     tab.lastElementChild.insertAdjacentHTML('beforeend', `<li class="tag" pageName="${name}">
-			<a href="#"><i class="${img}"></i><span>${title}</span></a>
+			<a href="#${name}"><i class="${img}"></i><span>${title}</span></a>
 		</li>`);
     tab.querySelector(`[pageName="${name}"]`).addEventListener('click', click);
+    if (document.location.hash.replace('#', '') == name) requestAnimationFrame(() => {
+      click({target: tab.querySelector(`[pageName="${name}"]`)});
+    });
   }
   
   function newCanvas(img, description) {
@@ -356,7 +368,6 @@ div.colour_pick {
     
 		userCpContentBox.insertAdjacentHTML('beforebegin', `<div class="content mobile-no-margin">
 			<div class="user_cp">
-				<div class="user-cp-content"></div>
 				<div class="tabs">
 					<div class="sidebar-shadow">
 						<div class="light-gradient"></div>
@@ -372,6 +383,7 @@ div.colour_pick {
 						</ul>
 					</div>
 				</div>
+        <div class="user-cp-content"></div>
 			</div>
 		</div>`);
 		const root = document.querySelector('.user-cp-content');
