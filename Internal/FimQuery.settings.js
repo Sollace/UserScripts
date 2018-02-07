@@ -7,12 +7,12 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2
+// @version     1.2.1
 // @grant       none
 // ==/UserScript==
 
 var FimFicSettings = {};
-window.FimFicSettings = unsafeWindow.FimFicSettings = FimFicSettings;
+window.FimFicSettings = win().FimFicSettings = FimFicSettings;
 (() => {
   const addGenericInput = (me, id, name, type, clas) => me.AddOption(id, name, `<div><input${clas ? ` class="${clas}"` : ''} inputID="${id}" type="${type}"></input></div>`).firstChild;
   const all = (selector, holder, func) => func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);
