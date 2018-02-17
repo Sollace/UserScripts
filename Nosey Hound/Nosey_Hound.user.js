@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.10
+// @version     2.2.11
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -12,179 +12,6 @@
 // ==/UserScript==
 
 if (typeof App == 'undefined') throw "Stopped: Not on page.";
-
-const STYLESHEET = `
-.drop-down-pop-up-content.dog {position: relative;}
-.dog .button {
-    display: inline-block;
-    background: linear-gradient(to bottom, rgba(170,170,170,0.2) 0%, rgba(120,120,120,0.2) 100%);
-    line-height: 20px;
-    margin-top: 4px;
-    padding: 5px 5px 0 5px;
-    border-radius: 5px 5px 0 0;
-    border: solid 1px rgba(0, 0, 0, 0.6);
-    border-bottom: none;
-    cursor: pointer;}
-.dog .button:not(.selected) {background: linear-gradient(to bottom, rgba(120,120,120,0.2) 0%, rgba(70,70,70,0.2) 100%);}
-.dog .tabs {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    border-bottom: solid 1px rgba(0,0,0,0.6);}
-.dog .tab {
-    display: none;
-    position: absolute;
-    bottom: 0px;
-    top: 30px;
-    left: 0px;
-    right: 0px;
-    background: rgba(120,120,120,0.2);
-    min-height: 270px;
-    overflow-y: auto;
-    padding: 10px;}
-.dog .list {
-  padding: 5px;}
-.dog .list ol {
-  padding-left: 0;
-  list-style-position: inside;}
-.dog .list ol ol {
-  padding-left: 16px;}
-.dog .tab .main .li {height: 20px;}
-.dog .tabs .button.hidden {display: none;}
-.dog .list .history {
-    font-size: 80%;
-    padding-left: 5px;
-    margin-left: -10px;
-    margin-right: -10px;
-    box-shadow: 0 0 2px rgba(0,0,0,0.3) inset;}
-.dog .list .history:first-child {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;}
-.dog .list .history:last-child {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;}
-.history.j {
-    background: rgba(0, 240, 0, 0.07);}
-.history.l {
-    background: rgba(240, 0, 0, 0.07);}
-.dog .list .history.j:before {content: "+ ";}
-.dog .list .history.l:before {content: "- ";}
-.dog .tab .main {
-    background: rgb(220, 250, 200);
-    border-radius: 20px;
-    padding: 15px;
-    border: dashed 1px rgba(0,0,0,0.2);
-    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
-    color: #555;
-    margin: 5px 0px;}
-.dog .tab.selected {display: block !important;}
-.dog .score {
-    text-align: center;
-    font-weight: bold;
-    font-size: 40px;
-    border-radius: 300px;
-    border: solid 5px;
-    margin-bottom: 5px;
-    height: 58px;
-    line-height: 45px;
-    text-shadow: 0 0 2px rgba(0,0,100,0.6);}
-.dog .score:not(.bar) {box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4),0 0 3px 1px rgba(0,0,30,0.3);}
-.dog .score.good {
-    background: rgba(0, 240, 0, 0.3);
-    color: #A5C75B;}
-.dog .score.bad {
-    background: rgba(240, 0, 0, 0.3);
-    color: #B15B5B;}
-.dog .score.neutral {
-    background: rgba(120, 120, 120, 0.3);
-    color: rgb(240, 240, 240);}
-.dog .score.fresh {
-    background: rgba(0, 0, 240, 0.3);
-    color: blue;}
-.dog .score.bar {
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
-    background: rgba(0, 0, 240, 0.3);
-    line-height: 50px;
-    font-size: 15px;}
-.dog .score.bar div {position: absolute;}
-.dog .glass {
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    z-index: 1;
-    border-radius: 500px;
-    box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4);}
-.dog .percentage.g {
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    background: #A5C75B;}
-.dog .percentage.l {
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    background: #B15B5B;}
-.dog .percentage.n {
-    top: 0px;
-    bottom: 0px;
-    background: rgba(255,255,255,0.3);}
-.dog li .dog {display: none;}
-.dog li a.opened ~ .dog {display: block;}
-.open-pin:after {
-    content: "";
-    float: right;
-    display: inline-block;
-    width: 0px;
-    height: 0px;
-    text-align: center;
-    line-height: 15px;
-    margin-top: 10px;
-    cursor: pointer;
-    border: solid;
-    border-width: 5px;
-    border-color: #507E2C transparent transparent transparent;}
-a:hover + .open-pin:after, .open-pin:hover:after {border-color: #609734 transparent transparent transparent;}
-.opened:hover + .open-pin:after, .opened + .open-pin:hover:after {border-color: transparent transparent #609734 transparent;}
-.opened + .open-pin:after {
-    margin-top: 5px;
-    border-color: transparent transparent #507E2C transparent;}
-#info-cards > * {z-index: 99999999999999999 !important;}
-.global_popup input[type="text"], .global_popup input[type="url"] {
-    padding: 8px;
-    width: 100%;
-    border: 1px solid #CCC;
-    background: none repeat scroll 0% 0% #F8F8F8;
-    outline: medium none;
-    color: #333;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;
-    border-radius: 3px;
-    margin: 5px 0px;}
-.resize-handle {
-    height: 10px;
-    width: 10px;
-    display: inline-block;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    border-bottom: solid 2px;
-    border-right: solid 2px;}
-
-a.sniffer {
-    border-bottom-right-radius: 0 !important;
-}
-a.sniffer:hover {
-    background: #258bd4;
-    color: #fff;
-    text-decoration: none;
-    box-shadow: 1px 1px 0 #b58bbc inset;
-}
-
-.info-card-container {
-  z-index: 99999999;
-}`;
 
 const settingsMan = {
   __gm: (key, parse) => {
@@ -215,6 +42,7 @@ const followerMapping = (_ => {
   function structuredChilds(x, y) {
     const child = idToChildMapping[`${x}|${y}`];
     return {
+      index: y + 1,
       content: internalMapping[x][y],
       children: internalMapping[child] ? internalMapping[child].map((a, i) => structuredChilds(child, i)) : [],
       opened: _ => openedMapping[`${x}|${y}`],
@@ -223,11 +51,11 @@ const followerMapping = (_ => {
       },
       html: function(filter) {
         if (!this.matches(filter)) return '';
-        let t = `<li data-item="${x}|${y}"><a `;
+        let t = `<li data-item="${x}|${y}"><span class="numb">${this.index}. </span><span class="title${this.opened() ? ' opened' : ''}"><a `;
         if (this.opened() || !this.children.length) {
-          t += `class="${this.opened() ? 'opened ' : ''}${!this.children.length ? 'unloaded' : ''}" `;
+          t += `class="${!this.children.length ? 'unloaded' : ''}" `;
         }
-        t += `target="_blank" href="/user/${this.content.id}/${this.content.name.replace(/ /g,'+')}" data-user="${this.content.name}">${this.content.name.replace(/\+/g, ' ')}</a>`;
+        t += `target="_blank" href="/user/${this.content.id}/${this.content.name.replace(/ /g,'+')}" data-user="${this.content.name}">${this.content.name.replace(/\+/g, ' ')}</a></span>`;
         if (this.children.length) {
           t += '<span class="open-pin"></span><div class="dog"><ol>';
           t += this.children.map(a => a.html(filter)).join('');
@@ -276,7 +104,7 @@ const followerMapping = (_ => {
         dirty = false;
         structured = {
           user: id,
-          children: internalMapping[id].map((a,i) => structuredChilds(id, i)),
+          children: internalMapping[id].map((a, i) => structuredChilds(id, i)),
           html: function(filter) {
             return `<ol>${this.children.map(a => a.html(filter)).join('')}</ol>`;
           }
@@ -336,11 +164,16 @@ const infoCards = (_ => {
   };
 })();
 
+function override(obj, member, new_func) {
+  new_func.super = obj[member].super || obj[member];
+  obj[member] = new_func;
+}
+
 try {
   if (getIsLoggedIn()) run();
 } catch (e) {
   try {
-    makeGlobalPopup('Nosey Hound', '', false).SetContent(e);
+    makePopup('Nosey Hound', '', false).SetContent(e);
   } catch (ee) {
     alert(`Nosey Hound: ${e}`);
   }
@@ -366,21 +199,20 @@ function run() {
       this.Sniff(true, this.pop.content);
     },
     sniffFollowers: function() {
-      const pop = this.pop = makeGlobalPopup(`Results${this.myPage ? '' : ` for ${this.userName}`}`, 'fa fa-table');
-      pop.content.style.minWidth = pop.content.style.width = '400px';
-      pop.content.style.minHeight = pop.content.style.height = '400px';
-      pop.content.parentNode.style.width = 'auto';
+      const pop = this.pop = makePopup(`Results${this.myPage ? '' : ` for ${this.userName}`}`, 'fa fa-table');
+      pop.content.parentNode.classList.add('dog-holder');
+      pop.SetWidth(400);
       pop.content.insertAdjacentHTML('afterend', '<div class="resize-handle"></div>');
       document.body.appendChild(document.getElementById('info-cards'));
       this.Sniff(true, pop.content);
       pop.Show();
     },
     snubFollowers: function(link) {
-      link.insertAdjacentHTML('afterend', '<span class="open-pin"></span><div></div>');
-      link.classList.add('opened');
+      link.parentNode.insertAdjacentHTML('afterend', '<span class="open-pin"></span><div></div>');
+      link.parentNode.classList.add('opened');
       link.classList.remove('unloaded');
-      followerMapping.setOpened(link.parentNode.dataset.item, true);
-      this.Sniff(false, link.parentNode.lastChild);
+      followerMapping.setOpened(link.parentNode.parentNode.dataset.item, true);
+      this.Sniff(false, link.closest('li').lastChild);
     },
     Sniff: function(type, pop) {
       let closed = false;
@@ -472,7 +304,7 @@ ${totalSection('List', localeL, lost, 3)}
 ${totalSection('Name Changes', localeN, named, 4)}
 <div class="tab tab-listing" data-tab="5">
   <input id="nosey_follower_searcher" data-id="${id}" type="text" placeholder="search followers"></input>
-  <div class="list content">${followerMapping.structured(id).html('')}</div>
+  <div class="list">${followerMapping.structured(id).html('')}</div>
 </div>
 <div class="tab" data-tab="6">
   <input id="nosey_history_searcher" data-id="${this.userId}" type="text" placeholder="search history"></input>
@@ -495,14 +327,18 @@ ${totalSection('Name Changes', localeN, named, 4)}
       return `<div class="score fresh">${this.followers.length}</div><div class="main">${this.myPage ? 'Welcome! Your' : `${this.userName}'s`} followers have been successfully saved.</div>`;
     },
     stats: function(g, l, G, L, N) {
-      let all = this.oldFollowers.length + g.length;
-      const percentG = (all ? (g.length * 100 / all) : 0),
-            percentL = (all ? (l.length * 100 / all) : 0),
-            percentN = ((this.followers.length - l.length) > 0 ? (N * 100 / (this.followers.length - l.length)) : 0);
-
-      const percentage = (a,l,b) => `<div class="percentage ${l}" style="width:${a}%;margin-left:${b || 0}%">${round(a || 0, 2)}%</div>`;
+      const outOf = (n, of) => of ? (n * 100 / of) : 0;
+      
+      const all = this.oldFollowers.length + g.length;
+      const percentG = outOf(g.length, all),
+            percentL = outOf(l.length, all),
+            percentN = outOf(N, all * (100 - percentG - percentL)/100);
+      
+      const percentage = (a,l,b) => `<div class="percentage ${l}" style="width:${a}%;margin-left:${b || 0}%">${a > 0 ? round(a || 0, 2) + '%' : ''}</div>`;
       return `<div class="score bar neutral"><div class="glass" ></div>
-                    ${percentage(percentG, 'g')}${percentage(percentL, 'l')}${percentage(percentN, 'n', percentG)}
+                    ${percentage(percentG, 'g')}
+                    ${percentage(percentL, 'l')}
+                    ${percentage(percentN, 'n', percentG)}
                 </div>
                 <div class="main">
                     <b>Total: </b>${this.followers.length.toLocaleString('en')} was ${this.oldFollowers.length.toLocaleString('en')}<br /><br />
@@ -547,10 +383,10 @@ ${totalSection('Name Changes', localeN, named, 4)}
     },
     processChanges: function(gained, lost, named) {
       const history = getHistory(this.userId);
-
+      
       for (let i = 0; i < gained.length || i < lost.length || i < named.length; i++) {
         if (i < gained.length) {
-          for (var j = history.length; --j;) {
+          for (let j = history.length - 1; j >= 0; j--) {
             if (history[j].type == 'l' && history[j].id == gained[i].id) {
               named.push({name: gained[i].name, oldName: history[j].name, id: gained[i].id});
               break;
@@ -586,10 +422,8 @@ ${totalSection('Name Changes', localeN, named, 4)}
     history: function(gained, lost, named) {
       const history = this.processChanges(gained, lost, named);
       const finalHistory = history.filter((a, i) => {
-        if (i < history.length - 1) {
-          if (a.type != 'n' && history[i + 1].type != 'n') {
-            if (a.name == history[i + 1].name) return false;
-          }
+        if (i < history.length - 1 && a.type != 'n' && history[i + 1].type != 'n') {
+          if (a.name == history[i + 1].name) return false;
         }
         return true;
       });
@@ -622,7 +456,7 @@ ${totalSection('Name Changes', localeN, named, 4)}
       const id = target.dataset.id;
       let limit = this.dataset.limit;
       if (limit && (limit = parseInt(limit)) > 0) {
-        var history = getHistory(id);
+        const history = getHistory(id);
         if (history.length > limit) {
           history.splice(0, history.length - limit);
           document.querySelector('.dog .list.history').innerHTML = historyList(history);
@@ -680,9 +514,9 @@ ${totalSection('Name Changes', localeN, named, 4)}
       target.innerText = target.dataset.text;
     }
   });
-  addDelegatedEvent(document.body, '.resize-handle', 'mousedown', (e, target) => {
+  addDelegatedEvent(document.body, '.drop-down-pop-up .resize-handle', 'mousedown', (e, target) => {
     e.preventDefault();
-    target = target.parentNode.querySelector('.drop-down-pop-up-content');
+    target = target.closest('.drop-down-pop-up');
     const resize = e => {
       const off = offset(target);
       target.style.width = `${e.pageX - off.left}px`;
@@ -699,7 +533,7 @@ ${totalSection('Name Changes', localeN, named, 4)}
   });
   addDelegatedEvent(document.body, '.dog .open-pin', 'click', (e, target) => {
     e.preventDefault();
-    const a = target.parentNode.querySelector('a');
+    const a = target.parentNode.querySelector('.title');
     followerMapping.setOpened(target.parentNode.dataset.item, !a.classList.contains('opened'));
     a.classList.toggle('opened');
     if (a.classList.contains('opened') && target.classList.contains('async')) {
@@ -716,8 +550,18 @@ ${totalSection('Name Changes', localeN, named, 4)}
       me.insertAdjacentHTML('afterbegin', `<a class="snuffer button button-icon-only" data=user="${e.user}><span title="Sniff Followers"><i class="fa fa-paw" /></span></a>`);
     });
   });
-
-  makeStyle(STYLESHEET);
+  
+  window.addEventListener('darkmodechange', addCss);
+  window.addEventListener('storage', c => {
+    if (c.key == 'stylesheet') addCss();
+  });
+  
+  override(NightModeController.prototype, 'update', function() {
+    NightModeController.prototype.update.super.apply(this, arguments);
+    window.dispatchEvent(new Event('darkmodechange'));
+  });
+  
+  addCss();
   addButtonsAndStuff();
   function confirm(button, finalMessage) {
     if (button.dataset.check != '2') {
@@ -733,6 +577,225 @@ ${totalSection('Name Changes', localeN, named, 4)}
       }
     }
     return false;
+  }
+  
+  function addCss() {
+    const light = currentTheme() == 'light';
+    const content_background = light ? '#fff' : '#29313f';
+    updateStyle(`
+.dog-holder {
+  min-width: 420px;
+  min-height: 520px;
+}
+.dog .button {
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(to bottom, rgba(120,120,120,0.2) 0%, rgba(70,70,70,0.2) 100%);
+    line-height: 20px;
+    margin-top: 4px;
+    padding: 5px 5px 0 5px;
+    border-radius: 5px 5px 0 0;
+    border: solid 1px rgba(0, 0, 0, 0.6);
+    border-bottom: none;
+    cursor: pointer;
+    vertical-align: bottom;}
+.dog .button.selected {
+    z-index: 20;
+    background: linear-gradient(to bottom, rgba(170,170,170,0.2) 0%, rgba(120,120,120,0.2) 100%);
+}
+.dog .button.selected:before {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: ${content_background};
+}
+.dog .button.selected:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(120,120,120,0.2);
+}
+.dog .tabs {
+    width: 100%;
+    height: 100%;
+    position: relative;}
+.dog .tab {
+    display: none;
+    position: absolute;
+    bottom: 1px;
+    top: 77px;
+    left: 1px;
+    right: 1px;
+    background: rgba(120,120,120,0.2);
+    border-top: solid 1px rgba(0,0,0,0.6);
+    min-height: 270px;
+    overflow-y: auto;
+    padding: 10px;}
+.dog .list {
+  padding: 5px;}
+.dog .list ol {
+  list-style: none;
+  padding-left: 0;}
+.dog .list ol ol {
+  width: 0;
+  white-space: nowrap;
+  padding-left: 16px;}
+.dog .list ol li {display: table-row-group;}
+.dog .list ol li span {
+  display: table-cell;
+}
+.dog .list ol li span.numb {
+  padding-right: 10px;
+}
+.dog .list ol li span.title {
+  width: 100%;
+}
+.dog .tab .main .li {height: 20px;}
+.dog .tabs .button.hidden {display: none;}
+.dog .list .history {
+    font-size: 80%;
+    padding-left: 5px;
+    margin-left: -10px;
+    margin-right: -10px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3) inset;}
+.dog .list .history:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;}
+.dog .list .history:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;}
+.history.j {
+    background: rgba(0, 240, 0, 0.07);}
+.history.l {
+    background: rgba(240, 0, 0, 0.07);}
+.dog .list .history.j:before {content: "+ ";}
+.dog .list .history.l:before {content: "- ";}
+.dog .tab .main {
+    background: rgb(220, 250, 200);
+    border-radius: 20px;
+    padding: 15px;
+    border: dashed 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
+    color: #555;
+    margin: 5px 0px;}
+.dog .tab.selected {display: block !important;}
+.dog .score {
+    text-align: center;
+    font-weight: bold;
+    font-size: 40px;
+    border-radius: 300px;
+    border: solid 5px;
+    margin-bottom: 5px;
+    height: 58px;
+    line-height: 45px;
+    text-shadow: 0 0 2px rgba(0,0,100,0.6);}
+.dog .score:not(.bar) {box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4),0 0 3px 1px rgba(0,0,30,0.3);}
+.dog .score.good {
+    background: rgba(0, 240, 0, 0.3);
+    color: #A5C75B;}
+.dog .score.bad {
+    background: rgba(240, 0, 0, 0.3);
+    color: #B15B5B;}
+.dog .score.neutral {
+    background: rgba(120, 120, 120, 0.3);
+    color: rgb(240, 240, 240);}
+.dog .score.fresh {
+    background: rgba(0, 0, 240, 0.3);
+    color: blue;}
+.dog .score.bar {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 3px 1px rgba(0,0,30,0.3);
+    background: rgba(0, 0, 240, 0.3);
+    line-height: 50px;
+    font-size: 15px;}
+.dog .score.bar div {position: absolute;}
+.dog .glass {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    border-radius: 500px;
+    box-shadow: inset 0 0 10px 5px rgba(255,255,255,0.4);}
+.dog .percentage.g {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    background: #A5C75B;}
+.dog .percentage.l {
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    background: #B15B5B;}
+.dog .percentage.n {
+    top: 0px;
+    bottom: 0px;
+    background: rgba(255,255,255,0.3);}
+.dog li .dog {display: none;}
+.dog li .opened ~ .dog {display: table-row;}
+.open-pin:after {
+    content: "";
+    float: right;
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+    text-align: center;
+    line-height: 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: solid;
+    border-width: 5px;
+    border-color: #507E2C transparent transparent transparent;}
+a:hover + .open-pin:after, .open-pin:hover:after {border-color: #609734 transparent transparent transparent;}
+.opened:hover + .open-pin:after, .opened + .open-pin:hover:after {border-color: transparent transparent #609734 transparent;}
+.opened + .open-pin:after {
+    margin-top: 5px;
+    border-color: transparent transparent #507E2C transparent;}
+#info-cards > * {z-index: 99999999999999999 !important;}
+.dog input[type="text"], .dog input[type="url"] {
+    position: sticky;
+    top: 5px;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #CCC;
+    background: none repeat scroll 0% 0% #F8F8F8;
+    outline: medium none;
+    color: #333;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1) inset;
+    border-radius: 3px;
+    margin: 5px 0px;}
+.resize-handle {
+    height: 10px;
+    width: 10px;
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-bottom: solid 2px;
+    border-right: solid 2px;}
+
+a.sniffer {
+    border-bottom-right-radius: 0 !important;
+}
+a.sniffer:hover {
+    background: #258bd4;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 1px 1px 0 #b58bbc inset;
+}
+
+.info-card-container {
+  z-index: 99999999;
+}`, 'nosey_hound_stylesheet');
   }
 
   function addButtonsAndStuff() {
@@ -878,12 +941,6 @@ function ajax(method, url, complete, error) {
   request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   request.send();
 };
-
-function makeGlobalPopup(title, fafaText, darken, close) {
-  const p = makePopup(title, fafaText, darken, close);
-  p.element.classList.add('global_popup');
-  return p;
-}
 
 function round(n, decimals) {
   const c = Math.pow(10, decimals);
