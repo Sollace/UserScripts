@@ -5,14 +5,15 @@
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
-// @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
+// @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.1
+// @version     1.2.2
 // @grant       none
 // ==/UserScript==
 
 var FimFicSettings = {};
-window.FimFicSettings = win().FimFicSettings = FimFicSettings;
+win().FimFicSettings = FimFicSettings;
+
 (() => {
   const addGenericInput = (me, id, name, type, clas) => me.AddOption(id, name, `<div><input${clas ? ` class="${clas}"` : ''} inputID="${id}" type="${type}"></input></div>`).firstChild;
   const all = (selector, holder, func) => func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);
@@ -303,6 +304,7 @@ div.colour_pick {
       const tab = new FimFicSettings.OptionsBuilder(canvas.querySelector('tbody'), canvas.querySelector('#validation_error_message'));
       if (!document.querySelector(`li[pageName="${name}"]`)) {
         newTabSwitcher(getTab(tabs, category, categoryIcon), name, img, title, e => {
+          document.querySelector('head title').innerText = `${description} - Fimfiction`;
           reference.style.display = 'none';
           all('.user-cp-content.generated', a => a.parentNode.removeChild(a));
 					reference.insertAdjacentElement('beforebegin', canvas);
