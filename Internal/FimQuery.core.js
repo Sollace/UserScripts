@@ -26,7 +26,7 @@ const getUserName = () => getUserNameUrlSafe().replace(/\+/g,' ');
 const getUserButton = () => document.querySelector('.user_toolbar a.button[href^="/user/"]');
 const getDefaultAvatar = size => `${staticFimFicDomain()}/images/none_${size > 64 ? 64 : size}.png`;
 const urlSafe = me => me.toLowerCase().replace(/[^a-z0-9_-]/gi,'-').replace(/--/,'-');
-const all = (selector, holder, func) => {return func ? Array.prototype.forEach.call(holder.querySelectorAll(selector), func) : all(selector, document, holder);};
+const all = (selector, holder, func) => {return Array.prototype.forEach.call((func ? holder : document).querySelectorAll(selector), func || holder);};
 const currentTheme = () => document.querySelector('#stylesheetMain').href.split('/').reverse()[0].split('.')[0];
 const tryRun = func => function() {
   try {return func.apply(this, arguments);
