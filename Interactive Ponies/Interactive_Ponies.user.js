@@ -6,15 +6,19 @@
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
 // @include     /^http?[s]://justsitback.deviantart.*/
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @version     3.0.4
+// @version     3.0.5
 // @grant       none
+// @run-at      document-start
 // ==/UserScript==
 
 const UPDATE_CHANNEL = 'Dev';
 let hasRun = false;
 
-document.addEventListener('DOMContentLoaded', InteractivePonies);
-InteractivePonies();
+if (this['App']) {
+  InteractivePonies();
+} else {
+  document.addEventListener('DOMContentLoaded', InteractivePonies);
+}
 
 function InteractivePonies() {
   if (hasRun) return;
