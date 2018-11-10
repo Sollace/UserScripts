@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.12
+// @version     2.2.13
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -208,7 +208,7 @@ function NoseyHound() {
       sniffFollowers: function() {
         const pop = this.pop = makePopup(`Results${this.myPage ? '' : ` for ${this.userName}`}`, 'fa fa-table');
         pop.content.parentNode.classList.add('dog-holder');
-        pop.SetWidth(400);
+        pop.SetWidth(480);
         pop.content.insertAdjacentHTML('afterend', '<div class="resize-handle"></div>');
         document.body.appendChild(document.getElementById('info-cards'));
         this.Sniff(true, pop.content);
