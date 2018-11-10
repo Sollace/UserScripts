@@ -718,7 +718,7 @@ function InteractivePonies() {
           case 'dash': return buildRef(pon, 'trot');
         }
       })),
-      new Pony('Smolder', 'smol', "I'm not cute, okay?;Why am I here?;I like cute, silly stuff!;You saw NOTHING;Ugh. *These* ponies are the heroes of Equestria?;What is it exactly you're proud of?;hat was pretty amazing.... even by dragon standards.", (img, pon) => {
+      new Pony('Smolder', 'smol', "I'm not cute, okay?;Why am I here?;I like cute, silly stuff!;You saw NOTHING;Ugh. *These* ponies are the heroes of Equestria?;What is it exactly you're proud of?;That was pretty amazing.... even by dragon standards.", (img, pon) => {
         switch(img) {
           case 'sleep': return buildRef(pon, 'pose');
           case 'stand':
