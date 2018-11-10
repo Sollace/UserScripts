@@ -186,7 +186,7 @@ function InteractivePonies() {
         'mouseenter': function() {
           if (Math.random() * 40 <= 5) this.Speak("...apples...;*bites*");
         }
-      }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*", (img, pon) => {
+      }) : attachEvents(new Pony('Fluttershy', 'flut', "That...big...dumb...meanie!;There is nothing fun about Dragons. Scary: yes. Fun: NO!;...who's Applejohn?;Baby steps, everypony. Baby steps;*cries*;....;I'd like to be a tree;I am so frustrated;Sometimes I wish I was a tree;I don't wanna talk about it;I'm Fluttershy;I'm so sorry to have scared you;I'm the world champion you know;Oh, my;Oopsie;yay;You rock, woohoo;You rock, Tom;You're the cutest thing ever;Pretty please?;You're going to love me;You're such a loudmouth;*squee*;*gasp* Mr. Beaverton Beaverteeth! Such language!;Mmm, it's so nice to be the pet for once;Will you, um... Lend me some bits please?;I could really use a knighty in shining armour right about now;Hi,I-um- I-If you don't mind, I would you to please... mfmffmf... *eep*", (img, pon) => {
         switch (img) {
           case 'sleep':
           case 'stand':
