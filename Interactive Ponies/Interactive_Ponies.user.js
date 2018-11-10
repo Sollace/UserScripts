@@ -722,9 +722,9 @@ function InteractivePonies() {
         switch(img) {
           case 'sleep': return buildRef(pon, 'pose');
           case 'stand':
-          case 'trot':
+          case 'trot': return buildRef(pon, img);
           case 'dash':
-          case 'fly': return buildRef(pon, img);
+          case 'fly': return buildRef(pon, 'fly');
         }
       }),
       new SpecialPony('Sphinx', 'spx', 2, "", (img, pon) => {
