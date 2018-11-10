@@ -6,12 +6,12 @@
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
 // @include     /^http?[s]://justsitback.deviantart.*/
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @version     3.0.5
+// @version     3.0.6
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
 
-const UPDATE_CHANNEL = 'Dev';
+const UPDATE_CHANNEL = 'master';
 let hasRun = false;
 
 if (this['App']) {
@@ -697,7 +697,7 @@ function InteractivePonies() {
           return null;
         }
       }),
-      offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^', (img, pon) => {
+      offset(sleepless(new Pony('Princess Flurry Heart', 'flur', 'Pftftft;Gugug...;*baby noises*;Gah! :D^;*demonic chants*', (img, pon) => {
         switch (img) {
           case 'sleep':
           case 'stand': return buildRef(pon, 'sit');
@@ -718,6 +718,15 @@ function InteractivePonies() {
           case 'dash': return buildRef(pon, 'trot');
         }
       })),
+      new Pony('Smolder', 'smol', "I'm not cute, okay?;Why am I here?;I like cute, silly stuff!;You saw NOTHING;Ugh. *These* ponies are the heroes of Equestria?;What is it exactly you're proud of?;hat was pretty amazing.... even by dragon standards.", (img, pon) => {
+        switch(img) {
+          case 'sleep': return buildRef(pon, 'pose');
+          case 'stand':
+          case 'trot':
+          case 'dash':
+          case 'fly': return buildRef(pon, img);
+        }
+      }),
       new SpecialPony('Sphinx', 'spx', 2, "", (img, pon) => {
         switch (img) {
           case 'trot':
