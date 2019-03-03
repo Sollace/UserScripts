@@ -73,7 +73,7 @@ function changeLogo() {
       a.parentNode.removeChild(a);
     });
 
-    document.insertAdjacentHTML('afterbegin', `<link rel="shortcut icon" xmlns="http://www.w3.org/1999/xhtml" href="${fav}"></link>`);
+    head.insertAdjacentHTML('afterbegin', `<link rel="shortcut icon" xmlns="http://www.w3.org/1999/xhtml" href="${fav}"></link>`);
   }
 }
 
