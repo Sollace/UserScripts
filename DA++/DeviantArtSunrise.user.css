@@ -1,4 +1,4 @@
-/* BETA 0.3 */
+/* BETA 0.4 */
 @-moz-document domain("deviantart.com") {
 
 body {
@@ -151,7 +151,8 @@ div[data-hook="deviation_std_thumb"] > div {
 
 @-moz-document regexp("http[s]?://(www.)?deviantart.com/[^/]+/journal/.*") {
 
-._31P_r {
+
+[data-hook="art_stage"] {
     height: 30vh;
 }
 
