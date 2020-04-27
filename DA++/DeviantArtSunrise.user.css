@@ -1,4 +1,6 @@
-/* BETA 0.1 */
+/* BETA 0.2 */
+
+@-moz-document domain("deviantart.com") {
 
 body {
     --da-fixup-font: #ddd;
@@ -29,11 +31,23 @@ body.light-green {
 }
 
 
-.theme-dark ._2ilS5, .theme-dark .forced-theme-light ._2ilS5, .theme-light ._2ilS5, .theme-light .forced-theme-dark ._2ilS5 {
+.theme-dark ._2ilS5,
+.theme-dark .forced-theme-light ._2ilS5,
+.theme-light ._2ilS5, .theme-light .forced-theme-dark ._2ilS5 {
     --L4: var(--da-fixup-font);
 }
+.theme-dark ._1ZWCM,
+[id^="popper-root"] {
+    --AS47: none;
+}
+
 .theme-dark .forced-theme-light ._3PQ6i, .theme-light {
     --L9: var(--da-fixup-font);
+}
+.theme-dark ._1TOd1, .no-theme-skin,
+[id^="popper-root"] {
+    --L8: var(--da-fixup-font);
+    --L2: var(--da-fixup-background);
 }
 
 .theme-dark .forced-theme-light ._3M0vT,
@@ -52,7 +66,17 @@ body.light-green {
     --D1: var(--da-fixup-font);
     --L2: var(--da-fixup-background);
     --G4: var(--da-fixup-background);
+    --L4: var(--da-fixup-border);
 }
+#site-header-user-menu {
+    box-shadow: 0 4px 12px 0 var(--da-fixup-drop-shadow);
+}
+
+header[role="banner"],
+nav[data-hook="profile_nav"] {
+    --D1: var(--da-fixup-background);
+}
+
 header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"]) {
     --G4: var(--da-fixup-background);
 }
@@ -117,4 +141,15 @@ div[data-hook="deviation_std_thumb"] > div {
 
 
 
+
+
+}
+
+@-moz-document regexp("http[s]?://(www.)?deviantart.com/[^/]+/journal/.*") {
+
+._31P_r {
+    height: 30vh;
+}
+
+}
 
