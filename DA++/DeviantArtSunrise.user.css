@@ -1,5 +1,4 @@
-/* BETA 0.2 */
-
+/* BETA 0.3 */
 @-moz-document domain("deviantart.com") {
 
 body {
@@ -37,6 +36,7 @@ body.light-green {
     --L4: var(--da-fixup-font);
 }
 .theme-dark ._1ZWCM,
+.theme-dark ._1hS4B,
 [id^="popper-root"] {
     --AS47: none;
 }
@@ -45,9 +45,13 @@ body.light-green {
     --L9: var(--da-fixup-font);
 }
 .theme-dark ._1TOd1, .no-theme-skin,
+.theme-dark .LgNSK,
 [id^="popper-root"] {
     --L8: var(--da-fixup-font);
     --L2: var(--da-fixup-background);
+}
+.no-theme-skin [data-role="menu"] {
+    --D1: var(--da-fixup-font); 
 }
 
 .theme-dark .forced-theme-light ._3M0vT,
@@ -152,4 +156,3 @@ div[data-hook="deviation_std_thumb"] > div {
 }
 
 }
-
