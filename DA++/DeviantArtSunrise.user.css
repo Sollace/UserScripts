@@ -1,5 +1,5 @@
-/* BETA 0.4 */
-@-moz-document domain("deviantart.com") {
+/* BETA 0.5 */
+@-moz-document regexp("http[s]?://.*deviantart.com.*") {
 
 body {
     --da-fixup-font: #ddd;
@@ -21,9 +21,9 @@ body.theme-light:not(.basic) {
     --da-fixup-drop-shadow: #606060;
     --da-fixup-content-font: #f0ebeb;
 }
-body.light-green {
+body.theme-light.light-green {
     --da-fixup-font: #000;
-    --da-fixup-background: #f9f9f9;
+    --da-fixup-background: #fce6e6;
     --da-fixup-border: #f9f3f3;
     --da-fixup-drop-shadow: #606060;
     --da-fixup-content-font: #bbb;
@@ -51,7 +51,7 @@ body.light-green {
     --L2: var(--da-fixup-background);
 }
 .no-theme-skin [data-role="menu"] {
-    --D1: var(--da-fixup-font); 
+    --D1: var(--da-fixup-font);
 }
 
 .theme-dark .forced-theme-light ._3M0vT,
@@ -80,6 +80,9 @@ header[role="banner"],
 nav[data-hook="profile_nav"] {
     --D1: var(--da-fixup-background);
 }
+#site-header-notifications {
+    --D1: var(--da-fixup-font);
+}
 
 header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"]) {
     --G4: var(--da-fixup-background);
@@ -95,8 +98,9 @@ header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"])
     background: none;
 }
 
-/* submit menu */ ._3ZM_A, ._3Cl8u,
-.sDE1k._1yL68,
+/* submit menu */
+.TEeJd,.pZckm,
+#site-header-more-menu,
 .theme-dark ._2Byfh {
     --L8: var(--da-fixup-font);
     --L4: var(--da-fixup-border);
@@ -104,7 +108,8 @@ header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"])
     box-shadow: 0 4px 12px 0 var(--da-fixup-drop-shadow);
 }
 /* submit menu popup thing */
-._3Cl8u {
+.TEeJd {
+    color: var(--da-fixup-font);
     border-color: var(--da-fixup-border);;
 }
 
@@ -129,7 +134,7 @@ footer > div:first-child > div:nth-child(2) {
 }
 
 /* back to top button*/
-.kiGGF.ipgJ4 {
+._13QrD {
     display: none !important;
 }
 
@@ -154,6 +159,29 @@ div[data-hook="deviation_std_thumb"] > div {
 
 [data-hook="art_stage"] {
     height: 30vh;
+}
+
+/* post body */
+._1Nxi6 {
+    width: 80%;
+}
+
+/* Reduce gap on the left of the title */
+
+/* post title */
+._1lAop {
+    width: 100%;
+}
+[data-hook="action_bar"] > div:first-child > div:first-child {
+    width: 100px;
+}
+/* Remove gap between edit icons and the cinema mode icons*/
+[data-hook="action_bar"] > div:first-child > div:nth-child(3) {
+    width: 90%;
+}
+/* Remove the cinema mode icons (we don't need these for journals)*/
+[data-hook="action_bar"] > div:first-child > div:nth-child(5){
+    display: none;
 }
 
 }
