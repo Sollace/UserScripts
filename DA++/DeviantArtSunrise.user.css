@@ -1,4 +1,4 @@
-/* BETA 0.5 */
+/* BETA 0.6 */
 @-moz-document regexp("http[s]?://.*deviantart.com.*") {
 
 body {
@@ -9,6 +9,7 @@ body {
     --da-fixup-content-font: #bbb;
 
     --L8: var(--da-fixup-font);
+    --D7: var(--da-fixup-drop-shadow);
     --D8: var(--da-fixup-content-font);
     --L1: var(--da-fixup-content-font);
     --G12: var(--da-fixup-font);
@@ -108,7 +109,7 @@ header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"])
     box-shadow: 0 4px 12px 0 var(--da-fixup-drop-shadow);
 }
 /* submit menu popup thing */
-.TEeJd {
+.TEeJd,._3Cl8u {
     color: var(--da-fixup-font);
     border-color: var(--da-fixup-border);;
 }
@@ -134,19 +135,25 @@ footer > div:first-child > div:nth-child(2) {
 }
 
 /* back to top button*/
-._13QrD {
+._13QrD, .kiGGF {
     display: none !important;
 }
 
+/** push the foooter to the bottom */
+#root > div.wFhot {
+    min-height: calc(100vh - 337px);
+}
 /* featured deviation tkes up the whole page */
 div[data-hook="deviation_std_thumb"],
 div[data-hook="deviation_std_thumb"] > div {
     max-height: 90vh;
 }
 
-
-
-
+/*Change the search background to black*/
+.ReactModal__Overlay {
+    --L8: var(--da-fixup-content-font);
+    background: rgba(0, 0, 0, 0.8) !important;
+}
 
 
 
@@ -184,4 +191,35 @@ div[data-hook="deviation_std_thumb"] > div {
     display: none;
 }
 
+}
+
+@-moz-document regexp("http[s]?://(www.)?deviantart.com/notifications/.*") {
+/*notification*/
+.Ijp9_ {
+    margin: 2px;
+    box-shadow: 0 0 3px var(--da-fixup-drop-shadow);
+}
+button._2qipq, /*category tab buttons*/
+button._192Gk, /*view all buttons*/
+button._1zPcM, /*deviant dropdown button*/
+button._241Ia {
+    transition: background 0.03s linear;
+}
+button._2qipq:hover,
+button._192Gk:hover,
+button._1zPcM:hover,
+button._241Ia:hover {
+    background: rgba(0,0,0,0.1) !important;
+    padding: 10px !important;
+    margin: -10px !important;
+    border-radius: 4px;
+}
+/*make category nemes easier to read*/
+button._2qipq /*category tab buttons*/ {
+    font-weight: bold;
+}
+/*remove the random gap at the top of the notification list*/
+._1F-dq {
+    padding: 0;
+}
 }
