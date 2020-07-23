@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.2.13
+// @version     2.3
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -373,7 +373,7 @@ function NoseyHound() {
         if (n.length) return `${result}
                       <b>Name changes (${N}):</b>
                       <div class="main">
-                          <ol>${n.map(a => `<li>${a.oldName.replace(/\+/g, ' ')} is now known as <a target="_blank" href="/user/${a.name}">${a.name.replace(/\+/g, ' ')}</a></li>`).join('')}</ol>
+                          <ol>${n.map(a => `<li>${a.oldName.replace(/\+/g, ' ')} is now known as <a target="_blank" href="/user/${a.id}/${a.name}">${a.name.replace(/\+/g, ' ')}</a></li>`).join('')}</ol>
                       </div>`;
         return result;
       },
@@ -825,7 +825,7 @@ function NoseyHound() {
     <div class="main">
       <div class="list">
         <ol>${list.map(a =>
-          `<li><a target="_blank" data-id="${a.id}" href="/user/${a.name.replace(/ /g,'+')}">${a.name.replace(/\+/g, ' ')}</a></li>`).join('')}
+          `<li><a target="_blank" data-id="${a.id}" href="/user/${a.id}/${a.name.replace(/ /g,'+')}">${a.name.replace(/\+/g, ' ')}</a></li>`).join('')}
         </ol>
       </div>
     </div>
@@ -887,14 +887,14 @@ function NoseyHound() {
     }
 
     function historyListItemName(a) {
-      if (a.type == 'j' || a.type == 'l') return `<a target="_blank" href="/user/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a> `;
+      if (a.type == 'j' || a.type == 'l') return `<a target="_blank" href="/user/${a.id}/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a> `;
       return `${a.old.replace(/\+/g, ' ')} `;
     }
 
     function historyListItemMessage(a) {
       if (a.type == 'j') return '<i>joined</i>';
       if (a.type == 'l') return '<i>left</i>';
-      return `changed names to</i> <a target="_blank" href="/user/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a>`;
+      return `changed names to</i> <a target="_blank" href="/user/${a.id}/${a.name.replace(/ /g,'+')}">${a.display.replace(/\+/g, ' ')}</a>`;
     }
 
     function historyList(arr) {
