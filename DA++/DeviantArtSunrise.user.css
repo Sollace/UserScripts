@@ -1,6 +1,5 @@
-/* BETA 0.6 */
+/* BETA 0.7 */
 @-moz-document regexp("http[s]?://.*deviantart.com.*") {
-
 body {
     --da-fixup-font: #ddd;
     --da-fixup-background: #333;
@@ -65,7 +64,7 @@ body.theme-light.light-green {
 ._2cBdT,
 #site-header-submit,
 #site-header-more-menu,
-#site-header-user-menu {
+[data-hook="user_link"] + [role="dialog"] {
     background: var(--da-fixup-background);
     color: var(--da-fixup-font);
     --D1: var(--da-fixup-font);
@@ -73,7 +72,7 @@ body.theme-light.light-green {
     --G4: var(--da-fixup-background);
     --L4: var(--da-fixup-border);
 }
-#site-header-user-menu {
+[data-hook="user_link"] + [role="dialog"] {
     box-shadow: 0 4px 12px 0 var(--da-fixup-drop-shadow);
 }
 
@@ -95,7 +94,7 @@ header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"])
 }
 
 .theme-dark ._3Vfho,
-#site-header-user-menu div[data-role="menu"] {
+[data-hook="user_link"] + [role="dialog"] div[data-role="menu"] {
     background: none;
 }
 
@@ -114,17 +113,6 @@ header button[aria-haspopup="true"]:not([aria-controls="site-header-more-menu"])
     border-color: var(--da-fixup-border);;
 }
 
-/* fuck that banner*/
-._1V4hC {
-    height: 400px;
-}
-#content-container {
-    margin-top: 0 !important;
-}
-.IcyS1._33RB- {
-    max-height: 450px;
-}
-/****/
 footer[role="contentinfo"] {
     height: 263px;
     padding-top: 30px;
@@ -155,15 +143,17 @@ div[data-hook="deviation_std_thumb"] > div {
     background: rgba(0, 0, 0, 0.8) !important;
 }
 
-
-
+/*Make the add-to-collections window a reasonable height*/
+._3LRQF, ._2n5r3._3Isw- > div,
+.dE5QT, ._3LRQF {
+    max-height: 90vh !important;
+    height: 90vh !important;
+}
 
 
 }
 
 @-moz-document regexp("http[s]?://(www.)?deviantart.com/[^/]+/journal/.*") {
-
-
 [data-hook="art_stage"] {
     height: 30vh;
 }
@@ -190,7 +180,6 @@ div[data-hook="deviation_std_thumb"] > div {
 [data-hook="action_bar"] > div:first-child > div:nth-child(5){
     display: none;
 }
-
 }
 
 @-moz-document regexp("http[s]?://(www.)?deviantart.com/notifications/.*") {
