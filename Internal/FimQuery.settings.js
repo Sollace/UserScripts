@@ -7,7 +7,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.2
+// @version     1.2.3
 // @grant       none
 // ==/UserScript==
 
@@ -177,7 +177,7 @@ div.colour_pick {
 					all('[data-colour]', picker, a => a.classList.toggle('colour_pick_selected', a.dataset.colour == input.value));
 					func(input);
 				};
-				addDelegatedEvent(picker, 'input', 'change', input.change);
+				input.addEventListener('change', input.change);
 				addDelegatedEvent(picker, '[data-colour]', 'click', (e, target) => {
           e.preventDefault();
           input.value = target.dataset.colour;
