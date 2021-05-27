@@ -6,7 +6,7 @@
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.3
+// @version     1.3.4
 // @grant       none
 // ==/UserScript==
 
@@ -14,7 +14,6 @@ const win = () => this['unsafeWindow'] || window['unsafeWindow'] || window;
 const isJQuery = () => !!win()['$'];
 const getUserId = () => {const w = win()['logged_in_user'];return w ? w.id : -1;};
 const getSafe = (name, defaultValue) => {let w = win();return w[name] || (w[name] = defaultValue);}
-const brightness = (r,g,b) => Math.sqrt((0.241 * r * r) + (0.691 * g * g) + (0.068 * b * b));
 const getIsLoggedIn = () => !!win()['logged_in_user'];
 const staticFimFicDomain = () => win()['static_url'] || '//static.fimfiction.net';
 const getFavicon = url => `//www.google.com/s2/favicons?domain_url=${encodeURIComponent(url)}`;
@@ -316,6 +315,14 @@ function getPageStartNumber() {
     return (pageNumber - 1) * (mode == 'list' || mode == 'cards' ? 60 : 10);
   }
   return 0;
+}
+
+function getDocCookie(name) {
+  return decodeURIComponent(document.cookie.replace(new RegExp(`(?:(?:^|.*;)\\s*${encodeURIComponent(name).replace(/[\-\.\+\*]/g,"\\$&")}\\s*\\=\\s*([^;]*).*$)|^.*$`), '$1')) || null;
+}
+
+function isNsfw() {
+  return getDocCookie('view_mature') == 'true';
 }
 
 function getParameter(name) {
