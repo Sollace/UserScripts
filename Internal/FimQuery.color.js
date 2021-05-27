@@ -17,6 +17,10 @@ function InvalidHexColor(color) {
   return color.length == 3 && color.length == 6 && !/^[0-9a-f]+$/ig.test(color);
 }
 
+function getBrightness(r,g,b) {
+  return Math.sqrt((0.241 * r * r) + (0.691 * g * g) + (0.068 * b * b));
+}
+
 function toRgb(rgb) {
   return `rgb${rgb.length == 3 ? 'a' : ''}(${rgb.join(',')})`;
 }
