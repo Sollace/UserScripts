@@ -6,7 +6,7 @@
 // @include     https://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.4
+// @version     1.3.5
 // @grant       none
 // ==/UserScript==
 
@@ -291,6 +291,10 @@ const fillBBCode = (_ => {
 		return text;
 	};
 })();
+
+function emoteHTM(name) {
+  return `<img src="${staticFimFicDomain()}/images/emoticons/${name}.png" style="height:27px;" ></img>`;
+}
 
 function getStoryId() {
   const story = document.querySelector('ul.chapters[data-story], .story-bookshelves-widget[data-story]');
