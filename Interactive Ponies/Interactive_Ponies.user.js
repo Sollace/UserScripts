@@ -6,7 +6,7 @@
 // @icon        http://fc01.deviantart.net/fs71/f/2014/077/f/2/seabreeze_floating_2_by_botchan_mlp-d7are6y.gif
 // @include     /^http?[s]://justsitback.deviantart.*/
 // @include     /^http?[s]://www.fimfiction.net/.*/
-// @version     3.0.6
+// @version     3.0.7
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -1392,7 +1392,7 @@ function InteractivePonies() {
       };
       interactiveP = interactiveP.closest('tr');
       document.querySelector('input[name="show_chapter_progress_bar"]').closest('tr').insertAdjacentElement('afterend', interactiveP);
-      interactiveP.insertAdjacentHTML('beforebegin', `<tr><td colspan="2" class="section_header">Interactive Pony</td></tr>`);
+      interactiveP.insertAdjacentHTML('beforebegin', `<tr class="section_header"><td colspan="2"><b>Interactive Pony</b></td></tr>`);
         interactiveP.insertAdjacentHTML('afterend', `
           <tr>
               <td class="label">Show Chapter Ponies</td>
@@ -1408,11 +1408,11 @@ function InteractivePonies() {
               <td class="label">Interactive Pony Type</td>
               <td><div id="ponyTypeDiv"><select name="interactive_pony_type">${Ponies.map(optItem).join('')}</select></div></td>
           </tr>
-          <tr id="custom_pony_field" style="${GlobalPonyType != 'Custom' ? 'display:none' : ''}">
+          <tr id="custom_pony_field" style="grid-template-columns: initial;${GlobalPonyType != 'Custom' ? 'display:none' : ''}">
               <td colspan="2" style="padding: 0; margin: 0">
                 <table style="width:100%">
                   <tr>
-                    <td class="label">Reset</td>
+                    <td class="label">Preset</td>
                     <td>
                       <select id="custom_pony_base">${Ponies.map(optItem).join('')}</select>
                       <a id="custom_pony_reset" class="styled_button styled_button_blue button-icon-only"><i class="fa fa-undo"></i></a>
