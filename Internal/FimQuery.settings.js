@@ -7,7 +7,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.3
+// @version     1.2.4
 // @grant       none
 // ==/UserScript==
 
@@ -50,7 +50,8 @@ a.premade_settings {
     text-decoration: none;}
 a.premade_settings_selected { box-shadow: 0px 0px 4px #302fff;}
 a.premade_settings:hover { box-shadow: 0px 0px 4px rgb(196, 111, 111);}
-a.premade_settings div.toolbar { height: 24px; }
+a.premade_settings div.toolbar {
+    height: 24px;border-bottom: inherit;}
 a.premade_settings span {
     display: block;
     font-weight: bold;
