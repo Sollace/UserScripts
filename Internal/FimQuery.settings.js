@@ -7,7 +7,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.5
+// @version     1.2.6
 // @grant       none
 // ==/UserScript==
 
@@ -50,8 +50,7 @@ a.premade_settings {
     text-decoration: none;}
 a.premade_settings_selected { box-shadow: 0px 0px 4px #302fff;}
 a.premade_settings:hover { box-shadow: 0px 0px 4px rgb(196, 111, 111);}
-a.premade_settings div.toolbar {
-    height: 24px;border-bottom: inherit;}
+a.premade_settings div.toolbar { height: 24px;border-bottom: inherit; }
 a.premade_settings span {
     display: block;
     font-weight: bold;
@@ -367,7 +366,10 @@ div.colour_pick {
     const tabs = document.querySelector('.tabs');
     if (tabs) return continuation(tabs, document.querySelector('.user-cp-content'));
     const userCpContentBox = document.querySelector('.user-cp-content-box');
-    if (!userCpContentBox) return new FimFicSettings.OptionsBuilder();
+    if (!userCpContentBox) {
+       setTimeout(() => initialiseTabs(continuation), 50);
+       return new FimFicSettings.OptionsBuilder();
+    }
     
 		userCpContentBox.insertAdjacentHTML('beforebegin', `<div class="content mobile-no-margin">
 			<div class="user_cp">
