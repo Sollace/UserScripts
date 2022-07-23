@@ -22,11 +22,14 @@ function longer(input) {
     .replace(/(0|1)/g, ch => ch == '1' ? 'O' : 'o')).join('')}ng`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function longerAll() {
   document.querySelectorAll('a:not([data-longified]').forEach(link => {
     try {
       link.dataset.longified = true;
       link.href = longer(link.href);
     } catch (ignored) {}
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', longerAll);
+setInterval(longerAll, 300);
