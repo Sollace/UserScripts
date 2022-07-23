@@ -6,7 +6,7 @@
 // @namespace   fun-sollace
 // @include     /.*/
 // @grant       none
-// @inject-into page
+// @inject-into content
 // @run-at      document-start
 // ==/UserScript==
 
