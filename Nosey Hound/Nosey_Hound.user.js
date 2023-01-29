@@ -4,7 +4,7 @@
 // @author      Sollace
 // @include     http://www.fimfiction.net/*
 // @include     https://www.fimfiction.net/*
-// @version     2.3
+// @version     2.3.0
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/FimQuery.core.js
 // @grant       GM_getValue
@@ -19,7 +19,7 @@ if (this['App']) {
 }
 
 function NoseyHound() {
-  
+
   const settingsMan = {
     __gm: (key, parse) => {
       let val = GM_getValue(key);
@@ -44,6 +44,7 @@ function NoseyHound() {
     const idToChildMapping = {};
     const nameToChildMapping = {};
     const openedMapping = [];
+    const idToNameMapping = {};
     let structured = null;
     let dirty = false;
     function structuredChilds(x, y) {
@@ -54,7 +55,9 @@ function NoseyHound() {
         children: internalMapping[child] ? internalMapping[child].map((a, i) => structuredChilds(child, i)) : [],
         opened: _ => openedMapping[`${x}|${y}`],
         matches: function(filter) {
-          return this.content.name.replace(/\+/g, ' ').toUpperCase().indexOf(filter.toUpperCase()) > -1 || this.children.some(a => a.matches(filter));
+          return this.content.name.replace(/\+/g, ' ').toUpperCase().indexOf(filter.toUpperCase()) > -1
+              || followerMapping.checkMatch(this.content.id, filter)
+              || this.children.some(a => a.matches(filter));
         },
         html: function(filter) {
           if (!this.matches(filter)) return '';
@@ -91,6 +94,13 @@ function NoseyHound() {
         idToChildMapping[id] = ch;
         dirty = true;
         return ch;
+      },
+      registerName: function(id, name) {
+        if (!idToNameMapping[id]) idToNameMapping[id] = [];
+        if (idToNameMapping[id].indexOf(name) == -1) idToNameMapping[id].push(name);
+      },
+      checkMatch(id, filter) {
+        return (idToNameMapping[id] || []).some(name => name.replace(/\+/g, ' ').toUpperCase().indexOf(filter.toUpperCase()) > -1);
       },
       setOpened: function(id, val) {
         openedMapping[id] = val;
@@ -240,6 +250,7 @@ function NoseyHound() {
               name: me.parentNode.querySelector('.name').childNodes[0].nodeValue
             };
           });
+          followers.forEach(follower => followerMapping.registerName(follower.id, follower.name));
           xml.parentNode.removeChild(xml);
           this[`do${type ? 'sniff' : 'snuff'}`](pop, followers);
         }, e => {
@@ -408,7 +419,8 @@ function NoseyHound() {
       },
       migrate: function(history, named) {
         const nameConversions = [];
-        return history.reverse().reduce((results, h) => {
+
+        history = history.reverse().reduce((results, h) => {
           if (!h) return results;
 
           nameConversions.forEach(k => {
@@ -425,6 +437,12 @@ function NoseyHound() {
           if (h.id) results.unshift(h);
           return results;
         }, []);
+
+        history.forEach(h => {
+          followerMapping.registerName(h.id, h.name);
+        });
+
+        return history;
       },
       history: function(gained, lost, named) {
         const history = this.processChanges(gained, lost, named);
@@ -508,6 +526,7 @@ function NoseyHound() {
     });
     addDelegatedEvent(document.body, '#nosey_history_searcher', 'input', (e, target) => {
       target.nextElementSibling.innerHTML = historyList(filterHistory(getHistory(target.dataset.id), target.value));
+      infoCards.rebind(target.nextElementSibling);
     });
     addDelegatedEvent(document.body, '.dog .button[data-tab]', 'click', (e, target) => {
       const tab = target.dataset.tab;
@@ -877,9 +896,12 @@ function NoseyHound() {
     }
 
     function filterHistory(history, term) {
-      return history.filter(item => (item.display && item.display.indexOf(term) > -1) ||
-                            (item.name && item.name.indexOf(term) > -1) ||
-                            (item.oldName && item.oldName.indexOf(term) > -1));
+      return history.filter(item =>
+              (item.display && item.display.indexOf(term) > -1) ||
+              (item.name && item.name.indexOf(term) > -1) ||
+              (item.oldName && item.oldName.indexOf(term) > -1) ||
+              followerMapping.checkMatch(item.id, term)
+     );
     }
 
     function list(arr) {
