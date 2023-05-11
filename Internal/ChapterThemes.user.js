@@ -2,9 +2,8 @@
 // @name        Fimfiction Chapter Themes API
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.1.1
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @version     1.1.2
+// @match       *://www.fimfiction.net/*
 // @require     http://code.jquery.com/jquery-1.8.3.min.js
 // @grant       none
 // ==/UserScript==

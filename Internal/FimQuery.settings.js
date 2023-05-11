@@ -2,12 +2,11 @@
 // @name        FimQuery.Settings (ref FimfictionAdvanced)
 // @description An extension of FimQuery to add a Settings Page factory
 // @author      Sollace
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @match       *://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.6
+// @version     1.2.7
 // @grant       none
 // ==/UserScript==
 

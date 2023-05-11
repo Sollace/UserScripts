@@ -2,8 +2,8 @@
 // @name        Fimfiction Events API (ref FimfictionAdvanced, Nosey Hound)
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4.2
-// @include     /^http?[s]://www.fimfiction.net/.*/
+// @version     4.2.1
+// @match       *://www.fimfiction.net/*
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==

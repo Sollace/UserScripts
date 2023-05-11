@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name Fimfiction Logger
 // @namespace sollace_fimfiction
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @match       *://www.fimfiction.net/*
 // @grant none
 // @run-at      document-start
 // ==/UserScript==

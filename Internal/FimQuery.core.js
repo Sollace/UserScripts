@@ -2,11 +2,10 @@
 // @name        FimQuery.Core (ref FimfictionAdvanced, Nosey Hound, EE)
 // @description A collection of useful functions for interacting with fimfiction.net
 // @author      Sollace
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @match       *://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.3.5
+// @version     1.3.6
 // @grant       none
 // ==/UserScript==
 

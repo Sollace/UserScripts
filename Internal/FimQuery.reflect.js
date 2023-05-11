@@ -2,11 +2,10 @@
 // @name        FimQuery.Reflect (ref FimfictionAdvanced)
 // @description Functions for the hardcore code junkies. Helps with directly modifying nighty's code.
 // @author      Sollace
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @match       *://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.0.0
+// @version     1.0.1
 // @require     https://github.com/Sollace/UserScripts/raw/master/Internal/Events.user.js
 // @grant       none
 // ==/UserScript==

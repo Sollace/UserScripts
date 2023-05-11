@@ -2,7 +2,7 @@
 // @name        RunScript Sandbox Breakout Utility
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     1.3
+// @version     1.3.0
 // @grant       none
 // ==/UserScript==
 

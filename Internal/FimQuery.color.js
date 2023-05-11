@@ -2,11 +2,10 @@
 // @name        FimQuery.Color (ref FimfictionAdvanced)
 // @description Utility functions for working with colours
 // @author      Sollace
-// @include     http://www.fimfiction.net/*
-// @include     https://www.fimfiction.net/*
+// @match       *://www.fimfiction.net/*
 // @namespace   fimfiction-sollace
 // @run-at      document-start
-// @version     1.0.0
+// @version     1.0.1
 // @grant       none
 // ==/UserScript==
 
