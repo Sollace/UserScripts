@@ -4,7 +4,7 @@
 // @include     /^http?[s]://.*\.youtube\..*/
 // @grant       none
 // @run-at      document-start
-// @version     1.3
+// @version     1.3.1
 // @author      Sollace
 // @description Adds a button on youtube videos to open them with Piped
 // ==/UserScript==
@@ -54,11 +54,7 @@ function addButton() {
         getInvidiousInstances().then(json => {
           menu.menus.invidious.innerHTML = '';
           json.filter(instance => {
-            if (!instance[1].stats) {
-              instance[1].stats = {usage: {users: {total: -1}}};
-              return true;
-            }
-            return instance[1].stats.usage.users.total > 1;
+            return defaultize(defaultize(defaultize(defaultize(instance[1], 'stats', {}), 'usage', {}), 'users', {}), 'total', -1) > 1;
           }).forEach(instance => {
             addMenuOption(menu.menus.invidious, {
               icon: instance[1].flag,
@@ -82,6 +78,13 @@ function addButton() {
   });
 
   return true;
+}
+
+function defaultize(obj, key, fallback) {
+  if (!obj[key]) {
+    obj[key] = fallback;
+  }
+  return obj[key];
 }
 
 function createButton(insertionPoint, referenceButton, clickHandler) {
