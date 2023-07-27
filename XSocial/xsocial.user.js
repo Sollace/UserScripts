@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        XSocial
 // @author      sollace
-// @namespace   sollace
+// @namespace   Violentmonkey Scripts
 // @include     /^https*://twitter.com/.*/
 // @grant       none
-// @version     1.0
+// @version     1.1
 // @inject-into content
 // @run-at      document-start
 // ==/UserScript==
@@ -21,7 +21,7 @@ function logoFor(element) {
 
 
 function applyScript() {
-  document.body.querySelectorAll('svg:not(.script-applied) path[d="M14.258 10.152L23.176 0h-2.113l-7.747 8.813L7.133 0H0l9.352 13.328L0 23.973h2.113l8.176-9.309 6.531 9.309h7.133zm-2.895 3.293l-.949-1.328L2.875 1.56h3.246l6.086 8.523.945 1.328 7.91 11.078h-3.246zm0 0"]').forEach(element => {
+  document.body.querySelectorAll('svg:not(.script-applied) path[d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"]').forEach(element => {
     element = element.closest('svg');
     element.innerHTML = logoFor(element);
     element.classList.add('script-applied');
@@ -47,4 +47,3 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 setInterval(applyScript, 100);
-
