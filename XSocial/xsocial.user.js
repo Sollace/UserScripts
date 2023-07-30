@@ -4,11 +4,13 @@
 // @namespace   Violentmonkey Scripts
 // @include     /^https*://twitter.com/.*/
 // @grant       none
-// @version     1.1
+// @version     1.2
 // @inject-into content
 // @run-at      document-start
 // ==/UserScript==
 
+const REPLACEABLE_MESSAGES = /twitter|tweet|trend|follow|message|reply|conversation|service|privacy|view|communities|harmful or spammy|people, topics, or keywords|unlock new features/ig;
+const X_REPLACEABLE = /twitter|tweet|trend|message|reply|conversation|service|privacy/ig;
 
 function logoFor(element) {
   return `
@@ -18,7 +20,6 @@ function logoFor(element) {
   </g>
  </g>`;
 }
-
 
 function applyScript() {
   document.body.querySelectorAll('svg:not(.script-applied) path[d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"]').forEach(element => {
@@ -31,13 +32,32 @@ function applyScript() {
   if (span && span.innerText.indexOf('Twitter') != -1) {
     span.innerText = span.innerText.replace('Twitter', 'X');
   }
-  document.querySelectorAll('title, #modal-header > span > span').forEach(a => a.innerText = a.innerText.replace('Twitter', 'X'));
+  document.querySelectorAll('input[placeholder*="Twitter"]').forEach(a => a.placeholder = a.placeholder.replace('Twitter', 'X'));
+  document.querySelectorAll('title, span:not(.script-applied), div[id*="placeholder"]:not(.script-applied)').forEach(a => {
+    if (!a.childElementCount && REPLACEABLE_MESSAGES.test(a.innerText)) {
+      a.innerText = a.innerText
+        .replaceAll(X_REPLACEABLE, 'X')
+        .replace('communities', 'channels').replace('Communities', 'Channels')
+        .replace('people, topics, or keywords', 'Elon sucks')
+        .replace('unlock new features', 'get more from XVideos')
+        .replace('harmful or spammy', 'true and I don\'t like it')
+        .replace('follow', 'watch').replace('Follow', 'Watch')
+        .replace('view', 'eye').replace('View', 'Eye');
+    }
+    if (a.innerText == 'What’s happening') {
+      a.style.color = '#f30000';
+    }
+    a.classList.add('script-applied');
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   try {
     document.head.insertAdjacentHTML('afterbegin', `<style type="text/css" id="xsocial-styles">
   img[src*="abs.twimg.com/sticky/illustrations"], *[style*="abs.twimg.com/sticky/illustrations"] {
+    filter: hue-rotate(180deg) blur(50px);
+  }
+  article:not(:hover) video, article:not(:hover) div[style*="background-image"] {
     filter: hue-rotate(180deg) blur(50px);
   }
 </style>`);
