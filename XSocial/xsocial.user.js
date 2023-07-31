@@ -4,13 +4,13 @@
 // @namespace   Violentmonkey Scripts
 // @include     /^https*://twitter.com/.*/
 // @grant       none
-// @version     1.2
+// @version     1.2.1
 // @inject-into content
 // @run-at      document-start
 // ==/UserScript==
 
-const REPLACEABLE_MESSAGES = /twitter|tweet|trend|follow|message|reply|conversation|service|privacy|view|communities|harmful or spammy|people, topics, or keywords|unlock new features/ig;
-const X_REPLACEABLE = /twitter|tweet|trend|message|reply|conversation|service|privacy/ig;
+const REPLACEABLE_MESSAGES = /twitter|tweet|trend|follow|message|reply|conversation|service|privacy|view|communities|harmful or spammy|people, topics, or keywords|unlock new features|post/ig;
+const X_REPLACEABLE = /twitter|tweet|trend|message|reply|conversation|service|privacy|post/ig;
 
 function logoFor(element) {
   return `
@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
   img[src*="abs.twimg.com/sticky/illustrations"], *[style*="abs.twimg.com/sticky/illustrations"] {
     filter: hue-rotate(180deg) blur(50px);
   }
-  article:not(:hover) video, article:not(:hover) div[style*="background-image"] {
+  article:not(:hover) video, article:not(:hover) div[style*="background-image"]:not([style*="profile_images"]) {
     filter: hue-rotate(180deg) blur(50px);
   }
 </style>`);
