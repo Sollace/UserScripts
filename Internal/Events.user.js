@@ -2,7 +2,7 @@
 // @name        Fimfiction Events API (ref FimfictionAdvanced, Nosey Hound)
 // @author      Sollace
 // @namespace   fimfiction-sollace
-// @version     4.2.1
+// @version     4.2.2
 // @match       *://www.fimfiction.net/*
 // @grant       none
 // @run-at      document-start
@@ -91,8 +91,8 @@ RunScript.build = (functionText, params) => {
 					eventName: 'addcomment', type: match[1], id: match[2]
 				})
 			}, {
-				test: /\/ajax\/users\/modules\/([^\/]+)\/(edit|modules)/, func: match => some({
-					eventName: match[2] == 'edit' ? 'editmodule' : 'savemodule', box: match[1]
+				test: /\/ajax\/users\/modules\/([^\/]+)(\/edit|\/modules|)/, func: match => some({
+					eventName: match[2] == '/edit' ? 'editmodule' : 'savemodule', box: match[1]
 				})
 			}
 		];
