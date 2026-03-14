@@ -6,7 +6,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.7
+// @version     1.2.8
 // @grant       none
 // ==/UserScript==
 
@@ -205,7 +205,21 @@ div.colour_pick {
     AddNameBox(id, name) {return addGenericInput(this, id, name, "text", "name");},
     AddTextBox(id, name) {return addGenericInput(this, id, name, "text");},
     AddPassword(id, name) {return addGenericInput(this, id, name, "password", "password");},
-    AddDropDown(id, name, items, value) {return this.AddOption(id, name, `<select inputID="${id}">${items.map((a, i) => `<option value="${i}" ${i === value ? ' selected' : ''}>${a}</option>`).join('')}</select>`);},
+    AddDropDown(id, name, items, value) {
+      return this.AddOption(id, name, `<select inputID="${id}">${items.map((item, index) => {
+        if (Array.isArray(item)) {
+          if (Array.isArray(item[1])) {
+            return `<optgroup label=${item[0]}>${item[1].map(subItem => makeOption(subItem[0], subItem[1])).join('')}</optgroup>`;
+          }
+          return makeOption(item[0], item[1]);
+        }
+        return makeOption(item, index);
+      }).join('')}</select>`);
+
+      function makeOption(label, val) {
+        return `<option value="${val}" ${val === value ? ' selected' : ''}>${label}</option>`;
+      }
+    },
     AddPresetSelect(id, name, revert, defaultIndex) {
       if (!document.querySelector('#settingsTab_presetStyle')) addPresetStyle();
       return this.AddOption(id, name, container => {
