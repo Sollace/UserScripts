@@ -118,19 +118,19 @@ div.colour_pick {
     this.container = container;
     this.err = err;
     if (factory) factory(this);
-  }
+  };
   FimFicSettings.OptionsBuilder.prototype = {
-    ShowError: function() {if (this.err) this.err.style.display = "block";},
-    HideError: function() {if (this.err) this.err.style.display = "none";},
-    HasInit: function() {return this.container;},
-    StartEndSection: function(title) {
+    ShowError() {if (this.err) this.err.style.display = "block";},
+    HideError() {if (this.err) this.err.style.display = "none";},
+    HasInit() {return this.container;},
+    StartEndSection(title) {
       this.AddRaw(`<tr><td class="section_header" colspan="2"><b>${title}</b></td></tr>`);
     },
-    getValue: function(id) {
+    getValue(id) {
       const field = this.container.querySelector(`input[inputID="${id}"`);
       return field ? (field.type == 'checkbox' ? field.checked : field.value) : null;
     },
-    AddColorSliders: function(id, name, alpha, func) {
+    AddColorSliders(id, name, alpha, func) {
       if (!document.querySelector('#settingsTab_colorMakerStyle')) addMakerStyle();
       return this.AddOption(id, name, container => {
         const components = ['Red','Green','Blue'];
@@ -157,9 +157,9 @@ div.colour_pick {
         return result;
       });
     },
-    AddColorPick: function(id, name, selected, func) {
+    AddColorPick(id, name, selected, func) {
       if (!document.querySelector('#settingsTab_colorPickerStyle')) addPickerStyle();
-      return this.AddOption(id, name, function(container) {
+      return this.AddOption(id, name, container => {
         const picks = a => `<div class="colour_pick${a == selected ? ' colour_pick_selected' : ''}" data-colour="${a}" style="background:${a};"></div>`;
         const colors = ["#d3926b","#d3b76b","#d3cf6b","#b4d36b","#88d36b","#6bd38d","#6bd3bc","#6bafd3","#6b81d3","#8b6bd3","#bc6bd3","#d36bab","#d36b77"];
         const grayScale = ["#000","#111","#333","#555","#777","#999","#aaa","#ccc","#ddd","#eee"];
@@ -185,10 +185,8 @@ div.colour_pick {
         return input;
       });
     },
-    AddLabelCheckBox: function(id, name, label) {
-      return this.AddOption(id, name, `<label><input inputID="${id}" type="checkbox"></i>${label}</label>`).firstChild;
-    },
-    AddCheckBox: function(id, name, value) {
+    AddLabelCheckBox(id, name, label) {return this.AddOption(id, name, `<label><input inputID="${id}" type="checkbox"></i>${label}</label>`).firstChild;},
+    AddCheckBox(id, name, value) {
       return this.AddOption(id, name, `<div>
         <label class="toggleable-switch">
           <input id="checkbox_${id}" inputID="${id}" type="checkbox" ${value ? 'checked="checked"' : ''}"></input>
@@ -196,21 +194,19 @@ div.colour_pick {
         </label>
       </div>`).querySelector('input');
     },
-    AddSlider: function(id, name, val, min, max) {
-      return this.AddOption(id, name, `<div><input inputID="${id}" type="range" min="${min}" max="${max}" style="max-width:50%;" value="${val}">${val}</input></div>`).firstChild;
-    },
+    AddSlider(id, name, val, min, max) {return this.AddOption(id, name, `<div><input inputID="${id}" type="range" min="${min}" max="${max}" style="max-width:50%;" value="${val}">${val}</input></div>`).firstChild;},
     AddRaw: function(field) {
       if (typeof field === 'string') {
         return this.container.insertAdjacentHTML('beforeend', `<div>${field}</div>`);
       }
       this.container.appendChild(field);
     },
-    AddEmailBox: function(id, name) {return addGenericInput(this, id, name, "text", "email");},
-    AddNameBox: function(id, name) {return addGenericInput(this, id, name, "text", "name");},
-    AddTextBox: function(id, name) {return addGenericInput(this, id, name, "text");},
-    AddPassword: function(id, name) {return addGenericInput(this, id, name, "password", "password");},
-    AddDropDown: function(id, name, items, value) {return this.AddOption(id, name, `<select inputID="${id}">${items.map((a, i) => `<option value="${i}" ${i === value ? ' selected' : ''}>${a}</option>`).join('')}</select>`);},
-    AddPresetSelect: function(id, name, revert, defaultIndex) {
+    AddEmailBox(id, name) {return addGenericInput(this, id, name, "text", "email");},
+    AddNameBox(id, name) {return addGenericInput(this, id, name, "text", "name");},
+    AddTextBox(id, name) {return addGenericInput(this, id, name, "text");},
+    AddPassword(id, name) {return addGenericInput(this, id, name, "password", "password");},
+    AddDropDown(id, name, items, value) {return this.AddOption(id, name, `<select inputID="${id}">${items.map((a, i) => `<option value="${i}" ${i === value ? ' selected' : ''}>${a}</option>`).join('')}</select>`);},
+    AddPresetSelect(id, name, revert, defaultIndex) {
       if (!document.querySelector('#settingsTab_presetStyle')) addPresetStyle();
       return this.AddOption(id, name, container => {
         let i = 0;
@@ -226,13 +222,13 @@ div.colour_pick {
         };
       });
     },
-    AddTextArea: function(id, name, defaul) {return this.AddOption(id, name, `<div><textarea inputID="${id}" >${defaul}</textarea></div>`).firstChild;},
-    AddOption: function(id, name, content) {
+    AddTextArea(id, name, defaul) {return this.AddOption(id, name, `<div><textarea inputID="${id}" >${defaul}</textarea></div>`).firstChild;},
+    AddOption(id, name, content) {
       this.container.insertAdjacentHTML('beforeend', `<tr><td id="${id}" class="label">${name}</td><td>${typeof(content) === 'string' ? content : ''}</td></tr>`);
       const data = this.container.lastChild.lastChild;
       return data.firstChild || content.call(this, data);
     },
-    AddToolbar: function(id, span) {
+    AddToolbar(id, span) {
       this.container.insertAdjacentHTML('beforeend', `<tr>
         <td colspan="${span}" id="${id}" style="padding: 0px;" >
           <div class="notifications"></div>
@@ -240,24 +236,24 @@ div.colour_pick {
       </tr>`);
       return {
         element: this.container.querySelector('.notifications'),
-        add: function(func) {
+        add(func) {
           this.row.insertAdjacentHTML('beforeend', '<a class="styled_button styled_button_grey" href="javascript:void();"></a>');
           func(this.row.lastChild);
         }
       }
     },
-    AppendControl: (holder, appended) => {
+    AppendControl(holder, appended) => {
       holder.insertAdjacentHTML('beforeend', appended);
       return holder.lastChild;
     },
-    AppendResetButton: function(control, defaultIndex) {
+    AppendResetButton(control, defaultIndex) {
       const rev = this.AppendButton(control, '<i class="fa fa-undo"></i> Revert to default');
       if (defaultIndex !== undefined) rev.dataset.revertIndex = defaultIndex;
       return rev;
     },
-    AppendButton: function(control, content) {return this.AppendControl(control.parentNode, `<a class="styled_button styled_button_blue">${content}</a>`);},
-    AddButton: function(id, name, label) {return this.AddOption(id, name, `<a inputID="${id}" class="styled_button styled_button_blue">"${label}</a>`);},
-    AddFinishButton: function(name, func) {
+    AppendButton(control, content) {return this.AppendControl(control.parentNode, `<a class="styled_button styled_button_blue">${content}</a>`);},
+    AddButton(id, name, label) {return this.AddOption(id, name, `<a inputID="${id}" class="styled_button styled_button_blue">"${label}</a>`);},
+    AddFinishButton(name, func) {
       const field = this.AddOption('captch', name, `<div>
         <button class="styled_button"><i class="fa fa-save"></i>Save Settings</button>
         <span style="display:none;opacity:1;transition:opacity 0.5s ease">
@@ -280,7 +276,7 @@ div.colour_pick {
       });
       return field;
     },
-    SetEnabled: function(selector, enable) {
+    SetEnabled(selector, enable) {
       all(selector, a => all('.premade_settings, label, input, select, button', a.parentNode, d => {
         if (enable) {
           d.removeAttribute('disabled');
