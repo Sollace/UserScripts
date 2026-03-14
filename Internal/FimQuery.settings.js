@@ -6,7 +6,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.9
+// @version     1.2.10
 // @grant       none
 // ==/UserScript==
 
@@ -209,7 +209,7 @@ div.colour_pick {
       return this.AddOption(id, name, `<select inputID="${id}">${items.map((item, index) => {
         if (Array.isArray(item)) {
           if (Array.isArray(item[1])) {
-            return `<optgroup label=${item[0]}>${item[1].map(subItem => makeOption(subItem[0], subItem[1])).join('')}</optgroup>`;
+            return `<optgroup label="${item[0]}">${item[1].map(subItem => makeOption(subItem[0], subItem[1])).join('')}</optgroup>`;
           }
           return makeOption(item[0], item[1]);
         }
