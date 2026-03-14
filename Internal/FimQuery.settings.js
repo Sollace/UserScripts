@@ -6,7 +6,7 @@
 // @namespace   fimfiction-sollace
 // @require     https://github.com/Sollace/UserScripts/raw/Dev/Internal/FimQuery.core.js
 // @run-at      document-start
-// @version     1.2.8
+// @version     1.2.9
 // @grant       none
 // ==/UserScript==
 
