@@ -256,7 +256,7 @@ div.colour_pick {
         }
       }
     },
-    AppendControl(holder, appended) => {
+    AppendControl(holder, appended) {
       holder.insertAdjacentHTML('beforeend', appended);
       return holder.lastChild;
     },
